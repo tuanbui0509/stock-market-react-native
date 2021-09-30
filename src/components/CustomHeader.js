@@ -1,6 +1,6 @@
 import React from 'react';
 import { Image, Text, TouchableOpacity, View } from 'react-native';
-import { IMAGE } from './constants/Image';
+import { IMAGE } from '../constants/Image';
 
 
 function CustomHeader(props) {

@@ -1,17 +1,18 @@
 import React from 'react';
 import { SafeAreaView, Text, View } from 'react-native';
-import CustomHeader from '../CustomHeader';
+import CustomHeader from '../../components/CustomHeader';
 
 
-function SettingsScreenDetail(props) {
+
+function StatementScreenDetail(props) {
     return (
         <SafeAreaView style={{ flex: 1 }}>
-            <CustomHeader title="Setting Detail" navigation={props.navigation} />
+            <CustomHeader title="Statement Detail" navigation={props.navigation} />
             <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-                <Text>Setting Detail!</Text>
+                <Text>Statement Detail!</Text>
             </View>
         </SafeAreaView>
     )
 }
 
-export default SettingsScreenDetail
+export default StatementScreenDetail

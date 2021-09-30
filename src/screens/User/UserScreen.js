@@ -1,24 +1,24 @@
 import React from 'react';
 import { SafeAreaView, TouchableOpacity, View } from 'react-native';
-import RVText from '../core/RVText';
-import CustomHeader from '../CustomHeader';
+import RVText from '../../core/RVText';
+import CustomHeader from '../../components/CustomHeader';
 
-function SettingsScreen(props) {
+function UserScreen(props) {
     let { navigation } = props
     return (
         <SafeAreaView style={{ flex: 1}}>
-            <CustomHeader title="Setting" isHome={true} navigation={navigation} />
+            <CustomHeader title="User" isHome={true} navigation={navigation} />
             <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-                <RVText content="Setting!" />
+                <RVText content="User!" />
                 <TouchableOpacity
                     style={{ marginTop: 20 }}
-                    onPress={() => navigation.navigate('SettingDetail')}
+                    onPress={() => navigation.navigate('UserDetail')}
                 >
-                    <RVText content="Go Setting Detail" />
+                    <RVText content="Go User Detail" />
                 </TouchableOpacity>
             </View>
         </SafeAreaView>
     )
 }
 
-export default SettingsScreen
+export default UserScreen
