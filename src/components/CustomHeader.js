@@ -6,7 +6,7 @@ import { IMAGE } from '../constants/Image';
 function CustomHeader(props) {
     let { isHome, title, navigation } = props
     return (
-        <View style={{ flexDirection: 'row', height: 50, paddingTop: 45 }}>
+        <View style={{ flexDirection: 'row', height: 50, paddingTop: 0 }}>
             <View style={{ flex: 1, justifyContent: 'center' }}>
                 {
                     isHome ?

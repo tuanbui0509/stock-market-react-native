@@ -1,14 +1,16 @@
 import React from 'react'
-import { Button, Text, View } from 'react-native'
 import { Provider } from 'react-redux'
+import { PersistGate } from 'redux-persist/integration/react'
 import Navigation from './src/navigation'
-import store from './src/store'
-
+import index from './src/store/index'
 
 export default function App() {
+ 
   return (
-    <Provider store={store} >
-      <Navigation />
+    <Provider store={index.store} >
+      <PersistGate loading={null} persistor={index.persistor}>
+        <Navigation />
+      </PersistGate>
     </Provider>
   )
 }

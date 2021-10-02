@@ -1,5 +1,8 @@
 const IMAGE = {
     ICON_PROFILE: require('../images/profile.png'),
+
+    ICON_LOGO: require('../images/ntnt.png'),
+
     ICON_MENU: require('../images/menu.png'),
     ICON_BACK: require('../images/back.png'),
 
