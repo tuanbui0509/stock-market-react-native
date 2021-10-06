@@ -24,7 +24,7 @@ const SplashScreen = ({ navigation }) => {
                 <Animatable.Image
                     animation="bounceIn"
                     duraton="1500"
-                    source={require('../images/ntnt.png')}
+                    source={require('../images/stock-market.jpg')}
                     style={styles.logo}
                     resizeMode="stretch"
                 />
@@ -63,7 +63,7 @@ const SplashScreen = ({ navigation }) => {
 export default SplashScreen;
 
 const { height } = Dimensions.get("screen");
-const height_logo = height * 0.28;
+const height_logo = height * 0.6;
 
 const styles = StyleSheet.create({
     container: {
@@ -84,8 +84,8 @@ const styles = StyleSheet.create({
         paddingHorizontal: 30
     },
     logo: {
-        width: height_logo,
-        height: height_logo
+        // width: height_logo,
+        height: height_logo,
     },
     title: {
         color: '#05375a',

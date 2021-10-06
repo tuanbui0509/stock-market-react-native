@@ -6,9 +6,6 @@ const currentUserSlice = createSlice({
     initialState: {},
     reducers: {
         addUser: (state, action) => {
-            console.log('====================================');
-            console.log('currentUserSlice: ', action);
-            console.log('====================================');
             return { ...action.payload };
         },
         removeUser: (state, action) => {

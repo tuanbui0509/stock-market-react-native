@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { Text, View, SafeAreaView, TouchableOpacity } from 'react-native';
-import CustomHeader from '../components/CustomHeader'
+import CustomHeader from '../../components/CustomHeader'
 
 function NotificationsScreen(props) {
     return (

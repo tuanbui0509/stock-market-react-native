@@ -11,6 +11,7 @@ function LightningTableStack({ navigation, route }) {
   return (
     <StackLightningTable.Navigator initialRouteName="LightningTable">
       <StackLightningTable.Screen name="LightningTable" component={LightningTableScreen} options={navOptionHandler} />
+
     </StackLightningTable.Navigator>
   )
 }

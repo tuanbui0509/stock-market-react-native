@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, StyleSheet } from 'react-native';
+import { View, StyleSheet, Alert } from 'react-native';
 import {
     useTheme,
     Avatar,
@@ -16,16 +16,44 @@ import {
     DrawerItem
 } from '@react-navigation/drawer';
 
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import Icon from 'react-native-vector-icons/Ionicons';
+// import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import * as Animatable from 'react-native-animatable';
+import { useDispatch, useSelector } from 'react-redux';
+import { removeToken } from '../../store/Token';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // import{ AuthContext } from '../components/context';
 
 export function DrawerContent(props) {
+    let { navigation } = props
+    const dispatch = useDispatch()
+    const Token = useSelector(state => state.Token)
 
-    const paperTheme = useTheme();
+    const Logout = async () => {
+        await AsyncStorage.removeItem('Token')
+        dispatch(removeToken())
+    }
 
-    // const { signOut, toggleTheme } = React.useContext(AuthContext);
+    const LogoutAlertHandler = () => {
+        //function to make two option alert
+        Alert.alert(
+            //title
+            'Đăng xuất',
+            //body
+            'Bạn có muốn đăng xuất không ?',
+            [
+                { text: 'Có', onPress: Logout },
+                {
+                    text: 'Không',
+                    onPress: () => console.log('No Pressed'),
+                    style: 'cancel',
+                },
+            ],
+            { cancelable: false }
+            //clicking out side of alert will not cancel
+        );
+    };
 
     return (
         <View style={{ flex: 1 }}>
@@ -34,7 +62,7 @@ export function DrawerContent(props) {
                     <View style={styles.userInfoSection}>
                         <View style={{ flexDirection: 'row', marginTop: 15 }}>
                             <Avatar.Image
-                                source={require('../images/ntnt_mobile.png')}
+                                source={require('../../images/ntnt_mobile.png')}
                                 size={60}
                             />
                             <View style={{ marginLeft: 15, flexDirection: 'column' }}>
@@ -48,56 +76,56 @@ export function DrawerContent(props) {
                         <DrawerItem
                             icon={({ color, size }) => (
                                 <Icon
-                                    name="home-outline"
+                                    name="ios-person-sharp"
                                     color={color}
                                     size={size}
                                 />
                             )}
-                            label="Home"
-                            onPress={() => { props.navigation.navigate('Home') }}
+                            label="Thông tin khách hàng"
+                            onPress={() => { props.navigation.navigate('Users') }}
                         />
                         <DrawerItem
                             icon={({ color, size }) => (
                                 <Icon
-                                    name="account-outline"
+                                    name="ios-card-outline"
                                     color={color}
                                     size={size}
                                 />
                             )}
-                            label="Profile"
-                            onPress={() => { props.navigation.navigate('Profile') }}
+                            label="Danh sách tài khoản"
+                            onPress={() => { props.navigation.navigate('Users') }}
                         />
                         <DrawerItem
                             icon={({ color, size }) => (
                                 <Icon
-                                    name="bookmark-outline"
+                                    name="ios-key-outline"
                                     color={color}
                                     size={size}
                                 />
                             )}
-                            label="Bookmarks"
+                            label="Đổi mật khẩu"
                             onPress={() => { props.navigation.navigate('BookmarkScreen') }}
                         />
                         <DrawerItem
                             icon={({ color, size }) => (
                                 <Icon
-                                    name="facebook"
+                                    name="cash-outline"
                                     color={color}
                                     size={size}
                                 />
                             )}
-                            label="Settings"
-                            onPress={() => { props.navigation.navigate('SettingsScreen') }}
+                            label="Ứng trước tiền bán"
+                            onPress={() => { props.navigation.navigate('BookmarkScreen') }}
                         />
                         <DrawerItem
                             icon={({ color, size }) => (
                                 <Icon
-                                    name="account-check-outline"
+                                    name="ios-documents-outline"
                                     color={color}
                                     size={size}
                                 />
                             )}
-                            label="Support"
+                            label="Xác nhận lệnh"
                             onPress={() => { props.navigation.navigate('SupportScreen') }}
                         />
                     </Drawer.Section>
@@ -107,13 +135,13 @@ export function DrawerContent(props) {
                 <DrawerItem
                     icon={({ color, size }) => (
                         <Icon
-                            name="exit-to-app"
+                            name="md-enter-outline"
                             color={color}
                             size={size}
                         />
                     )}
-                    label="Sign Out"
-                // onPress={() => {signOut()}}
+                    label="Đăng xuất"
+                    onPress={LogoutAlertHandler}
                 />
             </Drawer.Section>
         </View>
