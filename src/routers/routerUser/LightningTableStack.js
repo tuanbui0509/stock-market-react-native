@@ -1,6 +1,6 @@
 import { createStackNavigator } from '@react-navigation/stack';
 import React from 'react';
-import LightningTableScreen from '../screens/LightningTable/LightningTableScreen';
+import LightningTableScreen from '../../screens/users/LightningTable/LightningTableScreen';
 const navOptionHandler = () => ({
   headerShown: false
 })

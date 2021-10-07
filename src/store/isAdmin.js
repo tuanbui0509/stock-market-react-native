@@ -9,7 +9,7 @@ const isAdminSlice = createSlice({
             console.log('isAdmin');
             return true
         },
-        isUser: (state, payload) => {
+        removeAdmin: (state, payload) => {
             return false
         }
     }
@@ -17,6 +17,6 @@ const isAdminSlice = createSlice({
 
 const { actions, reducer } = isAdminSlice;
 
-export const { isAdmin, isUser } = actions;
+export const { isAdmin, removeAdmin } = actions;
 
 export default reducer;

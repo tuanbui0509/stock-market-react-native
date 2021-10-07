@@ -6,7 +6,6 @@ const isTokenSlice = createSlice({
     initialState: false,
     reducers: {
         addToken: (state, payload) => {
-            console.log('action', state);
             return true
         },
         removeToken: (state, payload) => {

@@ -1,17 +1,17 @@
 import React from 'react';
 import { SafeAreaView, Text, View } from 'react-native';
-import CustomHeader from '../../components/CustomHeader';
+import CustomHeader from '../../../components/CustomHeader';
 
 
-function OrderScreenDetail(props) {
+function AccountScreenDetail(props) {
     return (
         <SafeAreaView style={{ flex: 1 }}>
-            <CustomHeader title="Setting Detail" navigation={props.navigation} />
+            <CustomHeader title="AccountScreenDetail" navigation={props.navigation} />
             <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-                <Text>Setting Detail!</Text>
+                <Text>AccountScreenDetail Detail!</Text>
             </View>
         </SafeAreaView>
     )
 }
 
-export default OrderScreenDetail
+export default AccountScreenDetail

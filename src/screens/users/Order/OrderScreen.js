@@ -1,20 +1,21 @@
 import React from 'react';
 import { SafeAreaView, TouchableOpacity, View } from 'react-native';
-import RVText from '../../core/RVText';
-import CustomHeader from '../../components/CustomHeader';
+import RVText from '../../../core/RVText';
+
+import CustomHeader from '../../../components/CustomHeader';
 
 function OrderScreen(props) {
     let { navigation } = props
     return (
-        <SafeAreaView style={{ flex: 1}}>
-            <CustomHeader title="Setting" isHome={true} navigation={navigation} />
+        <SafeAreaView style={{ flex: 1 }}>
+            <CustomHeader title="Order" isHome={true} navigation={navigation} />
             <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-                <RVText content="Setting!" />
+                <RVText content="Order!" />
                 <TouchableOpacity
                     style={{ marginTop: 20 }}
-                    onPress={() => navigation.navigate('SettingDetail')}
+                    onPress={() => navigation.navigate('OrderDetail')}
                 >
-                    <RVText content="Go Setting Detail" />
+                    <RVText content="Go OrderScreenDetail" />
                 </TouchableOpacity>
             </View>
         </SafeAreaView>

@@ -22,6 +22,7 @@ import * as Animatable from 'react-native-animatable';
 import { useDispatch, useSelector } from 'react-redux';
 import { removeToken } from '../../store/Token';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { removeAdmin } from '../../store/isAdmin';
 
 // import{ AuthContext } from '../components/context';
 
@@ -29,10 +30,12 @@ export function DrawerContent(props) {
     let { navigation } = props
     const dispatch = useDispatch()
     const Token = useSelector(state => state.Token)
+    const isAdmin = useSelector(state => state.isAdmin)
 
     const Logout = async () => {
         await AsyncStorage.removeItem('Token')
         dispatch(removeToken())
+        dispatch(removeAdmin())
     }
 
     const LogoutAlertHandler = () => {
@@ -67,68 +70,105 @@ export function DrawerContent(props) {
                             />
                             <View style={{ marginLeft: 15, flexDirection: 'column' }}>
                                 <Title style={styles.title}>Bùi Ngọc Tuấn</Title>
-                                <Caption style={styles.caption}>200.000.000đ</Caption>
+                                {isAdmin ? null : <Caption style={styles.caption}>200.000.000đ</Caption>}
                             </View>
                         </View>
                     </View>
+                    {isAdmin ?
+                        <Drawer.Section style={styles.drawerSection}>
+                            <DrawerItem
+                                icon={({ color, size }) => (
+                                    <Icon
+                                        name="ios-person-sharp"
+                                        color={color}
+                                        size={size}
+                                    />
+                                )}
+                                label="Danh sách đơn đăng ký"
+                                onPress={() => { props.navigation.navigate('Users') }}
+                            />
+                            <DrawerItem
+                                icon={({ color, size }) => (
+                                    <Icon
+                                        name="ios-card-outline"
+                                        color={color}
+                                        size={size}
+                                    />
+                                )}
+                                label="Danh sách nhà đầu tư"
+                                onPress={() => { props.navigation.navigate('Users') }}
+                            />
+                            <DrawerItem
+                                icon={({ color, size }) => (
+                                    <Icon
+                                        name="ios-key-outline"
+                                        color={color}
+                                        size={size}
+                                    />
+                                )}
+                                label="Danh sách cổ phiếu"
+                                onPress={() => { props.navigation.navigate('BookmarkScreen') }}
+                            />
+                        </Drawer.Section> :
+                        <Drawer.Section style={styles.drawerSection}>
+                            <DrawerItem
+                                icon={({ color, size }) => (
+                                    <Icon
+                                        name="ios-person-sharp"
+                                        color={color}
+                                        size={size}
+                                    />
+                                )}
+                                label="Thông tin khách hàng"
+                                onPress={() => { props.navigation.navigate('Users') }}
+                            />
+                            <DrawerItem
+                                icon={({ color, size }) => (
+                                    <Icon
+                                        name="ios-card-outline"
+                                        color={color}
+                                        size={size}
+                                    />
+                                )}
+                                label="Danh sách tài khoản"
+                                onPress={() => { props.navigation.navigate('Users') }}
+                            />
+                            <DrawerItem
+                                icon={({ color, size }) => (
+                                    <Icon
+                                        name="ios-key-outline"
+                                        color={color}
+                                        size={size}
+                                    />
+                                )}
+                                label="Đổi mật khẩu"
+                                onPress={() => { props.navigation.navigate('BookmarkScreen') }}
+                            />
+                            <DrawerItem
+                                icon={({ color, size }) => (
+                                    <Icon
+                                        name="cash-outline"
+                                        color={color}
+                                        size={size}
+                                    />
+                                )}
+                                label="Ứng trước tiền bán"
+                                onPress={() => { props.navigation.navigate('BookmarkScreen') }}
+                            />
+                            <DrawerItem
+                                icon={({ color, size }) => (
+                                    <Icon
+                                        name="ios-documents-outline"
+                                        color={color}
+                                        size={size}
+                                    />
+                                )}
+                                label="Xác nhận lệnh"
+                                onPress={() => { props.navigation.navigate('SupportScreen') }}
+                            />
+                        </Drawer.Section>
+                    }
 
-                    <Drawer.Section style={styles.drawerSection}>
-                        <DrawerItem
-                            icon={({ color, size }) => (
-                                <Icon
-                                    name="ios-person-sharp"
-                                    color={color}
-                                    size={size}
-                                />
-                            )}
-                            label="Thông tin khách hàng"
-                            onPress={() => { props.navigation.navigate('Users') }}
-                        />
-                        <DrawerItem
-                            icon={({ color, size }) => (
-                                <Icon
-                                    name="ios-card-outline"
-                                    color={color}
-                                    size={size}
-                                />
-                            )}
-                            label="Danh sách tài khoản"
-                            onPress={() => { props.navigation.navigate('Users') }}
-                        />
-                        <DrawerItem
-                            icon={({ color, size }) => (
-                                <Icon
-                                    name="ios-key-outline"
-                                    color={color}
-                                    size={size}
-                                />
-                            )}
-                            label="Đổi mật khẩu"
-                            onPress={() => { props.navigation.navigate('BookmarkScreen') }}
-                        />
-                        <DrawerItem
-                            icon={({ color, size }) => (
-                                <Icon
-                                    name="cash-outline"
-                                    color={color}
-                                    size={size}
-                                />
-                            )}
-                            label="Ứng trước tiền bán"
-                            onPress={() => { props.navigation.navigate('BookmarkScreen') }}
-                        />
-                        <DrawerItem
-                            icon={({ color, size }) => (
-                                <Icon
-                                    name="ios-documents-outline"
-                                    color={color}
-                                    size={size}
-                                />
-                            )}
-                            label="Xác nhận lệnh"
-                            onPress={() => { props.navigation.navigate('SupportScreen') }}
-                        />
-                    </Drawer.Section>
                 </View>
             </DrawerContentScrollView>
             <Drawer.Section style={styles.bottomDrawerSection}>

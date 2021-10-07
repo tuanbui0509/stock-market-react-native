@@ -1,7 +1,8 @@
 import React from 'react';
 import { SafeAreaView, TouchableOpacity, View } from 'react-native';
-import RVText from '../../core/RVText';
-import CustomHeader from '../../components/CustomHeader';
+import RVText from '../../../core/RVText';
+
+import CustomHeader from '../../../components/CustomHeader';
 
 function StatementScreen(props) {
     let { navigation } = props

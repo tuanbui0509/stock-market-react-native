@@ -2,18 +2,16 @@ import axios from 'axios';
 import config from './config'
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useDispatch, useSelector } from 'react-redux';
-import { removeToken } from '../store/Token';
+// import { removeToken } from '../store/Token';
 const axiosClient = axios.create({
     baseURL: config.API_URL,
     headers: {
-        // 'content-type': 'application/json',
-        "Content-Type": "application/x-www-form-urlencoded",
-        Accept: "application/json"
+        'content-type': 'application/json',
     },
 });
 const requestHandler = async request => {
     const Token = await AsyncStorage.getItem('Token')
-    console.log(Token);
+    // console.log('Token: ', Token);
     if (Token) {
         request.headers.Authorization = `Bearer ${Token}`;
     }
@@ -21,17 +19,16 @@ const requestHandler = async request => {
 };
 
 const errorHandler = error => {
-    return Promise.reject(error);
+    return Promise.reject(error.response);
 };
 
 const responseHandler = async response => {
-    const dispatch = useDispatch()
-    const Token = useSelector(state => state.Token)
+    // const dispatch = useDispatch()
+    // const Token = useSelector(state => state.Token)
     if (response.status === 401) {
         await AsyncStorage.removeItem('Token')
-        dispatch(removeToken())
+        // dispatch(removeToken())
     }
-
     return response;
 };
 
