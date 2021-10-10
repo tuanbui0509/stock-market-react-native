@@ -37,7 +37,7 @@ const SplashScreen = ({ navigation }) => {
             >
                 <Text style={[styles.title, {
                     color: colors.text
-                }]}>Chào mừng mọi người đến với giao dịch chứng khoán!</Text>
+                }]}>Chào mừng đến với giao dịch chứng khoán!</Text>
                 <Text style={styles.text}>Đăng nhập với tài khoản</Text>
                 <View style={styles.button}>
                     <TouchableOpacity onPress={() => navigation.navigate('SignInScreen')}>

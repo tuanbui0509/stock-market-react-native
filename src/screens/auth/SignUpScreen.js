@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef, useState } from 'react';
 import {
     View,
     Text,
@@ -9,67 +9,104 @@ import {
     Platform,
     StyleSheet,
     ScrollView,
-    StatusBar
+    StatusBar,
+    Alert
 } from 'react-native';
 import * as Animatable from 'react-native-animatable';
 import { LinearGradient } from 'expo-linear-gradient';
-
+import moment from 'moment';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import Feather from 'react-native-vector-icons/Feather';
+import * as yup from 'yup'
+import { Field, Formik } from 'formik'
+import { useTheme } from 'react-native-paper';
+
+import CustomInput from '../../helpers/CustomInput'
+import DateTimePicker from '@react-native-community/datetimepicker';
+// import { Picker } from '@react-native-community/picker'
+import CustomDatePicker from '../../components/CustomDatePicker';
+import { Picker } from '@react-native-picker/picker';
+import * as ApiAuthentication from '../../api/Auth'
+
+const signUpValidationSchema = yup.object().shape({
+    ho: yup
+        .string()
+        .matches(/[a-zA-Z]/, 'Chỉ nhập chữ không nhập số và ký tự đặt biệt')
+        .required('Vui lòng nhập Họ'),
+    ten: yup
+        .string()
+        .matches(/[a-zA-Z]/, 'Chỉ nhập chữ không nhập số và ký tự đặt biệt')
+        .required('Vui lòng nhập Tên'),
+    sdt: yup
+        .string()
+        .matches(/(09)(\d){8}\b/, 'Định dạng số điện thoại không hợp lệ')
+        .required('Vui lòng nhập số điện thoại'),
+    email: yup
+        .string()
+        .email("Định dạng Email không hợp lệ")
+        .required('Vui lòng nhập địa chỉ email'),
+    noiSinh: yup
+        .string()
+        .required('Vui lòng nhập nơi sinh'),
+    diaChi: yup
+        .string()
+        .required('Vui lòng nhập địa chỉ'),
+    cmnd: yup
+        .string()
+        .required('Vui lòng nhập CMND'),
+    noiCapCMMD: yup
+        .string()
+        .required('Vui lòng nhập nơi cấp CMND'),
+    phai: yup
+        .boolean()
+        .required('Vui lòng chọn giới tính')
+})
 
 const SignInScreen = ({ navigation }) => {
 
     const [data, setData] = React.useState({
-        username: '',
-        password: '',
-        confirm_password: '',
-        check_textInputChange: false,
-        secureTextEntry: true,
-        confirm_secureTextEntry: true,
+        ho: '',
+        ten: '',
+        ngaySinh: moment(),
+        sdt: '',
+        email: '',
+        phai: '',
+        noiSinh: '',
+        diaChi: '',
+        cmnd: '',
+        noiCapCMMD: '',
+        ngayCapCMND: moment()
+
     });
+    const { colors } = useTheme();
+    const onSubmit = async (values) => {
+        console.log('data: ', data);
+        // console.log('value: ', values);
+        try {
+            const res = await ApiAuthentication.register(data);
+            console.log('====================================');
+            console.log(res.data);
+            console.log('====================================');
+            if (res.data.status === 0) {
+                Alert.alert('Thành công!', res.data.message, [
+                    { text: 'Xác nhận' }
+                ]);
+                navigation.goBack()
 
-    const textInputChange = (val) => {
-        if (val.length !== 0) {
-            setData({
-                ...data,
-                username: val,
-                check_textInputChange: true
-            });
-        } else {
-            setData({
-                ...data,
-                username: val,
-                check_textInputChange: false
-            });
+            }
+            else {
+                console.log('====================================');
+                console.log(res.data.message);
+                console.log('====================================');
+
+            }
+
+        } catch (err) {
+            console.log(err.data);
+            Alert.alert('Lỗi đăng nhập!', err.data.message, [
+                { text: 'Trở lại' }
+            ]);
         }
-    }
-
-    const handlePasswordChange = (val) => {
-        setData({
-            ...data,
-            password: val
-        });
-    }
-
-    const handleConfirmPasswordChange = (val) => {
-        setData({
-            ...data,
-            confirm_password: val
-        });
-    }
-
-    const updateSecureTextEntry = () => {
-        setData({
-            ...data,
-            secureTextEntry: !data.secureTextEntry
-        });
-    }
-
-    const updateConfirmSecureTextEntry = () => {
-        setData({
-            ...data,
-            confirm_secureTextEntry: !data.confirm_secureTextEntry
-        });
     }
 
     return (
@@ -83,130 +120,202 @@ const SignInScreen = ({ navigation }) => {
                 style={styles.footer}
             >
                 <ScrollView>
-                    <Text style={styles.text_footer}>Tài khoản</Text>
-                    <View style={styles.action}>
-                        <FontAwesome
-                            name="user-o"
-                            color="#05375a"
-                            size={20}
-                        />
-                        <TextInput
-                            placeholder="Tài khoản của bạn"
-                            style={styles.textInput}
-                            autoCapitalize="none"
-                            onChangeText={(val) => textInputChange(val)}
-                        />
-                        {data.check_textInputChange ?
-                            <Animatable.View
-                                animation="bounceIn"
-                            >
-                                <Feather
-                                    name="check-circle"
-                                    color="green"
-                                    size={20}
-                                />
-                            </Animatable.View>
-                            : null}
-                    </View>
 
-                    {/* <Text style={[styles.text_footer, {
-                        marginTop: 35
-                    }]}>Password</Text>
-                    <View style={styles.action}>
-                        <Feather
-                            name="lock"
-                            color="#05375a"
-                            size={20}
-                        />
-                        <TextInput
-                            placeholder="Your Password"
-                            secureTextEntry={data.secureTextEntry ? true : false}
-                            style={styles.textInput}
-                            autoCapitalize="none"
-                            onChangeText={(val) => handlePasswordChange(val)}
-                        />
-                        <TouchableOpacity
-                            onPress={updateSecureTextEntry}
-                        >
-                            {data.secureTextEntry ?
-                                <Feather
-                                    name="eye-off"
-                                    color="grey"
-                                    size={20}
-                                />
-                                :
-                                <Feather
-                                    name="eye"
-                                    color="grey"
-                                    size={20}
-                                />
-                            }
-                        </TouchableOpacity>
-                    </View>
+                    <Formik
+                        initialValues={data}
+                        onSubmit={onSubmit}
+                        validationSchema={signUpValidationSchema}
+                    >
+                        {({ handleSubmit, isValid }) => (
+                            <>
+                                <Text style={[styles.text_footer, {
+                                    color: colors.text,
+                                }]}>Họ:</Text>
+                                <View style={styles.action}>
+                                    <Field
+                                        component={CustomInput}
+                                        name="ho"
+                                        placeholder="Họ của bạn"
+                                        onValueChange={(value) => setData({ ...data, ho: value })}
+                                    />
+                                </View>
+                                <Text style={[styles.text_footer, {
+                                    color: colors.text,
+                                }]}>Tên:</Text>
+                                <View style={styles.action}>
+                                    <Field
+                                        component={CustomInput}
+                                        name="ten"
+                                        placeholder="Tên của bạn"
+                                        onValueChange={(value) => setData({ ...data, ten: value })}
 
-                    <Text style={[styles.text_footer, {
-                        marginTop: 35
-                    }]}>Confirm Password</Text>
-                    <View style={styles.action}>
-                        <Feather
-                            name="lock"
-                            color="#05375a"
-                            size={20}
-                        />
-                        <TextInput
-                            placeholder="Confirm Your Password"
-                            secureTextEntry={data.confirm_secureTextEntry ? true : false}
-                            style={styles.textInput}
-                            autoCapitalize="none"
-                            onChangeText={(val) => handleConfirmPasswordChange(val)}
-                        />
-                        <TouchableOpacity
-                            onPress={updateConfirmSecureTextEntry}
-                        >
-                            {data.secureTextEntry ?
-                                <Feather
-                                    name="eye-off"
-                                    color="grey"
-                                    size={20}
-                                />
-                                :
-                                <Feather
-                                    name="eye"
-                                    color="grey"
-                                    size={20}
-                                />
-                            }
-                        </TouchableOpacity>
-                    </View> */}
+                                    />
+                                </View>
 
-                    <View style={styles.button}>
-                        <TouchableOpacity
-                            style={styles.signIn}
-                            onPress={() => { }}
-                        >
-                            <LinearGradient
-                                colors={['#08d4c4', '#01ab9d']}
-                                style={styles.signIn}
-                            >
-                                <Text style={[styles.textSign, {
-                                    color: '#fff'
-                                }]}>Sign Up</Text>
-                            </LinearGradient>
-                        </TouchableOpacity>
+                                <Text style={[styles.text_footer, {
+                                    color: colors.text,
+                                }]}>Giới tính:</Text>
+                                <View style={styles.action}>
+                                    <View style={styles.styleSelect}>
+                                        <Picker
+                                            name='phai'
+                                            selectedValue={data.phai}
+                                            onValueChange={(itemValue) => setData({ ...data, phai: itemValue })}
+                                        >
+                                            <Picker.Item label="Chọn giới tính" value='' />
+                                            <Picker.Item label="Nam" value={true} />
+                                            <Picker.Item label="Nữ" value={false} />
+                                        </Picker>
+                                    </View>
+                                </View>
 
-                        <TouchableOpacity
-                            onPress={() => navigation.goBack()}
-                            style={[styles.signIn, {
-                                borderColor: '#009387',
-                                borderWidth: 1,
-                                marginTop: 15
-                            }]}
-                        >
-                            <Text style={[styles.textSign, {
-                                color: '#009387'
-                            }]}>Sign In</Text>
-                        </TouchableOpacity>
-                    </View>
+                                <Text style={[styles.text_footer, {
+                                    color: colors.text,
+                                }]}>Ngày sinh</Text>
+                                <View style={styles.action}>
+                                    {/* <CustomDatePicker
+                                        name="ngaySinh"
+                                        onDateChange={(value) => setData({ ...data, ngaySinh: value })}
+                                    /> */}
+                                    <Field
+                                        component={CustomDatePicker}
+                                        name="ngaySinh"
+                                        onDateChange={(value) => setData({ ...data, ngaySinh: value })}
+                                    // placeholder=""
+                                    />
+                                </View>
+                                <Text style={[styles.text_footer, {
+                                    color: colors.text,
+                                }]}>Nơi sinh của bạn:</Text>
+                                <View style={styles.action}>
+                                    <Field
+                                        component={CustomInput}
+                                        name="noiSinh"
+                                        placeholder="Nơi sinh của bạn"
+                                        onValueChange={(value) => setData({ ...data, noiSinh: value })}
+
+                                    />
+                                </View>
+
+                                <Text style={[styles.text_footer, {
+                                    color: colors.text,
+                                }]}>Địa chỉ của bạn:</Text>
+                                <View style={styles.action}>
+                                    <Field
+                                        component={CustomInput}
+                                        name="diaChi"
+                                        placeholder="Địa chỉ của bạn"
+                                        onValueChange={(value) => setData({ ...data, diaChi: value })}
+
+                                    />
+                                </View>
+                                <Text style={[styles.text_footer, {
+                                    color: colors.text,
+                                }]}>Email:</Text>
+
+                                <View style={styles.action}>
+
+                                    <Field
+                                        component={CustomInput}
+                                        name="email"
+                                        placeholder="Email của bạn"
+                                        keyboardType="email-address"
+                                        onValueChange={(value) => setData({ ...data, email: value })}
+
+                                    />
+
+                                </View>
+                                <Text style={[styles.text_footer, {
+                                    color: colors.text,
+                                }]}>Số điện thoại:</Text>
+                                <View style={styles.action}>
+                                    <Field
+                                        component={CustomInput}
+                                        name="sdt"
+                                        placeholder="Số điện thoại của bạn"
+                                        keyboardType="numeric"
+                                        onValueChange={(value) => setData({ ...data, sdt: value })}
+
+                                    />
+                                </View>
+                                <Text style={[styles.text_footer, {
+                                    color: colors.text,
+                                }]}>CMND:</Text>
+                                <View style={styles.action}>
+                                    <Field
+                                        component={CustomInput}
+                                        name="cmnd"
+                                        placeholder="CMND của bạn"
+                                        keyboardType="numeric"
+                                        onValueChange={(value) => setData({ ...data, cmnd: value })}
+
+                                    />
+                                </View>
+
+                                <Text style={[styles.text_footer, {
+                                    color: colors.text,
+                                }]}>Ngày cấp CMND:</Text>
+                                <View style={styles.action}>
+                                    {/* <CustomDatePicker
+                                        name="ngayCapCMMD"
+                                        onDateChange={(value) => setData({ ...data, ngayCapCMND: value })}
+                                    /> */}
+                                    <Field
+                                        component={CustomDatePicker}
+                                        name="ngayCapCMND"
+                                        onDateChange={(value) => setData({ ...data, ngayCapCMND: value })}
+                                    // placeholder=""
+                                    />
+                                </View>
+                                <Text style={[styles.text_footer, {
+                                    color: colors.text,
+                                }]}>Nơi cấp CMND:</Text>
+                                <View style={styles.action}>
+                                    <Field
+                                        component={CustomInput}
+                                        name="noiCapCMMD"
+                                        placeholder="Nơi cấp CMND"
+                                        onValueChange={(value) => setData({ ...data, noiCapCMMD: value })}
+
+                                    />
+                                </View>
+
+
+
+                                <View style={styles.button}>
+                                    <TouchableOpacity
+                                        style={styles.signIn}
+                                        onPress={handleSubmit}
+                                    >
+                                        <LinearGradient
+                                            colors={['#08d4c4', '#01ab9d']}
+                                            style={styles.signIn}
+                                        >
+                                            <Text style={[styles.textSign, {
+                                                color: '#fff'
+                                            }]}>Sign Up</Text>
+                                        </LinearGradient>
+                                    </TouchableOpacity>
+
+                                    <TouchableOpacity
+                                        onPress={() => navigation.goBack()}
+                                        style={[styles.signIn, {
+                                            borderColor: '#009387',
+                                            borderWidth: 1,
+                                            marginTop: 15
+                                        }]}
+                                    >
+                                        <Text style={[styles.textSign, {
+                                            color: '#009387'
+                                        }]}>Sign In</Text>
+                                    </TouchableOpacity>
+                                </View>
+
+                            </>
+                        )}
+                    </Formik>
+
+
                 </ScrollView>
             </Animatable.View>
         </View>
@@ -241,10 +350,11 @@ const styles = StyleSheet.create({
     },
     text_footer: {
         color: '#05375a',
-        fontSize: 18
+        fontSize: 18,
+        marginBottom: 10
     },
     action: {
-        flexDirection: 'row',
+        // flexDirection: 'row',
         marginTop: 10,
         borderBottomWidth: 1,
         borderBottomColor: '#f2f2f2',
@@ -278,5 +388,37 @@ const styles = StyleSheet.create({
     },
     color_textPrivate: {
         color: 'grey'
+    },
+    pickedDateContainer: {
+        padding: 20,
+        backgroundColor: '#eee',
+        borderRadius: 10,
+    },
+    pickedDate: {
+        fontSize: 18,
+        color: 'black',
+    },
+    btnContainer: {
+        padding: 30,
+    },
+    // This only works on iOS
+    datePicker: {
+        width: 320,
+        height: 260,
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'flex-start',
+    },
+    styleSelect: {
+        paddingVertical: 10,
+        paddingHorizontal: 10,
+        borderWidth: 1,
+        height: 40,
+        width: '100%',
+        marginBottom: 10,
+        backgroundColor: 'white',
+        borderColor: 'gray',
+        borderWidth: StyleSheet.hairlineWidth,
+        borderRadius: 10,
     }
 });

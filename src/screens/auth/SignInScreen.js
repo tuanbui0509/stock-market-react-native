@@ -30,7 +30,7 @@ const SignInScreen = ({ navigation }) => {
     const dispatch = useDispatch()
     const isToken = useSelector(state => state.Token)
 
-    const [data, setData] = React.useState({
+    const [acc, setAcc] = React.useState({
         username: '',
         password: '',
         check_textInputChange: false,
@@ -43,15 +43,15 @@ const SignInScreen = ({ navigation }) => {
 
     const textInputChange = (val) => {
         if (val.trim().length >= 1) {
-            setData({
-                ...data,
+            setAcc({
+                ...acc,
                 username: val,
                 check_textInputChange: true,
                 isValidUser: true
             });
         } else {
-            setData({
-                ...data,
+            setAcc({
+                ...acc,
                 username: val,
                 check_textInputChange: false,
                 isValidUser: false
@@ -61,14 +61,15 @@ const SignInScreen = ({ navigation }) => {
 
     const handlePasswordChange = (val) => {
         if (val.trim().length >= 1) {
-            setData({
-                ...data,
+            setAcc({
+                ...acc,
                 password: val,
+                check_textInputChange: true,
                 isValidPassword: true
             });
         } else {
-            setData({
-                ...data,
+            setAcc({
+                ...acc,
                 password: val,
                 isValidPassword: false
             });
@@ -76,39 +77,57 @@ const SignInScreen = ({ navigation }) => {
     }
 
     const updateSecureTextEntry = () => {
-        setData({
-            ...data,
-            secureTextEntry: !data.secureTextEntry
+        setAcc({
+            ...acc,
+            secureTextEntry: !acc.secureTextEntry
         });
     }
 
     const handleValidUser = (val) => {
         if (val.trim().length >= 1) {
-            setData({
-                ...data,
+            setAcc({
+                ...acc,
                 isValidUser: true
             });
         } else {
-            setData({
-                ...data,
+            setAcc({
+                ...acc,
                 isValidUser: false
             });
         }
     }
 
-    const loginHandle = async (userName, password) => {
-        if (data.username.length == 0 || data.password.length == 0) {
+    const loginHandle = async () => {
+        if (acc.username.length == 0 && acc.password.length == 0) {
+            setAcc({
+                ...acc,
+                isValidUser: false,
+                isValidPassword: false,
+            });
             return;
         }
-        if (data.isValidPassword || data.isValidUser) {
+        else if (acc.username.length == 0) {
+            setAcc({
+                ...acc,
+                isValidUser: false,
+            });
+            return;
+        }
+        else if (acc.password.length == 0) {
+            setAcc({
+                ...acc,
+                isValidPassword: false,
+            });
+            return;
+        }
+        if (!acc.isValidPassword || !acc.isValidUser) {
             return;
         }
         try {
-
-            const res = await ApiAuthentication.login({ userName: userName, password: password });
+            const res = await ApiAuthentication.login({ username: acc.username, password: acc.password });
             let { data } = res.data
             console.log('====================================');
-            console.log(data);
+            console.log(res.data);
             console.log('====================================');
             if (res.data.status === 0) {
                 await AsyncStorage.setItem('Token', data.token)
@@ -123,7 +142,7 @@ const SignInScreen = ({ navigation }) => {
             }
             else {
                 console.log('====================================');
-                console.log(data.message);
+                console.log(res.data.message);
                 console.log('====================================');
 
             }
@@ -168,7 +187,7 @@ const SignInScreen = ({ navigation }) => {
                             onChangeText={(val) => textInputChange(val)}
                             onEndEditing={(e) => handleValidUser(e.nativeEvent.text)}
                         />
-                        {data.check_textInputChange ?
+                        {acc.check_textInputChange ?
                             <Animatable.View
                                 animation="bounceIn"
                             >
@@ -180,7 +199,7 @@ const SignInScreen = ({ navigation }) => {
                             </Animatable.View>
                             : null}
                     </View>
-                    {data.isValidUser ? null :
+                    {acc.isValidUser ? null :
                         <Animatable.View animation="fadeInLeft" duration={500}>
                             <Text style={styles.errorMsg}>Tài khoản không được để trống.</Text>
                         </Animatable.View>
@@ -200,7 +219,7 @@ const SignInScreen = ({ navigation }) => {
                         <TextInput
                             placeholder="Mật khẩu của bạn"
                             placeholderTextColor="#666666"
-                            secureTextEntry={data.secureTextEntry ? true : false}
+                            secureTextEntry={acc.secureTextEntry ? true : false}
                             style={[styles.textInput, {
                                 color: colors.text
                             }]}
@@ -210,7 +229,7 @@ const SignInScreen = ({ navigation }) => {
                         <TouchableOpacity
                             onPress={updateSecureTextEntry}
                         >
-                            {data.secureTextEntry ?
+                            {acc.secureTextEntry ?
                                 <Feather
                                     name="eye-off"
                                     color="grey"
@@ -225,7 +244,7 @@ const SignInScreen = ({ navigation }) => {
                             }
                         </TouchableOpacity>
                     </View>
-                    {data.isValidPassword ? null :
+                    {acc.isValidPassword ? null :
                         <Animatable.View animation="fadeInLeft" duration={500}>
                             <Text style={styles.errorMsg}>Mật khẩu không được để trống.</Text>
                         </Animatable.View>
@@ -238,7 +257,7 @@ const SignInScreen = ({ navigation }) => {
                     <View style={styles.button}>
                         <TouchableOpacity
                             style={styles.signIn}
-                            onPress={() => { loginHandle(data.username, data.password) }}
+                            onPress={loginHandle}
                         >
                             <LinearGradient
                                 colors={['#08d4c4', '#01ab9d']}
