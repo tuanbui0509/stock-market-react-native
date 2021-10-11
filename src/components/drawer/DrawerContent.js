@@ -23,6 +23,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { removeToken } from '../../store/Token';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { removeAdmin } from '../../store/isAdmin';
+import { removeUser } from '../../store/CurrentUser';
 
 // import{ AuthContext } from '../components/context';
 
@@ -31,11 +32,14 @@ export function DrawerContent(props) {
     const dispatch = useDispatch()
     const Token = useSelector(state => state.Token)
     const isAdmin = useSelector(state => state.isAdmin)
+    const CurrentUser = useSelector(state => state.CurrentUser)
 
     const Logout = async () => {
         await AsyncStorage.removeItem('Token')
+        await AsyncStorage.removeItem('user')
         dispatch(removeToken())
         dispatch(removeAdmin())
+        dispatch(removeUser())
     }
 
     const LogoutAlertHandler = () => {
@@ -120,7 +124,7 @@ export function DrawerContent(props) {
                                     />
                                 )}
                                 label="Thông tin khách hàng"
-                                onPress={() => { props.navigation.navigate('Users') }}
+                                onPress={() => { props.navigation.navigate('InformationScreen') }}
                             />
                             <DrawerItem
                                 icon={({ color, size }) => (
@@ -147,6 +151,17 @@ export function DrawerContent(props) {
                             <DrawerItem
                                 icon={({ color, size }) => (
                                     <Icon
+                                        name="finger-print-outline"
+                                        color={color}
+                                        size={size}
+                                    />
+                                )}
+                                label="Đổi mã PIN"
+                                onPress={() => { props.navigation.navigate('SupportScreen') }}
+                            />
+                            <DrawerItem
+                                icon={({ color, size }) => (
+                                    <Icon
                                         name="cash-outline"
                                         color={color}
                                         size={size}
@@ -155,17 +170,7 @@ export function DrawerContent(props) {
                                 label="Ứng trước tiền bán"
                                 onPress={() => { props.navigation.navigate('BookmarkScreen') }}
                             />
-                            <DrawerItem
-                                icon={({ color, size }) => (
-                                    <Icon
-                                        name="ios-documents-outline"
-                                        color={color}
-                                        size={size}
-                                    />
-                                )}
-                                label="Xác nhận lệnh"
-                                onPress={() => { props.navigation.navigate('SupportScreen') }}
-                            />
+
                         </Drawer.Section>
                     }
 

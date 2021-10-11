@@ -3,6 +3,7 @@ import { combineReducers } from 'redux'
 import Token from './Token';
 import isAdmin from './isAdmin';
 import CurrentUser from './CurrentUser';
+import BankAccount from './users/BankAccount';
 import {
     persistStore, persistReducer, FLUSH,
     REHYDRATE,
@@ -16,7 +17,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 const reducer = combineReducers({
     Token,
     isAdmin,
-    CurrentUser
+    CurrentUser,
+    BankAccount
 })
 
 const persistConfig = {

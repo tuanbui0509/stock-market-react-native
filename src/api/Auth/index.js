@@ -6,9 +6,6 @@ export const register = (body) => {
     return AxiosClient.post("DangKy", body)
 }
 export const login = (body) => {
-    console.log('====================================');
-    console.log(body);
-    console.log('====================================');
     return AxiosClient.post("DangNhap", JSON.stringify(body))
 }
 

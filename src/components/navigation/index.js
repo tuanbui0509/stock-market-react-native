@@ -10,6 +10,7 @@ import SignUpScreen from '../../screens/auth/SignUpScreen'
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { addToken } from '../../store/Token'
 import axios from 'axios'
+import { addUser } from '../../store/CurrentUser'
 
 const navOptionHandler = () => ({
     headerShown: false
@@ -22,12 +23,16 @@ export default function Navigation() {
     const dispatch = useDispatch()
     const Token = useSelector(state => state.Token)
     const isAdmin = useSelector(state => state.isAdmin)
-    const getToken = async () => {
+    const CurrentUser = useSelector(state => state.CurrentUser)
+    const getData = async () => {
         try {
             const value = await AsyncStorage.getItem('Token')
+            const user = await AsyncStorage.getItem('user')
+            // console.log('CurrentUser: ', CurrentUser);
             if (value !== null) {
-                // console.log(value);
                 dispatch(addToken())
+            } if (user) {
+                dispatch(addUser(JSON.parse(user)))
             }
         } catch (error) {
             console.log(error);
@@ -35,7 +40,7 @@ export default function Navigation() {
     }
 
     React.useEffect(() => {
-        getToken()
+        getData()
     }, [])
 
     return (

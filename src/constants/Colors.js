@@ -10,4 +10,7 @@ export default {
     gold: 'gold',
     purple: 'purple',
     skyBlue: 'skyblue',
+    standard: 'rgb(246, 155, 11)',
+    ceil: 'rgb(0, 105, 196)',
+    floor: 'rgb(190, 0, 190)',
 }

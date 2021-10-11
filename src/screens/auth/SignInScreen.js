@@ -18,17 +18,17 @@ import Feather from 'react-native-vector-icons/Feather';
 
 import { useTheme } from 'react-native-paper';
 import { addToken } from '../../store/Token';
+import { addUser } from '../../store/CurrentUser';
 
 import { useDispatch, useSelector } from 'react-redux';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as ApiAuthentication from '../../api/Auth'
-import axios from 'axios';
-import config from '../../axios/config'
 
 import { isAdmin } from '../../store/isAdmin';
 const SignInScreen = ({ navigation }) => {
     const dispatch = useDispatch()
     const isToken = useSelector(state => state.Token)
+    const CurrentUser = useSelector(state => state.CurrentUser)
 
     const [acc, setAcc] = React.useState({
         username: '',
@@ -126,12 +126,11 @@ const SignInScreen = ({ navigation }) => {
         try {
             const res = await ApiAuthentication.login({ username: acc.username, password: acc.password });
             let { data } = res.data
-            console.log('====================================');
-            console.log(res.data);
-            console.log('====================================');
             if (res.data.status === 0) {
                 await AsyncStorage.setItem('Token', data.token)
+                await AsyncStorage.setItem('user', JSON.stringify(data.user))
                 dispatch(addToken())
+                dispatch(addUser(data.user))
                 Alert.alert('Thành công!', res.data.message, [
                     { text: 'Xác nhận' }
                 ]);

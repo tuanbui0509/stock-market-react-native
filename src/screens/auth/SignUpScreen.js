@@ -1,32 +1,19 @@
-import React, { useRef, useState } from 'react';
+import { Picker } from '@react-native-picker/picker';
+import { LinearGradient } from 'expo-linear-gradient';
+import { Field, Formik } from 'formik';
+import moment from 'moment';
+import React from 'react';
 import {
-    View,
-    Text,
-    Button,
-    TouchableOpacity,
-    Dimensions,
-    TextInput,
-    Platform,
-    StyleSheet,
-    ScrollView,
-    StatusBar,
-    Alert
+    Alert, Platform, ScrollView,
+    StatusBar, StyleSheet, Text, TouchableOpacity, View
 } from 'react-native';
 import * as Animatable from 'react-native-animatable';
-import { LinearGradient } from 'expo-linear-gradient';
-import moment from 'moment';
-import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import Feather from 'react-native-vector-icons/Feather';
-import * as yup from 'yup'
-import { Field, Formik } from 'formik'
 import { useTheme } from 'react-native-paper';
-
-import CustomInput from '../../helpers/CustomInput'
-import DateTimePicker from '@react-native-community/datetimepicker';
-// import { Picker } from '@react-native-community/picker'
+import * as yup from 'yup';
+import * as ApiAuthentication from '../../api/Auth';
 import CustomDatePicker from '../../components/CustomDatePicker';
-import { Picker } from '@react-native-picker/picker';
-import * as ApiAuthentication from '../../api/Auth'
+import CustomInput from '../../helpers/CustomInput';
+
 
 const signUpValidationSchema = yup.object().shape({
     ho: yup

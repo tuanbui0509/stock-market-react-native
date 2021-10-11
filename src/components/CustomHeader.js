@@ -24,12 +24,12 @@ function CustomHeader(props) {
                                 source={IMAGE.ICON_BACK}
                                 resizeMode="contain"
                             />
-                            <Text>Back</Text>
+                            <Text>Quay lại</Text>
                         </TouchableOpacity>
                 }
             </View>
 
-            <View style={{ flex: 1.5, justifyContent: 'center' }}>
+            <View style={{ flex: 1, justifyContent: 'center' }}>
                 <Text style={{ textAlign: 'center' }}>{title}</Text>
             </View>
             <View style={{ flex: 1 }}></View>
