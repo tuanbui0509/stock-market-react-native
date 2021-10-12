@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
 import { Row, Table } from 'react-native-table-component';
 import * as Api from '../../../api/Account';
+import Formatter from '../../../helpers/formatNumber'
+
 export default function MyStockScreen() {
     const [columns, setColumns] = useState(['MaCP', 'Số lượng', 'Tổng số', 'Số lượng T0', 'Số lượng T1', 'Số lượng T2', 'Giá TT', 'Giá trị TT'])
     const [widthArr, setWidthArr] = useState([80, 80, 80, 100, 100, 100, 80, 100])
@@ -9,6 +11,15 @@ export default function MyStockScreen() {
     useEffect(() => {
         const fetchApi = async () => {
             const res = await Api.MyStocks()
+            res.data.list.forEach((e) => {
+                e.soLuong = Formatter(e.soLuong);
+                e.soLuongT0 = Formatter(e.soLuongT0);
+                e.soLuongT1 = Formatter(e.soLuongT1);
+                e.soLuongT2 = Formatter(e.soLuongT2);
+                e.tongSo = Formatter(e.tongSo);
+                e.giaTT = Formatter(e.giaTT);
+                e.giaTriTT = Formatter(e.giaTriTT);
+            })
             setTableData(res.data.list);
         }
 

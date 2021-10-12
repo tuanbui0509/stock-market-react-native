@@ -5,16 +5,25 @@ import * as Api from '../../../api/Account';
 import { Picker } from '@react-native-picker/picker';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchBankAccount } from '../../../store/users/BankAccount';
+import Formatter from '../../../helpers/formatNumber'
 
 export default function MyBankAccountScreen() {
     const BankAccount = useSelector(state => state.BankAccount)
     const dispatch = useDispatch()
-    const [columns, setColumns] = useState(['Số dư tài khoản', 'Số dư T0', 'Số dư T1', 'Số dư T2', 'Chờ thanh toán', 'Tổng số tiến'])
+    const [columns, setColumns] = useState(['Số dư tài khoản', 'Số dư T0', 'Số dư T1', 'Số dư T2', 'Chờ thanh toán', 'Tổng số tiền'])
     const [widthArr, setWidthArr] = useState([130, 100, 100, 100, 120, 120])
     const [tableData, setTableData] = useState([])
     useEffect(() => {
         const fetchApi = async () => {
             const res = await Api.MyBankAccount()
+            res.data.forEach((e) => {
+                e.soDuT0 = Formatter(e.soDuT0) || 0;
+                e.soDuT1 = Formatter(e.soDuT1) || 0;
+                e.soDuT2 = Formatter(e.soDuT2) || 0;
+                e.soDu = Formatter(e.soDu) || 0;
+                e.choThanhToan = Formatter(e.choThanhToan) || 0;
+                e.tongSoTien = Formatter(e.tongSoTien) || 0;
+            })
             dispatch(fetchBankAccount(res.data))
             let temp = []
             temp.push(res.data[0])
@@ -38,7 +47,7 @@ export default function MyBankAccountScreen() {
     const getListBankAccount = BankAccount?.map((acc, index) => {
         let value = acc.nganHang.tenNganHang + ' - ' + acc.stk
         return (
-            <Picker.Item key={index} label={value} value={acc.stk} />
+            <Picker.Item key={index} label={value} value={acc.stk} style={{ fontSize: 16 }} />
         )
     })
 
@@ -97,8 +106,8 @@ const styles = StyleSheet.create({
     container: { padding: 5, paddingTop: 5, backgroundColor: '#fff' },
     header: { height: 50, backgroundColor: '#37C2D0' },
     textHeader: { textAlign: 'center', fontWeight: '100', color: '#fff', fontSize: 16, fontWeight: 'bold' },
-    textBody: { textAlign: 'center', fontWeight: '100', fontWeight: 'bold' },
+    textBody: { textAlign: 'center', fontWeight: '100', fontWeight: 'bold', fontSize: 15 },
     dataWrapper: { marginTop: -1 },
     row: { height: 40, backgroundColor: '#fff' },
-    styleSelect: { paddingTop: 20, paddingBottom: 20, width: 350 }
+    styleSelect: { paddingTop: 20, paddingBottom: 20, width: 300 }
 });
