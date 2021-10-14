@@ -24,6 +24,7 @@ function LightningTableScreen(props) {
             const res = await Api.LightningTable()
             setTableData(res.data);
         }
+        console.log('123');
         fetchApi()
     }, [])
     const sortTable = (column) => {

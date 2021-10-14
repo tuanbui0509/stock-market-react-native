@@ -13,6 +13,7 @@ import * as yup from 'yup';
 import * as ApiAuthentication from '../../api/Auth';
 import CustomDatePicker from '../../components/CustomDatePicker';
 import CustomInput from '../../helpers/CustomInput';
+import Color from '../../constants/Colors'
 
 
 const signUpValidationSchema = yup.object().shape({
@@ -98,7 +99,7 @@ const SignInScreen = ({ navigation }) => {
 
     return (
         <View style={styles.container}>
-            <StatusBar backgroundColor='#009387' barStyle="light-content" />
+            <StatusBar backgroundColor={Color.bg_color} barStyle="light-content" />
             <View style={styles.header}>
                 <Text style={styles.text_header}>Đăng ký tài khoản!</Text>
             </View>
@@ -275,26 +276,26 @@ const SignInScreen = ({ navigation }) => {
                                         onPress={handleSubmit}
                                     >
                                         <LinearGradient
-                                            colors={['#08d4c4', '#01ab9d']}
+                                            colors={['#08d4c4', Color.bg_color]}
                                             style={styles.signIn}
                                         >
                                             <Text style={[styles.textSign, {
                                                 color: '#fff'
-                                            }]}>Sign Up</Text>
+                                            }]}>Đăng ký</Text>
                                         </LinearGradient>
                                     </TouchableOpacity>
 
                                     <TouchableOpacity
-                                        onPress={() => navigation.goBack()}
+                                        onPress={() => navigation.replace('SignInScreen')}
                                         style={[styles.signIn, {
-                                            borderColor: '#009387',
+                                            borderColor: Color.bg_color,
                                             borderWidth: 1,
                                             marginTop: 15
                                         }]}
                                     >
                                         <Text style={[styles.textSign, {
-                                            color: '#009387'
-                                        }]}>Sign In</Text>
+                                            color: Color.bg_color
+                                        }]}>Đăng nhập</Text>
                                     </TouchableOpacity>
                                 </View>
 
@@ -314,7 +315,7 @@ export default SignInScreen;
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#009387'
+        backgroundColor: Color.bg_color
     },
     header: {
         flex: 1,

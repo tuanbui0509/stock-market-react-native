@@ -10,7 +10,6 @@ const CustomInput = (props) => {
     } = props
 
     const onChangeText = (text) => {
-        console.log(text);
         onChange(name)(text)
         props.onValueChange(text)
 
@@ -42,8 +41,8 @@ const styles = StyleSheet.create({
         width: '100%',
         marginBottom: 10,
         backgroundColor: 'white',
-        borderColor: 'gray',
-        borderWidth: StyleSheet.hairlineWidth,
+        // borderColor: 'gray',
+        // borderWidth: StyleSheet.hairlineWidth,
         borderRadius: 10,
 
         flex: 1,

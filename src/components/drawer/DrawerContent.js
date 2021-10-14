@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, StyleSheet, Alert } from 'react-native';
 import {
     useTheme,
@@ -17,22 +17,19 @@ import {
 } from '@react-navigation/drawer';
 
 import Icon from 'react-native-vector-icons/Ionicons';
-// import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import * as Animatable from 'react-native-animatable';
 import { useDispatch, useSelector } from 'react-redux';
 import { removeToken } from '../../store/Token';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { removeAdmin } from '../../store/isAdmin';
 import { removeUser } from '../../store/CurrentUser';
-
-// import{ AuthContext } from '../components/context';
-
 export function DrawerContent(props) {
-    let { navigation } = props
+
     const dispatch = useDispatch()
     const Token = useSelector(state => state.Token)
     const isAdmin = useSelector(state => state.isAdmin)
     const CurrentUser = useSelector(state => state.CurrentUser)
+    const [Loading, setLoading] = useState(false)
 
     const Logout = async () => {
         await AsyncStorage.removeItem('Token')
@@ -61,7 +58,8 @@ export function DrawerContent(props) {
             //clicking out side of alert will not cancel
         );
     };
-
+    // console.log(CurrentUser);
+    // console.log('====================================');
     return (
         <View style={{ flex: 1 }}>
             <DrawerContentScrollView {...props}>
@@ -126,7 +124,7 @@ export function DrawerContent(props) {
                                 label="Thông tin khách hàng"
                                 onPress={() => { props.navigation.navigate('InformationScreen') }}
                             />
-                            <DrawerItem
+                            {/* <DrawerItem
                                 icon={({ color, size }) => (
                                     <Icon
                                         name="ios-card-outline"
@@ -136,7 +134,7 @@ export function DrawerContent(props) {
                                 )}
                                 label="Danh sách tài khoản"
                                 onPress={() => { props.navigation.navigate('Users') }}
-                            />
+                            /> */}
                             <DrawerItem
                                 icon={({ color, size }) => (
                                     <Icon
@@ -146,7 +144,7 @@ export function DrawerContent(props) {
                                     />
                                 )}
                                 label="Đổi mật khẩu"
-                                onPress={() => { props.navigation.navigate('BookmarkScreen') }}
+                                onPress={() => { props.navigation.navigate('ChangePasswordScreen', { ...CurrentUser }) }}
                             />
                             <DrawerItem
                                 icon={({ color, size }) => (

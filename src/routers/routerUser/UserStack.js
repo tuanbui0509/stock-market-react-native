@@ -1,6 +1,6 @@
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { StyleSheet } from 'react-native';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import CustomHeader from '../../components/CustomHeader';
@@ -28,17 +28,20 @@ const createTopTabs = (props) => {
             color={color}
           />
         )
-      }
+      },
+      tabBarLabelStyle: { fontSize: 12 },
+      // tabBarItemStyle: { width: 100 },
+      tabBarStyle: { backgroundColor: 'powderblue' },
     })}
-    tabBarOptions={{
-      activeTintColor: '#007AFF',
-      inactiveTintColor: '#555',
-      activeBackgroundColor: '#fff',
-      inactiveBackgroundColor: '#999',
-      showLabel: true,
-      labelStyle: { fontSize: 14 },
-      showIcon: true,
-    }}
+    // tabBarOptions={{
+    //   activeTintColor: '#007AFF',
+    //   inactiveTintColor: '#555',
+    //   activeBackgroundColor: '#fff',
+    //   inactiveBackgroundColor: '#999',
+    //   showLabel: true,
+    //   labelStyle: { fontSize: 14 },
+    //   showIcon: true,
+    // }}
     activeColor='#f0edf6'
     inactiveColor='#3e2465'
     barStyle={{ backgroundColor: '#694fad' }}
@@ -52,6 +55,8 @@ const createTopTabs = (props) => {
       component={MyBankAccountScreen}
     />
   </Tab.Navigator>
+
+
 }
 
 const navOptionHandler = () => ({
@@ -61,6 +66,10 @@ const navOptionHandler = () => ({
 const Stack = createStackNavigator()
 
 function UserStack({ navigation, route }) {
+  const [loading, setLoading] = useState(false)
+  useEffect(() => {
+
+  }, [setLoading])
   return (
     <>
       <CustomHeader title="Thông tin khách hàng" isHome={true} navigation={navigation} />

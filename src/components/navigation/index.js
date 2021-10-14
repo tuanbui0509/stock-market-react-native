@@ -38,7 +38,6 @@ export default function Navigation() {
             console.log(error);
         }
     }
-
     React.useEffect(() => {
         getData()
     }, [])

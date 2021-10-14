@@ -13,4 +13,8 @@ export default {
     standard: 'rgb(246, 155, 11)',
     ceil: 'rgb(0, 105, 196)',
     floor: 'rgb(190, 0, 190)',
+
+    //radiant color and background
+    btn_color: '#08d4c4',
+    bg_color: '#37C2D0',
 }

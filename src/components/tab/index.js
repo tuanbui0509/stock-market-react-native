@@ -30,7 +30,7 @@ function TabNavigator() {
                         // options={navOptionHandler} 
                         options={{
                             tabBarLabel: 'QL Đơn đăng ký',
-                            tabBarColor: '#1f65ff',
+                            tabBarColor: '#37C2D0',
                             tabBarIcon: ({ color }) => (
                                 <Icon name="ios-person" color={color} size={26} />
                             ),
@@ -40,7 +40,7 @@ function TabNavigator() {
                     <Tab.Screen name="ManagementStocks" component={ManagementStockStack}
                         options={{
                             tabBarLabel: 'QL Cỗ phiếu',
-                            tabBarColor: '#1f65ff',
+                            tabBarColor: '#37C2D0',
                             tabBarIcon: ({ color }) => (
                                 <Icon name="md-bar-chart-sharp" color={color} size={26} />
                             ),
@@ -51,7 +51,7 @@ function TabNavigator() {
 
                         options={{
                             tabBarLabel: 'QL Nhà đầu tư',
-                            tabBarColor: '#1f65ff',
+                            tabBarColor: '#37C2D0',
                             tabBarIcon: ({ color }) => (
                                 <Icon name="ios-reader" color={color} size={26} />
                             ),
@@ -61,7 +61,7 @@ function TabNavigator() {
                     {/* <Tab.Screen name="Orders" component={OrderStack}
                         options={{
                             tabBarLabel: 'Đặt lệnh',
-                            tabBarColor: '#1f65ff',
+                            tabBarColor: '#37C2D0',
                             tabBarIcon: ({ color }) => (
                                 <Icon name="md-construct-sharp" color={color} size={26} />
                             ),
@@ -74,7 +74,7 @@ function TabNavigator() {
                         // options={navOptionHandler} 
                         options={{
                             tabBarLabel: 'Khách hàng',
-                            tabBarColor: '#1f65ff',
+                            tabBarColor: '#37C2D0',
                             tabBarIcon: ({ color }) => (
                                 <Icon name="ios-person" color={color} size={26} />
                             ),
@@ -84,7 +84,7 @@ function TabNavigator() {
                     <Tab.Screen name="Lightning-tables" component={LightningTableStack}
                         options={{
                             tabBarLabel: 'Thị trường',
-                            tabBarColor: '#1f65ff',
+                            tabBarColor: '#37C2D0',
                             tabBarIcon: ({ color }) => (
                                 <Icon name="md-bar-chart-sharp" color={color} size={26} />
                             ),
@@ -95,7 +95,7 @@ function TabNavigator() {
 
                         options={{
                             tabBarLabel: 'Sổ lệnh',
-                            tabBarColor: '#1f65ff',
+                            tabBarColor: '#37C2D0',
                             tabBarIcon: ({ color }) => (
                                 <Icon name="ios-reader" color={color} size={26} />
                             ),
@@ -105,7 +105,7 @@ function TabNavigator() {
                     <Tab.Screen name="Orders" component={OrderStack}
                         options={{
                             tabBarLabel: 'Đặt lệnh',
-                            tabBarColor: '#1f65ff',
+                            tabBarColor: '#37C2D0',
                             tabBarIcon: ({ color }) => (
                                 <Icon name="md-construct-sharp" color={color} size={26} />
                             ),
@@ -118,7 +118,7 @@ function TabNavigator() {
                 // options={navOptionHandler} 
                 options={{
                     tabBarLabel: 'Khách hàng',
-                    tabBarColor: '#1f65ff',
+                    tabBarColor: '#37C2D0',
                     tabBarIcon: ({ color }) => (
                         <Icon name="ios-person" color={color} size={26} />
                     ),
@@ -128,7 +128,7 @@ function TabNavigator() {
             <Tab.Screen name="Lightning-tables" component={LightningTableStack}
                 options={{
                     tabBarLabel: 'Thị trường',
-                    tabBarColor: '#1f65ff',
+                    tabBarColor: '#37C2D0',
                     tabBarIcon: ({ color }) => (
                         <Icon name="md-bar-chart-sharp" color={color} size={26} />
                     ),
@@ -139,7 +139,7 @@ function TabNavigator() {
 
                 options={{
                     tabBarLabel: 'Sổ lệnh',
-                    tabBarColor: '#1f65ff',
+                    tabBarColor: '#37C2D0',
                     tabBarIcon: ({ color }) => (
                         <Icon name="ios-reader" color={color} size={26} />
                     ),
@@ -149,7 +149,7 @@ function TabNavigator() {
             <Tab.Screen name="Orders" component={OrderStack}
                 options={{
                     tabBarLabel: 'Đặt lệnh',
-                    tabBarColor: '#1f65ff',
+                    tabBarColor: '#37C2D0',
                     tabBarIcon: ({ color }) => (
                         <Icon name="md-construct-sharp" color={color} size={26} />
                     ),

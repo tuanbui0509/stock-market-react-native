@@ -1,36 +1,40 @@
 import React from 'react';
-import { Image, Text, TouchableOpacity, View } from 'react-native';
-import { IMAGE } from '../constants/Image';
-
-
+import { Text, TouchableOpacity, View } from 'react-native';
+import Icon from 'react-native-vector-icons/FontAwesome';
 function CustomHeader(props) {
-    let { isHome, title, navigation } = props
+    let { isHome, title, navigation, route } = props
+
     return (
-        <View style={{ flexDirection: 'row', height: 50, paddingTop: 0 }}>
+        <View style={{ flexDirection: 'row', height: 50, paddingTop: 0, backgroundColor: '#37C2D0' }}>
             <View style={{ flex: 1, justifyContent: 'center' }}>
                 {
                     isHome ?
                         <TouchableOpacity onPress={() => navigation.openDrawer()}>
-                            <Image style={{ width: 30, height: 30, marginLeft: 5 }}
-                                source={IMAGE.ICON_MENU}
-                                resizeMode="contain" />
+                            <Icon
+                                name="bars"
+                                color='#fff'
+                                size={30}
+                                style={{ marginLeft: 10 }}
+                            />
                         </TouchableOpacity>
                         :
                         <TouchableOpacity
                             style={{ flexDirection: 'row', alignItems: 'center' }}
-                            onPress={() => navigation.goBack()}
+                            onPress={() => navigation.replace('HomeApp')}
                         >
-                            <Image style={{ width: 25, height: 25, marginLeft: 5 }}
-                                source={IMAGE.ICON_BACK}
-                                resizeMode="contain"
+                            <Icon
+                                name="chevron-left"
+                                color='#fff'
+                                size={20}
+                                style={{ marginLeft: 10 }}
                             />
-                            <Text>Quay lại</Text>
+                            <Text style={{ color: '#fff', fontWeight: 'bold' }}>  Quay lại</Text>
                         </TouchableOpacity>
                 }
             </View>
 
-            <View style={{ flex: 1, justifyContent: 'center' }}>
-                <Text style={{ textAlign: 'center' }}>{title}</Text>
+            <View style={{ flex: 2, justifyContent: 'center' }}>
+                <Text style={{ textAlign: 'center', fontWeight: 'bold', fontSize: 18, color: '#fff' }}>{title}</Text>
             </View>
             <View style={{ flex: 1 }}></View>
         </View>

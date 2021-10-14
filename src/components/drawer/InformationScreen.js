@@ -4,16 +4,25 @@ import CustomHeader from '../CustomHeader'
 import * as Animatable from 'react-native-animatable';
 import { useTheme } from 'react-native-paper';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-
+import Color from '../../constants/Colors'
+import { format } from 'date-fns';
 function InformationScreen(props) {
     const { colors } = useTheme();
-    const [user, setUser] = useState({})
+    const [user, setUser] = useState('')
     useEffect(() => {
         const getUser = async () => {
             setUser(JSON.parse(await AsyncStorage.getItem('user')))
         }
         getUser()
     }, [])
+    let ngaySinh, ngayCapCmnd
+    if (user) {
+
+        let value1 = new Date(user.ngaySinh)
+        let value2 = new Date(user.ngayCapCmnd)
+        ngaySinh = format(value1, 'dd/MM/yyyy')
+        ngayCapCmnd = format(value2, 'dd/MM/yyyy')
+    }
     return (
         <SafeAreaView style={{ flex: 1 }}>
             <CustomHeader title="" navigation={props.navigation} />
@@ -29,70 +38,101 @@ function InformationScreen(props) {
                         <View style={styles.action}>
                             <Text style={[styles.text_footer, {
                                 color: colors.text,
-                            }]}>Họ: {user.ho}</Text>
+                                fontWeight: 'bold'
+                            }]}>Họ và tên: </Text>
+                            <Text style={[styles.text_footer, {
+                                color: colors.text,
+                            }]}>{user.ho} {user.ten}</Text>
+                        </View>
+
+                        {/* <View style={styles.action}>
+                            <Text style={[styles.text_footer, {
+                                fontWeight: 'bold',
+                                color: colors.text,
+                            }]}>Tên: </Text>
+                            <Text style={[styles.text_footer, {
+                                color: colors.text,
+                            }]}>{user.ten}</Text>
+                        </View> */}
+
+                        <View style={styles.action}>
+                            <Text style={[styles.text_footer, {
+                                color: colors.text, fontWeight: 'bold',
+                            }]}>Giới tính: </Text>
+                            <Text style={[styles.text_footer, {
+                                color: colors.text,
+                            }]}>{user.phai ? 'Nam' : 'Nữ'}</Text>
                         </View>
 
                         <View style={styles.action}>
                             <Text style={[styles.text_footer, {
-                                color: colors.text,
-                            }]}>Tên: {user.ten}</Text>
-                        </View>
-
-                        <View style={styles.action}>
+                                color: colors.text, fontWeight: 'bold',
+                            }]}>Ngày sinh: </Text>
                             <Text style={[styles.text_footer, {
                                 color: colors.text,
-                            }]}>Giới tính: {user.phai ? 'Nam' : 'Nữ'}</Text>
-
-                        </View>
-
-                        <View style={styles.action}>
-                            <Text style={[styles.text_footer, {
-                                color: colors.text,
-                            }]}>Ngày sinh: {user.ngaySinh}</Text>
+                            }]}>{ngaySinh}</Text>
 
                         </View>
                         <View style={styles.action}>
                             <Text style={[styles.text_footer, {
+                                color: colors.text, fontWeight: 'bold',
+                            }]}>Nơi sinh: </Text>
+                            <Text style={[styles.text_footer, {
                                 color: colors.text,
-                            }]}>Nơi sinh của bạn: {user.noiSinh}</Text>
-
+                            }]}>{user.noiSinh}</Text>
                         </View>
 
                         <View style={styles.action}>
                             <Text style={[styles.text_footer, {
+                                color: colors.text, fontWeight: 'bold',
+                            }]}>Địa chỉ: </Text>
+                            <Text style={[styles.text_footer, {
                                 color: colors.text,
-                            }]}>Địa chỉ của bạn: {user.diaChi}</Text>
-
+                            }]}>{user.diaChi}</Text>
                         </View>
 
                         <View style={styles.action}>
                             <Text style={[styles.text_footer, {
+                                color: colors.text, fontWeight: 'bold',
+                            }]}>Email: </Text>
+                            <Text style={[styles.text_footer, {
                                 color: colors.text,
-                            }]}>Email: {user.email}</Text>
+                            }]}>{user.email}</Text>
                         </View>
                         <View style={styles.action}>
                             <Text style={[styles.text_footer, {
+                                color: colors.text, fontWeight: 'bold',
+                            }]}>Số điện thoại: </Text>
+                            <Text style={[styles.text_footer, {
                                 color: colors.text,
-                            }]}>Số điện thoại: {user.sdt}</Text>
-
+                            }]}>{user.sdt}</Text>
                         </View>
                         <View style={styles.action}>
 
                             <Text style={[styles.text_footer, {
+                                color: colors.text, fontWeight: 'bold',
+                            }]}>CMND: </Text>
+                            <Text style={[styles.text_footer, {
                                 color: colors.text,
-                            }]}>CMND: {user.cmnd}</Text>
+                            }]}>{user.cmnd}</Text>
                         </View>
 
                         <View style={styles.action}>
                             <Text style={[styles.text_footer, {
+                                color: colors.text, fontWeight: 'bold',
+                            }]}>Ngày cấp CMND: </Text>
+                            <Text style={[styles.text_footer, {
                                 color: colors.text,
-                            }]}>Ngày cấp CMND: {(user.ngayCapCmnd)}</Text>
+                            }]}>{ngayCapCmnd}</Text>
 
                         </View>
                         <View style={styles.action}>
                             <Text style={[styles.text_footer, {
+                                color: colors.text, fontWeight: 'bold',
+                            }]}>Nơi cấp CMND: </Text>
+                            <Text style={[styles.text_footer, {
                                 color: colors.text,
-                            }]}>Nơi cấp CMND: {user.noiCapCmmd}</Text>
+                            }]}>{user.noiCapCmmd}</Text>
                         </View>
 
                     </ScrollView>
@@ -105,7 +145,7 @@ function InformationScreen(props) {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#009387'
+        backgroundColor: Color.bg_color
     },
     header: {
         // flex: 1,

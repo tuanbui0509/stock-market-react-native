@@ -23,6 +23,7 @@ import { addUser } from '../../store/CurrentUser';
 import { useDispatch, useSelector } from 'react-redux';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as ApiAuthentication from '../../api/Auth'
+import Color from '../../constants/Colors'
 
 import { isAdmin } from '../../store/isAdmin';
 const SignInScreen = ({ navigation }) => {
@@ -140,10 +141,7 @@ const SignInScreen = ({ navigation }) => {
 
             }
             else {
-                console.log('====================================');
                 console.log(res.data.message);
-                console.log('====================================');
-
             }
 
         } catch (err) {
@@ -155,7 +153,7 @@ const SignInScreen = ({ navigation }) => {
 
     return (
         <View style={styles.container}>
-            <StatusBar backgroundColor='#009387' barStyle="light-content" />
+            <StatusBar backgroundColor={Color.bg_color} barStyle="light-content" />
             <View style={styles.header}>
                 <Text style={styles.text_header}>Chào mừng đến với NTNT!</Text>
             </View>
@@ -251,7 +249,7 @@ const SignInScreen = ({ navigation }) => {
 
 
                     <TouchableOpacity>
-                        <Text style={{ color: '#009387', marginTop: 15 }}>Quên mật khẩu?</Text>
+                        <Text style={{ color: Color.bg_color, marginTop: 15 }}>Quên mật khẩu?</Text>
                     </TouchableOpacity>
                     <View style={styles.button}>
                         <TouchableOpacity
@@ -259,7 +257,7 @@ const SignInScreen = ({ navigation }) => {
                             onPress={loginHandle}
                         >
                             <LinearGradient
-                                colors={['#08d4c4', '#01ab9d']}
+                                colors={[Color.btn_color, Color.bg_color]}
                                 style={styles.signIn}
                             >
                                 <Text style={[styles.textSign, {
@@ -271,13 +269,13 @@ const SignInScreen = ({ navigation }) => {
                         <TouchableOpacity
                             onPress={() => navigation.navigate('SignUpScreen')}
                             style={[styles.signIn, {
-                                borderColor: '#009387',
+                                borderColor: Color.bg_color,
                                 borderWidth: 1,
                                 marginTop: 15
                             }]}
                         >
                             <Text style={[styles.textSign, {
-                                color: '#009387'
+                                color: Color.bg_color
                             }]}>Đăng ký</Text>
                         </TouchableOpacity>
                     </View>
@@ -293,7 +291,7 @@ export default SignInScreen;
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#009387'
+        backgroundColor: Color.bg_color
     },
     header: {
         flex: 1,
