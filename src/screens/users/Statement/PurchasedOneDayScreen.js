@@ -6,17 +6,14 @@ import Formatter from '../../../helpers/formatNumber';
 import queryString from 'query-string';
 
 export default function PurchasedOneDayScreen({ navigation }) {
-    const [columns, setColumns] = useState(['MaCP', 'Khả dụng', 'Giá TT', 'Giá trị TT'])
+    const [columns, setColumns] = useState(['MaCK', 'Mua/Bán', 'KL Khớp/Tổng KL', 'Trạng thái', 'Hùy lệnh'])
+
     const [tableData, setTableData] = useState([])
-    const [pagination, setPagination] = useState({
-        current: 1,
-        pageSize: 10,
-    })
     useEffect(() => {
         const unsubscribe = navigation.addListener('focus', () => {
             const fetchApi = async () => {
-                // const paramsString = queryString.stringify(pagination);
-                // const res = await Api.PurchasedOneDay()
+                const res = await Api.PurchasedOneDay()
+                setTableData(res.data.list)
             }
             fetchApi()
         });
@@ -43,29 +40,37 @@ export default function PurchasedOneDayScreen({ navigation }) {
 
         </View>
     )
-
+    const ClassNameRender = (val) => {
+        if (val === 'CK')
+            return Color.yellow
+        else if (val === 'KH' || val === 'KP')
+            return Color.green
+        else
+            return Color.red
+    }
     return (
         <View style={styles.container}>
             <FlatList
                 data={tableData}
-                style={{ width: "98%", paddingTop: 5 }}
+                style={{ width: "100%", marginTop: 10, }}
                 keyExtractor={(item, index) => index + ""}
                 ListHeaderComponent={tableHeader}
                 stickyHeaderIndices={[0]}
                 renderItem={({ item, index }) => {
                     return (
-                        <View style={{ ...styles.tableRow, backgroundColor: index % 2 == 1 ? "#F0FBFC" : "white" }}>
-                            <Text
-                                style={{ ...styles.columnRowTxt, fontWeight: "bold" }}
-                            // onPress={() => onClickStock(item)}
-                            >
-                                {item.maCp.trim()}</Text>
-                            {/* <Text style={styles.columnRowTxtLight}>{item.tongSo}</Text> */}
-                            <Text style={styles.columnRowTxt4}>{item.soLuong}</Text>
-                            <Text style={styles.columnRowTxt4}>{item.giaTT}</Text>
-                            <Text style={styles.columnRowTxt4}>{item.giaTriTT}</Text>
-                        </View>
-
+                        <ScrollView >
+                            <View style={{ ...Styles.tableRow, backgroundColor: index % 2 == 1 ? "#F0FBFC" : "white" }}>
+                                <Text
+                                    style={{ ...Styles.columnRowTxt, fontWeight: "bold" }}
+                                // onPress={() => onClickStock(item)}
+                                >
+                                    {item.maCP.trim()}</Text>
+                                <Text style={{ ...Styles.columnRowTxt, width: '20%', color: item.loaiGiaoDich ? Color.green : Color.red }}>{item.loaiGiaoDich ? 'Mua' : 'Bán'}</Text>
+                                <Text style={{ ...Styles.columnRowTxtLight, width: '20%' }}>{Formatter(item.soLuong)}/{Formatter(item.slKhop) || '0'}</Text>
+                                <Text style={{ ...Styles.columnRowTxtLight, width: '20%' }}>{Formatter(item.gia)}</Text>
+                                <Text style={{ ...Styles.columnRowTxt, width: '20%', color: ClassNameRender(item.maTT.trim()) }}>{item.tenTrangThai}</Text>
+                            </View>
+                        </ScrollView>
                     )
                 }}
             />

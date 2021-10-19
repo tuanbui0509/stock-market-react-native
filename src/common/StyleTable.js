@@ -100,7 +100,8 @@ const styles = StyleSheet.create({
     textTitleRBSheet: {
         fontSize: 20,
         padding: 2,
-        fontWeight: 'bold'
+        fontWeight: 'bold',
+        textAlign: "center",
     },
     textBodyRBSheet: {
         width: "16.66666666666667%",

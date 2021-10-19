@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Button, FlatList, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import * as Api from '../../../api/Statement';
-import Styles from '../../../common/StyleTable';
 import Formatter from '../../../helpers/formatNumber';
 import queryString from 'query-string';
 import { useForm, Controller } from "react-hook-form";
@@ -14,11 +13,18 @@ import moment from 'moment';
 import Color from '../../../constants/Colors';
 import { Col } from 'react-native-table-component';
 import { LinearGradient } from 'expo-linear-gradient';
+import Modal from "react-native-modal";
+import styleModal from '../../../common/styleModal';
+import Styles from '../../../common/StyleTable';
+import { format } from 'date-fns';
 
 export default function HistoryOrderScreen({ navigation }) {
     const [columns, setColumns] = useState(['MaCK', 'Mua/Bán', 'KL Khớp/Tổng KL', 'Giá', 'Trạng thái'])
+    const [detail, setDetail] = useState(['Mã LD', 'Giá', 'SL Khớp', 'Giá trị khớp'])
     const [tableData, setTableData] = useState([])
     const [status, setStatus] = useState([])
+    const [currentMaCK, setCurrentMaCK] = useState([])
+
     const [data, setData] = useState({
         from: moment().subtract(7, 'd'),
         to: moment(),
@@ -36,6 +42,7 @@ export default function HistoryOrderScreen({ navigation }) {
             const fetchApi = async () => {
                 const temp = { ...data, from: data.from.format('MM/DD/YYYY'), to: data.to.format('MM/DD/YYYY') }
                 const paramsString = queryString.stringify(temp);
+                console.log(paramsString);
                 const res = await Api.HistoryOrder(paramsString)
                 setTableData(res.data.list)
             }
@@ -96,6 +103,52 @@ export default function HistoryOrderScreen({ navigation }) {
         else
             return Color.red
     }
+    const tableHeaderDetail = () => (
+        <View style={Styles.tableHeaderDetail}>
+            {
+                detail.map((column, index) => {
+                    {
+                        return (
+                            <TouchableOpacity
+                                key={index}
+                                style={{ ...Styles.columnHeader, width: '25%' }} >
+                                <Text style={{ ...Styles.columnHeaderTxt, fontSize: 13 }}>{column} </Text>
+                            </TouchableOpacity>
+                        )
+                    }
+                })
+            }
+
+        </View>
+    )
+
+
+
+    const [isModalVisible, setModalVisible] = useState(false);
+
+    const toggleModal = (item) => {
+        setCurrentMaCK(item)
+        setModalVisible(!isModalVisible);
+    };
+    const YourOwnComponent = () =>
+        <View style={styleModal.centeredView}>
+            <View style={styleModal.modalView}>
+                <Text style={{ ...Styles.textTitleRBSheet, fontSize: 16 }}>Mã cổ phiếu: {currentMaCK.maCP}</Text>
+                <Text style={{ ...Styles.textTitleRBSheet, fontSize: 16 }}>STK: {currentMaCK.stk}</Text>
+                <Text style={{ ...Styles.textTitleRBSheet, fontSize: 16 }}>Thời gian: {format(new Date(currentMaCK.thoiGian), 'dd/MM/yyyy kk:mm:ss')}</Text>
+                <FlatList
+                    style={{ paddingTop: 5 }}
+                    ListHeaderComponent={tableHeaderDetail()}
+                />
+                <View style={{ ...Styles.tableRow, backgroundColor: "#F0FBFC", paddingBottom: 20 }}>
+                    <Text style={{ ...Styles.textBodyRBSheet, width: '25%', fontSize: 13 }}>{Formatter(currentMaCK.maLD) || '0'}</Text>
+                    <Text style={{ ...Styles.textBodyRBSheet, width: '25%', fontSize: 13 }}>{Formatter(currentMaCK.giaKhop) || '0'}</Text>
+                    <Text style={{ ...Styles.textBodyRBSheet, width: '25%', fontSize: 13 }}>{Formatter(currentMaCK.slKhop) || '0'}</Text>
+                    <Text style={{ ...Styles.textBodyRBSheet, width: '25%', fontSize: 13 }}>{Formatter(currentMaCK.giaTriKhop) || '0'}</Text>
+                </View>
+                <Button title="Đóng" onPress={() => setModalVisible(false)} />
+            </View>
+        </View>;
 
     return (
         <View style={styles.container}>
@@ -158,7 +211,7 @@ export default function HistoryOrderScreen({ navigation }) {
                         colors={[Color.btn_color, Color.bg_color]}
                         style={styles.appButtonContainer}
                     >
-                        <Text style={styles.appButtonText}>Xác nhận</Text>
+                        <Text style={styles.appButtonText}>Cập nhật</Text>
                     </LinearGradient>
                 </TouchableOpacity>
             </View>
@@ -174,18 +227,7 @@ export default function HistoryOrderScreen({ navigation }) {
                             <View style={{ ...Styles.tableRow, backgroundColor: index % 2 == 1 ? "#F0FBFC" : "white" }}>
                                 <Text
                                     style={{ ...Styles.columnRowTxt, fontWeight: "bold" }}
-                                // onPress={() => onClickStock(item)}
-                                >
-                                    {item.maCP.trim()}</Text>
-                                <Text style={{ ...Styles.columnRowTxt, width: '20%', color: item.loaiGiaoDich ? Color.green : Color.red }}>{item.loaiGiaoDich ? 'Mua' : 'Bán'}</Text>
-                                <Text style={{ ...Styles.columnRowTxtLight, width: '20%' }}>{Formatter(item.soLuong)}/{Formatter(item.slKhop) || '0'}</Text>
-                                <Text style={{ ...Styles.columnRowTxtLight, width: '20%' }}>{Formatter(item.gia)}</Text>
-                                <Text style={{ ...Styles.columnRowTxt, width: '20%', color: ClassNameRender(item.maTT.trim()) }}>{item.tenTrangThai}</Text>
-                            </View>
-                            <View style={{ ...Styles.tableRow, backgroundColor: index % 2 == 1 ? "#F0FBFC" : "white" }}>
-                                <Text
-                                    style={{ ...Styles.columnRowTxt, fontWeight: "bold" }}
-                                // onPress={() => onClickStock(item)}
+                                    onPress={() => toggleModal(item)}
                                 >
                                     {item.maCP.trim()}</Text>
                                 <Text style={{ ...Styles.columnRowTxt, width: '20%', color: item.loaiGiaoDich ? Color.green : Color.red }}>{item.loaiGiaoDich ? 'Mua' : 'Bán'}</Text>
@@ -197,6 +239,20 @@ export default function HistoryOrderScreen({ navigation }) {
                     )
                 }}
             />
+            <Modal
+                isVisible={isModalVisible}
+                onBackdropPress={() => setModalVisible(false)}
+                testID={'modal'}
+                backdropOpacity={0.8}
+                animationIn="zoomInDown"
+                animationOut="zoomOutUp"
+                animationInTiming={600}
+                animationOutTiming={600}
+                backdropTransitionInTiming={600}
+                backdropTransitionOutTiming={600}
+            >
+                <YourOwnComponent />
+            </Modal>
         </View>
     )
 }
@@ -242,7 +298,7 @@ const styles = StyleSheet.create({
     textStyle: {
         paddingVertical: 10,
         height: 40,
-        width: '86%',
+        width: '80%',
         marginLeft: 10,
         borderWidth: StyleSheet.hairlineWidth,
         borderRadius: 10,
