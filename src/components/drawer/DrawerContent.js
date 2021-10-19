@@ -116,7 +116,7 @@ export function DrawerContent(props) {
                             <DrawerItem
                                 icon={({ color, size }) => (
                                     <Icon
-                                        name="ios-person-sharp"
+                                        name="person-circle-sharp"
                                         color={color}
                                         size={size}
                                     />
@@ -144,7 +144,7 @@ export function DrawerContent(props) {
                                     />
                                 )}
                                 label="Đổi mật khẩu"
-                                onPress={() => { props.navigation.navigate('ChangePasswordScreen', { ...CurrentUser }) }}
+                                onPress={() => { props.navigation.navigate('ChangePasswordScreen') }}
                             />
                             <DrawerItem
                                 icon={({ color, size }) => (
@@ -155,7 +155,7 @@ export function DrawerContent(props) {
                                     />
                                 )}
                                 label="Đổi mã PIN"
-                                onPress={() => { props.navigation.navigate('SupportScreen') }}
+                                onPress={() => { props.navigation.navigate('ChangePinScreen') }}
                             />
                             <DrawerItem
                                 icon={({ color, size }) => (

@@ -17,7 +17,6 @@ const CustomDatePicker = (props) => {
 
     const onChangeDate = (e, selectedDate) => {
         setShow(false)
-        console.log('selectedDate: ', moment(selectedDate));
         setDate(moment(selectedDate))
         props.onDateChange(selectedDate)
     }

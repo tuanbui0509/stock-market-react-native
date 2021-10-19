@@ -86,7 +86,7 @@ function TabNavigator() {
                             tabBarLabel: 'Thị trường',
                             tabBarColor: '#37C2D0',
                             tabBarIcon: ({ color }) => (
-                                <Icon name="md-bar-chart-sharp" color={color} size={26} />
+                                <Icon name="bar-chart" color={color} size={26} />
                             ),
                             headerShown: false
                         }}
@@ -107,7 +107,7 @@ function TabNavigator() {
                             tabBarLabel: 'Đặt lệnh',
                             tabBarColor: '#37C2D0',
                             tabBarIcon: ({ color }) => (
-                                <Icon name="md-construct-sharp" color={color} size={26} />
+                                <Icon name="hammer" color={color} size={26} />
                             ),
                             headerShown: false
                         }}

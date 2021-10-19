@@ -8,6 +8,7 @@ import CustomHeader from '../../../components/CustomHeader';
 import Color from '../../../constants/Colors';
 import Formatter from '../../../helpers/formatNumber'
 import * as Price from '../../../constants/Price';
+import styles from '../../../common/StyleTable';
 function LightningTableScreen(props) {
     const refRBSheet = useRef();
     let { navigation } = props
@@ -19,21 +20,18 @@ function LightningTableScreen(props) {
     const [selectedColumn, setSelectedColumn] = useState(null)
     const [tableData, setTableData] = useState([])
     const [currentStock, setCurrentStock] = useState([])
+
     useEffect(() => {
-        const fetchApi = async () => {
-            const res = await Api.LightningTable()
-            setTableData(res.data);
-        }
-        console.log('123');
-        fetchApi()
-    }, [])
-    const sortTable = (column) => {
-        const newDirection = direction === "desc" ? "asc" : "desc"
-        const sortedData = _.orderBy(tableData, [column], [newDirection])
-        setSelectedColumn(column)
-        setDirection(newDirection)
-        setTableData(sortedData)
-    }
+        const unsubscribe = navigation.addListener('focus', () => {
+            const fetchApi = async () => {
+                const res = await Api.LightningTable()
+                setTableData(res.data);
+            }
+            fetchApi()
+        });
+
+        return unsubscribe;
+    }, [navigation]);
     const tableHeader = () => (
         <View style={styles.tableHeader}>
             {
@@ -42,14 +40,8 @@ function LightningTableScreen(props) {
                         return (
                             <TouchableOpacity
                                 key={index}
-                                style={styles.columnHeader}
-                                onPress={() => sortTable(column)}>
-                                <Text style={styles.columnHeaderTxt}>{column + " "}
-                                    {selectedColumn === column && <MaterialCommunityIcons
-                                        name={direction === "desc" ? "arrow-down-drop-circle" : "arrow-up-drop-circle"}
-                                    />
-                                    }
-                                </Text>
+                                style={styles.columnHeader}>
+                                <Text style={styles.columnHeaderTxt}>{column}</Text>
                             </TouchableOpacity>
                         )
                     }
@@ -67,8 +59,7 @@ function LightningTableScreen(props) {
                         return (
                             <TouchableOpacity
                                 key={index}
-                                style={styles.columnHeader}
-                                onPress={() => sortTable(column)}>
+                                style={styles.columnHeader} >
                                 <Text style={styles.columnHeaderTxt}>{column}
 
                                 </Text>
@@ -89,11 +80,8 @@ function LightningTableScreen(props) {
                         return (
                             <TouchableOpacity
                                 key={index}
-                                style={styles.columnHeaderDetail}
-                                onPress={() => sortTable(column)}>
-                                <Text style={styles.columnHeaderTxt}>{column}
-
-                                </Text>
+                                style={styles.columnHeaderDetail} >
+                                <Text style={styles.columnHeaderTxt}>{column}</Text>
                             </TouchableOpacity>
                         )
                     }
@@ -225,101 +213,4 @@ function LightningTableScreen(props) {
 
     )
 }
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: '#fff',
-        alignItems: 'center',
-        justifyContent: 'center',
-    },
-    containerRBSheet: {
-        flex: 1,
-        backgroundColor: '#fff',
-        alignItems: 'center',
-    },
-    tableHeader: {
-        flexDirection: "row",
-        justifyContent: "space-evenly",
-        alignItems: "center",
-        backgroundColor: "#37C2D0",
-        borderTopEndRadius: 10,
-        borderTopStartRadius: 10,
-        height: 50
-    },
-    tableHeaderDetail: {
-        flexDirection: "row",
-        justifyContent: "space-evenly",
-        alignItems: "center",
-        backgroundColor: "#37C2D0",
-        borderTopEndRadius: 10,
-        borderTopStartRadius: 10,
-        height: 40
-    },
-    tableRow: {
-        flexDirection: "row",
-        height: 40,
-        alignItems: "center",
-    },
-    columnHeader: {
-        width: "20%",
-        justifyContent: "center",
-        alignItems: "center"
-    },
-    columnHeaderDetail: {
-        width: "30%",
-        justifyContent: "center",
-        alignItems: "center"
-    },
-    columnHeaderTxt: {
-        color: "white",
-        fontWeight: "bold",
-        fontSize: 16
-    },
-    columnRowTxt: {
-        width: "20%",
-        textAlign: "center",
-        fontSize: 16,
-        fontWeight: "bold",
-
-    },
-    columnRowFloor: {
-        width: "20%",
-        textAlign: "center",
-        color: Color.floor,
-        fontWeight: "bold",
-        fontSize: 16
-    },
-    columnRowCeil: {
-        width: "20%",
-        textAlign: "center",
-        color: Color.ceil,
-        fontWeight: "bold",
-        fontSize: 16
-    },
-    columnRowStandard: {
-        width: "20%",
-        textAlign: "center",
-        fontWeight: "bold",
-        color: Color.standard,
-        fontSize: 16
-
-    },
-    textTitleRBSheet: {
-        fontSize: 20,
-        padding: 2,
-        fontWeight: 'bold'
-    },
-    textBodyRBSheet: {
-        width: "16.66666666666667%",
-        textAlign: "center",
-        fontSize: 16,
-        fontWeight: "bold"
-    },
-    textBodyRBSheet_main: {
-        width: "30%",
-        textAlign: "center",
-        fontSize: 16,
-        fontWeight: "bold"
-    }
-});
 export default LightningTableScreen

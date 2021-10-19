@@ -7,3 +7,11 @@ export const MyStocks = () => {
 export const MyBankAccount = () => {
     return AxiosClient.get("TaiKhoanNganHang")
 }
+
+export const ChangePassword = (body) => {
+    return AxiosClient.put("MatKhau/DangNhap",body)
+}
+
+export const ChangePin = (body) => {
+    return AxiosClient.put("MatKhau/DatLenh",body)
+}

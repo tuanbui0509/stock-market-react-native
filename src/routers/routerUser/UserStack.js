@@ -30,18 +30,13 @@ const createTopTabs = (props) => {
         )
       },
       tabBarLabelStyle: { fontSize: 12 },
-      // tabBarItemStyle: { width: 100 },
       tabBarStyle: { backgroundColor: 'powderblue' },
+      tabBarActiveTintColor: '#007AFF',
+      tabBarInactiveTintColor: '#555',
+      tabBarActiveBackgroundColor: '#fff',
+      tabBarInactiveBackgroundColor: '#999',
+      showLabel: true,
     })}
-    // tabBarOptions={{
-    //   activeTintColor: '#007AFF',
-    //   inactiveTintColor: '#555',
-    //   activeBackgroundColor: '#fff',
-    //   inactiveBackgroundColor: '#999',
-    //   showLabel: true,
-    //   labelStyle: { fontSize: 14 },
-    //   showIcon: true,
-    // }}
     activeColor='#f0edf6'
     inactiveColor='#3e2465'
     barStyle={{ backgroundColor: '#694fad' }}

@@ -19,26 +19,25 @@ const signUpValidationSchema = yup.object().shape({
         .string()
         //   .matches(/\w*[a-z]\w*/,  "Password must have a small letter")
         //   .matches(/\w*[A-Z]\w*/,  "Password must have a capital letter")
-        //   .matches(/\d/, "Password must have a number")
+          .matches(/\d/, "Password must have a number")
         //   .matches(/[!@#$%^&*()\-_"=+{}; :,<.>]/, "Password must have a special character")
-        .min(8, ({ min }) => `Mật khẩu ít nhất là ${min} ký tự`)
-        .required('Mật khẩu cũ không được trống'),
+        .min(6, ({ min }) => `Mã Pin ít nhất là ${min} ký tự`)
+        .required('Mã Pin cũ không được trống'),
     newPassword: yup
         .string()
         //   .matches(/\w*[a-z]\w*/,  "Password must have a small letter")
         //   .matches(/\w*[A-Z]\w*/,  "Password must have a capital letter")
         //   .matches(/\d/, "Password must have a number")
         //   .matches(/[!@#$%^&*()\-_"=+{}; :,<.>]/, "Password must have a special character")
-        .min(8, ({ min }) => `Mật khẩu ít nhất là ${min} ký tự`)
-        .required('Mật khẩu mới không được trống'),
+        .min(6, ({ min }) => `Mã Pin ít nhất là ${min} ký tự`)
+        .required('Mã Pin mới không được trống'),
     confirmPassword: yup
         .string()
-        .oneOf([yup.ref('newPassword')], 'Hai mật khẩu không giống nhau')
-        .required('Xác nhận mật khẩu mới không được trống'),
+        .oneOf([yup.ref('newPassword')], 'Hai Mã Pin không giống nhau')
+        .required('Xác nhận Mã Pin mới không được trống'),
 })
 
-const ChangePasswordScreen = ({ navigation, route }) => {
-    const CurrentUser = route.params
+const ChangePinScreen = ({ navigation, route }) => {
     const [data, setData] = useState({
         oldPassword: '',
         newPassword: '',
@@ -47,10 +46,7 @@ const ChangePasswordScreen = ({ navigation, route }) => {
 
     const changeHandle = async (values) => {
         try {
-            const res = await Api.ChangePassword({ oldPassword: data.oldPassword, newPassword: data.newPassword })
-            console.log('====================================');
-            console.log(res.data);
-            console.log('====================================');
+            const res = await Api.ChangePin({ oldPassword: data.oldPassword, newPassword: data.newPassword })
             if (res.data.status === 400) {
                 Alert.alert('Thất bại!', res.data.message, [
                     { text: 'Quay lại' }
@@ -75,7 +71,7 @@ const ChangePasswordScreen = ({ navigation, route }) => {
         <View style={styles.container}>
             <CustomHeader title="" navigation={navigation} />
             <View style={styles.header}>
-                <Text style={styles.text_header}>Đổi mật khẩu!</Text>
+                <Text style={styles.text_header}>Đổi Mã Pin!</Text>
             </View>
             <Animatable.View
                 animation="fadeInUpBig"
@@ -96,7 +92,7 @@ const ChangePasswordScreen = ({ navigation, route }) => {
                             <>
                                 <Text style={[styles.text_footer, {
                                     marginTop: 10
-                                }]}>Mật khẩu cũ</Text>
+                                }]}>Mã Pin cũ</Text>
                                 <View style={styles.action}>
 
                                     <Field
@@ -104,7 +100,7 @@ const ChangePasswordScreen = ({ navigation, route }) => {
                                         iconName='lock'
                                         component={CustomInput}
                                         name="oldPassword"
-                                        placeholder="Nhập mật khẩu cũ"
+                                        placeholder="Nhập Mã Pin cũ"
                                         secureTextEntry
                                         onValueChange={(value) => setData({ ...data, oldPassword: value })}
 
@@ -113,13 +109,13 @@ const ChangePasswordScreen = ({ navigation, route }) => {
 
                                 <Text style={[styles.text_footer, {
                                     marginTop: 15
-                                }]}>Mật khẩu mới</Text>
+                                }]}>Mã Pin mới</Text>
                                 <View style={styles.action}>
                                     <Field
                                         component={CustomInput}
                                         value={data.newPassword}
                                         name="newPassword"
-                                        placeholder="Nhập mật khẩu mới"
+                                        placeholder="Nhập Mã Pin mới"
                                         secureTextEntry
                                         onValueChange={(value) => setData({ ...data, newPassword: value })}
 
@@ -128,7 +124,7 @@ const ChangePasswordScreen = ({ navigation, route }) => {
 
                                 <Text style={[styles.text_footer, {
                                     marginTop: 15
-                                }]}>Xác nhận lại mật khẩu mới</Text>
+                                }]}>Xác nhận lại Mã Pin mới</Text>
                                 <View style={styles.action}>
                                     {/* <Feather
                                         name="lock"
@@ -140,7 +136,7 @@ const ChangePasswordScreen = ({ navigation, route }) => {
                                         value={data.confirmPassword}
                                         component={CustomInput}
                                         name="confirmPassword"
-                                        placeholder="Xác nhận lại mật khẩu mới"
+                                        placeholder="Xác nhận lại Mã Pin mới"
                                         secureTextEntry
                                         onValueChange={(value) => setData({ ...data, confirmPassword: value })}
 
@@ -193,7 +189,7 @@ const ChangePasswordScreen = ({ navigation, route }) => {
     );
 };
 
-export default ChangePasswordScreen;
+export default ChangePinScreen;
 
 const styles = StyleSheet.create({
     container: {
