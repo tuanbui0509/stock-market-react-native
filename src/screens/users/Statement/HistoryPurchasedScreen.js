@@ -1,21 +1,3 @@
-// import React from 'react';
-// import { SafeAreaView, TouchableOpacity, View } from 'react-native';
-// import RVText from '../../../core/RVText';
-
-// import CustomHeader from '../../../components/CustomHeader';
-
-// function HistoryPurchasedScreen(props) {
-//     let { navigation } = props
-//     return (
-//         <SafeAreaView style={{ flex: 1 }}>
-//             <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-//                 <RVText content="HistoryPurchasedScreen!" />
-//             </View>
-//         </SafeAreaView>
-//     )
-// }
-
-// export default HistoryPurchasedScreen
 import React, { useEffect, useState } from 'react';
 import { Button, FlatList, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import * as Api from '../../../api/Statement';
@@ -60,7 +42,7 @@ export default function HistoryPurchasedScreen({ navigation }) {
             const fetchApi = async () => {
                 const temp = { ...data, from: data.from.format('MM/DD/YYYY'), to: data.to.format('MM/DD/YYYY') }
                 const paramsString = queryString.stringify(temp);
-                console.log(paramsString);
+                // console.log(paramsString);
                 const res = await Api.HistoryPurchased(paramsString)
                 setTableData(res.data.list)
             }
@@ -223,16 +205,14 @@ export default function HistoryPurchasedScreen({ navigation }) {
 
                 </View>
             </View>
-            <View style={styles.content_wp}>
-                <TouchableOpacity onPress={handleSubmit}>
-                    <LinearGradient
-                        colors={[Color.btn_color, Color.bg_color]}
-                        style={styles.appButtonContainer}
-                    >
-                        <Text style={styles.appButtonText}>Cập nhật</Text>
-                    </LinearGradient>
-                </TouchableOpacity>
-            </View>
+            <TouchableOpacity onPress={handleSubmit}>
+                <LinearGradient
+                    colors={[Color.btn_color, Color.bg_color]}
+                    style={styles.appButtonContainer}
+                >
+                    <Text style={styles.appButtonText}>Cập nhật</Text>
+                </LinearGradient>
+            </TouchableOpacity>
             <FlatList
                 data={tableData}
                 style={{ width: "100%", marginTop: 10, }}

@@ -42,7 +42,7 @@ export default function HistoryOrderScreen({ navigation }) {
             const fetchApi = async () => {
                 const temp = { ...data, from: data.from.format('MM/DD/YYYY'), to: data.to.format('MM/DD/YYYY') }
                 const paramsString = queryString.stringify(temp);
-                console.log(paramsString);
+                // console.log(paramsString);
                 const res = await Api.HistoryOrder(paramsString)
                 setTableData(res.data.list)
             }
@@ -205,16 +205,14 @@ export default function HistoryOrderScreen({ navigation }) {
 
                 </View>
             </View>
-            <View style={styles.content_wp}>
-                <TouchableOpacity onPress={handleSubmit}>
-                    <LinearGradient
-                        colors={[Color.btn_color, Color.bg_color]}
-                        style={styles.appButtonContainer}
-                    >
-                        <Text style={styles.appButtonText}>Cập nhật</Text>
-                    </LinearGradient>
-                </TouchableOpacity>
-            </View>
+            <TouchableOpacity onPress={handleSubmit}>
+                <LinearGradient
+                    colors={[Color.btn_color, Color.bg_color]}
+                    style={styles.appButtonContainer}
+                >
+                    <Text style={styles.appButtonText}>Cập nhật</Text>
+                </LinearGradient>
+            </TouchableOpacity>
             <FlatList
                 data={tableData}
                 style={{ width: "100%", marginTop: 10, }}
@@ -318,7 +316,12 @@ const styles = StyleSheet.create({
         borderRadius: 10,
         paddingVertical: 8,
         paddingHorizontal: 12,
-        width: 400
+        width: '50%',
+        padding: 10,
+        justifyContent: 'center',
+        alignItems: 'center',
+        // flex: 1
+        textAlign: 'center'
     },
     appButtonText: {
         fontSize: 16,

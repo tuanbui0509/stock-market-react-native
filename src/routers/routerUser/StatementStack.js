@@ -11,31 +11,31 @@ const Tab = createMaterialTopTabNavigator();
 const createTopTabs = (props) => {
   return <Tab.Navigator
     screenOptions={({ route }) => ({
-      tabBarIcon: ({ focused, size, color }) => {
-        let iconName;
-        if (route.name === 'Lệnh trong ngày') {
-          iconName = 'receipt-outline';
-          size = focused ? 25 : 20;
-          color = focused ? '#007AFF' : '#555';
-        } else if (route.name === 'Lịch sử lệnh đặt') {
-          iconName = 'md-newspaper-outline';
-          size = focused ? 25 : 20;
-          color = focused ? '#007AFF' : '#555';
-        }
-        else if (route.name === 'Lịch sử khớp lệnh') {
-          iconName = 'md-documents-outline';
-          size = focused ? 25 : 20;
-          color = focused ? '#007AFF' : '#555';
-        }
-        return (
-          <Ionicons
-            name={iconName}
-            size={size}
-            color={color}
-          />
-        )
-      },
-      tabBarLabelStyle: { fontSize: 12 },
+      // tabBarIcon: ({ focused, size, color }) => {
+      //   let iconName;
+      //   if (route.name === 'Lệnh trong ngày') {
+      //     iconName = 'receipt-outline';
+      //     size = focused ? 25 : 20;
+      //     color = focused ? '#007AFF' : '#555';
+      //   } else if (route.name === 'Lịch sử lệnh đặt') {
+      //     iconName = 'md-newspaper-outline';
+      //     size = focused ? 25 : 20;
+      //     color = focused ? '#007AFF' : '#555';
+      //   }
+      //   else if (route.name === 'Lịch sử khớp lệnh') {
+      //     iconName = 'md-documents-outline';
+      //     size = focused ? 25 : 20;
+      //     color = focused ? '#007AFF' : '#555';
+      //   }
+      //   return (
+      //     <Ionicons
+      //       name={iconName}
+      //       size={size}
+      //       color={color}
+      //     />
+      //   )
+      // },
+      tabBarLabelStyle: { fontSize: 12, fontWeight: 'bold' },
       tabBarStyle: { backgroundColor: 'powderblue' },
       tabBarActiveTintColor: '#007AFF',
       tabBarInactiveTintColor: '#555',
