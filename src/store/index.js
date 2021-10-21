@@ -4,6 +4,8 @@ import Token from './Token';
 import isAdmin from './isAdmin';
 import CurrentUser from './CurrentUser';
 import BankAccount from './users/BankAccount';
+import MyStock from './users/MyStock';
+import LightningTable from './common/LightningTable';
 import {
     persistStore, persistReducer, FLUSH,
     REHYDRATE,
@@ -18,7 +20,9 @@ const reducer = combineReducers({
     Token,
     isAdmin,
     CurrentUser,
-    BankAccount
+    BankAccount,
+    LightningTable,
+    MyStock
 })
 
 const persistConfig = {

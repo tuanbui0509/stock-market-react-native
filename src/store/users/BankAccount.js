@@ -2,7 +2,7 @@ import { createSlice } from "@reduxjs/toolkit";
 
 
 const BankAccountSlice = createSlice({
-    name: 'BanhAccount',
+    name: 'BankAccount',
     initialState: [],
     reducers: {
         fetchBankAccount: (state, action) => {
