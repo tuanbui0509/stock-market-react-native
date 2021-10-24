@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { SafeAreaView, StyleSheet, Text, TextInput, View, ScrollView, TouchableOpacity } from 'react-native';
+import { SafeAreaView, StyleSheet, Text, TextInput, View, ScrollView, TouchableOpacity, Button } from 'react-native';
 import CustomHeader from '../../../components/CustomHeader';
 import SearchableDropdown from 'react-native-searchable-dropdown';
 import * as ApiLT from '../../../api/LightningTable';
@@ -13,7 +13,8 @@ import Formatter from '../../../helpers/formatNumber'
 import { fetchLightningTable } from '../../../store/common/LightningTable';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchMyStock } from '../../../store/users/MyStock';
-
+import Modal from "react-native-modal";
+import styleModal from '../../../common/styleModal';
 const OrderScreen = ({ navigation }) => {
     const LightningTable = useSelector(state => state.LightningTable)
     const MyStock = useSelector(state => state.MyStock)
@@ -28,7 +29,7 @@ const OrderScreen = ({ navigation }) => {
         maCp: "",
         gia: 0,
         soLuong: 0,
-        mkdatLenh: "",
+        mkdatLenh: '',
         loaiGiaoDich: true,// Trạng thái mua bán mua: true, bán: false
         loaiLenh: 'LO'// Trạng thái Loai: ATO, ATC, LO
     });
@@ -49,9 +50,20 @@ const OrderScreen = ({ navigation }) => {
     }
     useEffect(() => {
         const unsubscribe = navigation.addListener('focus', () => {
+            setOrder({
+                ...order,
+                maCp: "",
+                gia: 0,
+                soLuong: 0,
+                mkdatLenh: "",
+                loaiGiaoDich: true,// Trạng thái mua bán mua: true, bán: false
+                loaiLenh: 'LO'// Trạng thái Loai: ATO, ATC, LO
+            })
+            setCurrentStock()
             fetchBankAccount()
             fetchApiStocks()
             fetchApiMyStock()
+
         });
 
         return unsubscribe;
@@ -111,6 +123,122 @@ const OrderScreen = ({ navigation }) => {
             </View>
         </View>)
     }
+
+    const ComponentForm = () =>
+        <View style={styleModal.centeredView}>
+            <View style={styleModal.modalView}>
+                <Text style={{ ...styles.textTitle, fontWeight: 'bold', fontSize: 18, color: '#000' }}>Bạn có muốn đặt lệnh này không?</Text>
+                <View style={styles.wrapperLabel}>
+                    <View style={styles.contentLabel}>
+                        <Text style={{ ...styles.textTitle, fontSize: 16, marginRight: 20 }}>Tài khoản:</Text>
+                        <Text style={{ ...styles.textTitle, fontWeight: 'bold', fontSize: 16, color: '#000' }}>{order.stk}</Text>
+                    </View>
+                    <View style={styles.contentLabel}>
+                    </View>
+                </View>
+                <View style={styles.wrapperLabel}>
+                    <View style={styles.contentLabel}>
+                        <Text style={{ ...styles.textTitle, fontSize: 16, marginRight: 20 }}>Mua/Bán:</Text>
+                        <Text style={{ ...styles.textTitle, fontWeight: 'bold', fontSize: 16, color: order.loaiGiaoDich ? Color.green : Color.red }}>{order.loaiGiaoDich ? 'Mua' : 'Bán'}</Text>
+                    </View>
+                    <View style={styles.contentLabel}>
+                        <Text style={{ ...styles.textTitle, fontSize: 16, marginRight: 20 }}>Mã CK:</Text>
+                        <Text style={{ ...styles.textTitle, fontWeight: 'bold', fontSize: 16, color: '#000' }}>{order.maCp}</Text>
+                    </View>
+                </View>
+                <View style={styles.wrapperLabel}>
+                    <View style={styles.contentLabel}>
+                        <Text style={{ ...styles.textTitle, fontSize: 16, marginRight: 20 }}>Số lượng:</Text>
+                        <Text style={{ ...styles.textTitle, fontWeight: 'bold', fontSize: 16, color: '#000' }}>{order.soLuong}</Text>
+                    </View>
+                    <View style={styles.contentLabel}>
+                        <Text style={{ ...styles.textTitle, fontSize: 16, marginRight: 20 }}>Giá:</Text>
+                        <Text style={{ ...styles.textTitle, fontWeight: 'bold', fontSize: 16, color: '#000' }}>{order.gia}</Text>
+                    </View>
+                </View>
+                <View style={styles.wrapperLabel}>
+                    <View style={styles.contentLabel}>
+                        <Text style={{ ...styles.textTitle, fontSize: 16, marginRight: 20 }}>Giá trị:</Text>
+                        <Text style={{ ...styles.textTitle, fontWeight: 'bold', fontSize: 16, color: '#000' }}>{Formatter(order.gia * order.soLuong)}</Text>
+                    </View>
+                    <View style={styles.contentLabel}>
+                    </View>
+                </View>
+                <View style={styles.wrapperLabel}>
+                    <TouchableOpacity onPress={handleConfirm}>
+                        <LinearGradient
+                            colors={['#F8495A', Color.red]}
+                            style={{ ...styles.appButtonContainer, width: 140, marginRight: 20 }}
+                        >
+                            <Text style={styles.appButtonText}>Xác nhận</Text>
+                        </LinearGradient>
+                    </TouchableOpacity>
+                    <TouchableOpacity onPress={handleSubmit}>
+                        <LinearGradient
+                            colors={['#fff', '#fff']}
+                            style={{ ...styles.appButtonContainer, width: 140 }}
+                        >
+                            <Text style={{ ...styles.appButtonText, color: '#333' }}>Đóng</Text>
+                        </LinearGradient>
+                    </TouchableOpacity>
+                </View>
+            </View>
+        </View>;
+
+
+    const ComponentConFirm = () =>
+        <View style={styleModal.centeredView}>
+            <View style={styleModal.modalView}>
+                <Text style={{ ...styles.textTitle, fontWeight: 'bold', fontSize: 18, color: '#000' }}>Nhập mã Pin của bạn?</Text>
+                <TextInput
+                    name="mkdatLenh"
+                    style={{ ...styles.textInput, width: '80%', marginLeft: 0, marginBottom: 20 }}
+                    onChangeText={text => setOrder({ ...order, mkdatLenh: text })}
+                    placeholder="Mã Pin của bạn"
+                    secureTextEntry={true}
+                    maxLength={6}
+                    value={order.mkdatLenh}
+                />
+                <View style={styles.wrapperLabel}>
+                    <TouchableOpacity onPress={handleFinish}>
+                        <LinearGradient
+                            colors={['#F8495A', Color.red]}
+                            style={{ ...styles.appButtonContainer, width: 140, marginRight: 20 }}
+                        >
+                            <Text style={styles.appButtonText}>Xác nhận</Text>
+                        </LinearGradient>
+                    </TouchableOpacity>
+                    <TouchableOpacity onPress={() => { setModalConfirmVisible(false), setOrder({ ...order, mkdatLenh: null }) }}>
+                        <LinearGradient
+                            colors={['#fff', '#fff']}
+                            style={{ ...styles.appButtonContainer, width: 140 }}
+                        >
+                            <Text style={{ ...styles.appButtonText, color: '#333' }}>Hủy bỏ</Text>
+                        </LinearGradient>
+                    </TouchableOpacity>
+                </View>
+            </View>
+        </View>;
+    const [isModalFormVisible, setModalFormVisible] = useState(false);
+    const [isModalConfirmVisible, setModalConfirmVisible] = useState(false);
+
+    const handleSubmit = () => {
+        setModalFormVisible(!isModalFormVisible);
+        // setModalConfirmVisible(!isModalConfirmVisible);
+    };
+
+    const handleConfirm = () => {
+        setModalFormVisible(!isModalFormVisible);
+        setModalConfirmVisible(!isModalConfirmVisible);
+    };
+
+    const handleFinish = () => {
+        setModalConfirmVisible(!isModalConfirmVisible);
+        setOrder({ ...order, mkdatLenh: '' })
+        console.log('====================================');
+        console.log(order);
+        console.log('====================================');
+    };
     return (
         <>
             <CustomHeader title="Đặt lệnh" isHome={true} navigation={navigation} />
@@ -159,9 +287,10 @@ const OrderScreen = ({ navigation }) => {
                             itemsContainerStyle={{
                                 maxHeight: '70%',
                             }}
+                            resetValue={false}
                             items={stocks}
                             placeholder="Tìm mã cổ phiếu"
-                            resetValue={false}
+                            // resetValue={false}
                             underlineColorAndroid="transparent"
                             setSort={(item, searchedText) => item.macp.trim().toLowerCase().startsWith(searchedText.toLowerCase())}
                         />
@@ -172,7 +301,7 @@ const OrderScreen = ({ navigation }) => {
                     <View style={styles.content_wp}>
                         <View style={styles.box}>
                             <Text style={styles.textTitle}>Số dư tài khoản</Text>
-                            <Text style={{ ...styles.textTitle, fontWeight: 'bold' }}>{currentBank ? Formatter(currentBank?.soDu) : '0'}</Text>
+                            <Text style={{ ...styles.textTitle, fontWeight: 'bold', color: '#000' }}>{currentBank ? Formatter(currentBank?.soDu) : '0'}</Text>
                         </View>
                     </View>
                     <View style={styles.content_wp}>
@@ -273,7 +402,7 @@ const OrderScreen = ({ navigation }) => {
 
                     <View style={{ ...styles.content_wp, justifyContent: 'center', flexDirection: "column" }}>
                         {/* <View style={styles.box}> */}
-                        <TouchableOpacity onPress={handleChooseBuy}>
+                        <TouchableOpacity onPress={handleSubmit}>
                             <LinearGradient
                                 colors={[Color.btn_color, Color.bg_color]}
                                 style={{ ...styles.appButtonContainer, width: 220 }}
@@ -286,6 +415,36 @@ const OrderScreen = ({ navigation }) => {
                     <Text style={{ fontSize: 10, textAlign: 'center' }}>Giá x 1000 VNĐ. Bản quyền thuộc về Công ty Cổ phần chứng khoán NTNT. © 2021</Text>
                 </ScrollView>
             </SafeAreaView>
+
+            <Modal
+                isVisible={isModalFormVisible}
+                onBackdropPress={() => setModalFormVisible(false)}
+                testID={'modal'}
+                backdropOpacity={0.8}
+                animationIn="zoomInDown"
+                animationOut="zoomOutUp"
+                animationInTiming={600}
+                animationOutTiming={600}
+                backdropTransitionInTiming={600}
+                backdropTransitionOutTiming={600}
+            >
+                <ComponentForm />
+            </Modal>
+
+            <Modal
+                isVisible={isModalConfirmVisible}
+                onBackdropPress={() => setModalConfirmVisible(false)}
+                testID={'modal'}
+                backdropOpacity={0.8}
+                animationIn="zoomInDown"
+                animationOut="zoomOutUp"
+                animationInTiming={600}
+                animationOutTiming={600}
+                backdropTransitionInTiming={600}
+                backdropTransitionOutTiming={600}
+            >
+                <ComponentConFirm />
+            </Modal>
         </>
     );
 };
@@ -359,7 +518,8 @@ const styles = StyleSheet.create({
     },
     textTitle: {
         fontSize: 18,
-        marginBottom: 5
+        marginBottom: 5,
+        color: '#888'
     },
     textLabel: {
         fontSize: 18,
@@ -381,5 +541,17 @@ const styles = StyleSheet.create({
         fontWeight: "bold",
         alignSelf: "center",
         textTransform: "uppercase"
+    },
+    wrapperLabel: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between'
+    },
+    contentLabel: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'flex-start',
+        flex: 1,
+        marginBottom: 10
     }
 });
