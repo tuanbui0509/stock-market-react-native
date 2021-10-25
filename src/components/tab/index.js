@@ -20,7 +20,6 @@ const navOptionHandler = () => ({
 const Tab = createBottomTabNavigator()
 function TabNavigator() {
     const dispatch = useDispatch()
-    const Token = useSelector(state => state.Token)
     const isAdmin = useSelector(state => state.isAdmin)
     return (
         <Tab.Navigator>
@@ -113,49 +112,6 @@ function TabNavigator() {
                         }}
                     />
                 </>}
-
-            {/* <Tab.Screen name="Users" component={UserStack}
-                // options={navOptionHandler} 
-                options={{
-                    tabBarLabel: 'Khách hàng',
-                    tabBarColor: '#37C2D0',
-                    tabBarIcon: ({ color }) => (
-                        <Icon name="ios-person" color={color} size={26} />
-                    ),
-                    headerShown: false
-                }}
-            />
-            <Tab.Screen name="Lightning-tables" component={LightningTableStack}
-                options={{
-                    tabBarLabel: 'Thị trường',
-                    tabBarColor: '#37C2D0',
-                    tabBarIcon: ({ color }) => (
-                        <Icon name="md-bar-chart-sharp" color={color} size={26} />
-                    ),
-                    headerShown: false
-                }}
-            />
-            <Tab.Screen name="Statements" component={StatementStack} options={navOptionHandler}
-
-                options={{
-                    tabBarLabel: 'Sổ lệnh',
-                    tabBarColor: '#37C2D0',
-                    tabBarIcon: ({ color }) => (
-                        <Icon name="ios-reader" color={color} size={26} />
-                    ),
-                    headerShown: false
-                }}
-            />
-            <Tab.Screen name="Orders" component={OrderStack}
-                options={{
-                    tabBarLabel: 'Đặt lệnh',
-                    tabBarColor: '#37C2D0',
-                    tabBarIcon: ({ color }) => (
-                        <Icon name="md-construct-sharp" color={color} size={26} />
-                    ),
-                    headerShown: false
-                }}
-            /> */}
         </Tab.Navigator>
     )
 }
