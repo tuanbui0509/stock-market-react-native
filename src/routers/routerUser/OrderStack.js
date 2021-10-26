@@ -1,30 +1,40 @@
 import { Picker } from '@react-native-picker/picker';
 import { useIsFocused } from '@react-navigation/core';
-import { createStackNavigator } from '@react-navigation/stack';
 import { LinearGradient } from 'expo-linear-gradient';
+import { Field, Formik } from 'formik';
 import React, { useEffect, useState } from 'react';
-import { Button, SafeAreaView, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { SafeAreaView, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { AutocompleteDropdown } from "react-native-autocomplete-dropdown";
 import Modal from "react-native-modal";
 import { RadioButton } from 'react-native-paper';
-import SearchableDropdown from 'react-native-searchable-dropdown';
 import { useDispatch, useSelector } from 'react-redux';
+import * as yup from 'yup';
 import * as ApiUser from '../../api/Account';
 import * as ApiLT from '../../api/LightningTable';
 import styleModal from '../../common/styleModal';
 import CustomHeader from '../../components/CustomHeader';
 import Color from '../../constants/Colors';
 import * as Price from '../../constants/Price';
+import CustomInputOrder from '../../helpers/CustomInputOrder';
 import Formatter from '../../helpers/formatNumber';
 import { fetchLightningTable } from '../../store/common/LightningTable';
 import { fetchMyStock } from '../../store/users/MyStock';
-import * as yup from 'yup'
-import { Formik } from 'formik'
-import { values } from 'lodash';
 const pinValidationSchema = yup.object().shape({
   pin: yup
     .string()
     .min(6, ({ min }) => `Mã pin phải đủ ${min} chữ số`)
     .required('Yêu cầu nhập mã Pin'),
+})
+
+const formValidationSchema = yup.object().shape({
+  soLuong: yup
+    .string()
+    .min(1, ({ min }) => `Số lượng không được để trống`)
+    .required('Yêu cầu nhập Số lượng'),
+  gia: yup
+    .string()
+    .min(1, ({ min }) => 'Giá không được để trống')
+    .required('Yêu cầu nhập Giá'),
 })
 function OrderStack({ navigation, route }) {
   const isFocused = useIsFocused();
@@ -32,15 +42,16 @@ function OrderStack({ navigation, route }) {
   const MyStock = useSelector(state => state.MyStock)
   const dispatch = useDispatch()
 
-  const [stocks, setStocks] = useState([]);
+  const [stocks, setStocks] = useState(null);
   const [BankAccount, setBankAccount] = useState([])
   const [currentBank, setCurrentBank] = useState()
-  const [currentStock, setCurrentStock] = useState()
+  const [currentStock, setCurrentStock] = useState(null)
+  const [tempStock, setTempStock] = useState({})
   const [order, setOrder] = useState({
     stk: "",
     maCp: "",
-    gia: 0,
-    soLuong: 0,
+    gia: '',
+    soLuong: '',
     mkdatLenh: '',
     loaiGiaoDich: true,// Trạng thái mua bán mua: true, bán: false
     loaiLenh: 'LO'// Trạng thái Loai: ATO, ATC, LO
@@ -53,8 +64,13 @@ function OrderStack({ navigation, route }) {
   }
   const fetchApiStocks = async () => {
     const res = await ApiLT.LightningTable()
-    setStocks(res.data);
+    // setStocks(res.data);
     dispatch(fetchLightningTable(res.data))
+    const suggestions = LightningTable.map((item) => ({
+      id: item.macp.trim(),
+      title: item.macp.trim()
+    }))
+    setStocks(suggestions)
   }
   const fetchApiMyStock = async () => {
     const res = await ApiUser.MyStocks()
@@ -65,13 +81,13 @@ function OrderStack({ navigation, route }) {
       setOrder({
         ...order,
         maCp: "",
-        gia: 0,
-        soLuong: 0,
+        gia: '',
+        soLuong: '',
         mkdatLenh: "",
         loaiGiaoDich: true,// Trạng thái mua bán mua: true, bán: false
         loaiLenh: 'LO'// Trạng thái Loai: ATO, ATC, LO
       })
-      setCurrentStock()
+      setCurrentStock(null)
       fetchBankAccount()
       fetchApiStocks()
       fetchApiMyStock()
@@ -89,11 +105,17 @@ function OrderStack({ navigation, route }) {
   const mapMyStockToLightningTable = () => {
     // const temp = [...LightningTable]
     const result = LightningTable.filter(o1 => MyStock?.some(o2 => o1.macp.trim() === o2.maCp.trim()));
-    setStocks(result)
+    const suggestions = result.map((item) => ({
+      id: item.macp,
+      title: item.macp.trim()
+    }))
+    setStocks(suggestions)
   }
   const handleSelectItem = (item) => {
-    setOrder({ ...order, maCp: item.macp })
+    setOrder({ ...order, maCp: item?.id })
     setCurrentStock(item)
+    const res = findById(item?.id, LightningTable);
+    setTempStock(res)
   }
   const handleChooseBuy = () => {
     setOrder({ ...order, loaiGiaoDich: true })
@@ -122,16 +144,24 @@ function OrderStack({ navigation, route }) {
     let res = BankAccount[index];
     setCurrentBank(res)
   }
+
+  const findById = (id, list) => {
+    for (let i = 0; i < list.length; i++)
+      if (list[i].macp.trim() === id?.trim())
+        return list[i];
+  }
+
+
   const stockInformation = () => {
     return (<View style={{ ...styles.content_wp, borderBottomWidth: 1 }}>
       <View style={styles.box_cp}>
-        <Text style={{ fontSize: 24 }}>Giá: {currentStock?.gia / Price.PRICE || null}</Text>
-        <Text style={styles.textTitle}>KL: {currentStock?.kl || null}</Text>
+        <Text style={{ fontSize: 24 }}>Giá: {tempStock?.gia / Price.PRICE || null}</Text>
+        <Text style={styles.textTitle}>KL: {tempStock?.kl || null}</Text>
       </View>
       <View style={styles.box_cp}>
-        <Text style={{ ...styles.textTitle, color: Color.ceil }}>Trần: {(currentStock?.giaTran / Price.PRICE) || null}</Text>
-        <Text style={{ ...styles.textTitle, color: Color.floor }}>Sàn: {(currentStock?.giaSan / Price.PRICE) || null}</Text>
-        <Text style={{ ...styles.textTitle, color: Color.standard }}>TC: {(currentStock?.giaTC / Price.PRICE) || null}</Text>
+        <Text style={{ ...styles.textTitle, color: Color.ceil }}>Trần: {(tempStock?.giaTran / Price.PRICE) || null}</Text>
+        <Text style={{ ...styles.textTitle, color: Color.floor }}>Sàn: {(tempStock?.giaSan / Price.PRICE) || null}</Text>
+        <Text style={{ ...styles.textTitle, color: Color.standard }}>TC: {(tempStock?.giaTC / Price.PRICE) || null}</Text>
       </View>
     </View>)
   }
@@ -229,11 +259,7 @@ function OrderStack({ navigation, route }) {
               {errors.pin &&
                 <Text style={{ fontSize: 10, color: 'red' }}>{errors.pin}</Text>
               }
-              {/* <Button
-                onPress={handleSubmit}
-                title="LOGIN"
-                disabled={!isValid}
-              /> */}
+
               <View style={styles.wrapperLabel}>
                 <TouchableOpacity onPress={handleSubmit}>
                   <LinearGradient
@@ -277,174 +303,148 @@ function OrderStack({ navigation, route }) {
   return (
     <>
       <CustomHeader title="Đặt lệnh" isHome={true} navigation={navigation} />
-      <SafeAreaView style={styles.container}>
-        <View>
-          <View style={styles.box_stk}>
-            <View style={styles.textStyle}>
-              <Picker
-                selectedValue={order.stk}
-                onValueChange={onChangeListBank}>
-                {showStatusPicker}
-              </Picker>
+      <Formik
+        validationSchema={formValidationSchema}
+        initialValues={{ soLuong: order.soLuong, gia: order.gia }}
+        onSubmit={handleSubmitForm}
+      >
+        {({ handleSubmit }) => (
+          <SafeAreaView style={styles.container}>
+            <View>
+              <View style={styles.box_stk}>
+                <View style={styles.textStyle}>
+                  <Picker
+                    selectedValue={order.stk}
+                    onValueChange={onChangeListBank}>
+                    {showStatusPicker}
+                  </Picker>
+                </View>
+              </View>
+              <View style={styles.textSelect}>
+                <AutocompleteDropdown
+                  clearOnFocus={false}
+                  closeOnBlur={true}
+                  onSelectItem={handleSelectItem}
+                  dataSet={stocks}
+                  // clearOnFocus={false}
+                  textInputProps={{
+                    placeholder: "Tìm kiếm mã CK",
+                  }}
+                />
+              </View>
             </View>
-          </View>
-          <View style={styles.textSelect}>
-            <SearchableDropdown
-              selectedItems={currentStock}
-              onTextChange={text => console.log(text)}
-              onItemSelect={handleSelectItem}
-              containerStyle={{ padding: 5 }}
-              textInputStyle={{
-                paddingVertical: 9,
-                paddingHorizontal: 12,
-                height: 42,
-                width: '90%',
-                marginLeft: 10,
-                borderWidth: StyleSheet.hairlineWidth,
-                borderRadius: 5,
-                fontSize: 18,
-                fontWeight: 'bold'
-              }}
-              itemStyle={{
-                paddingVertical: 9,
-                paddingHorizontal: 12,
-                height: 42,
-                width: '90%',
-                borderWidth: 1,
-                borderColor: '#e5e5e5',
-                marginLeft: 10,
-                fontSize: 18,
-                borderBottomWidth: 0
-              }}
-              itemTextStyle={{
-                color: '#222',
-              }}
-              itemsContainerStyle={{
-                maxHeight: '70%',
-              }}
-              resetValue={false}
-              items={stocks}
-              placeholder="Tìm mã cổ phiếu"
-              // resetValue={false}
-              underlineColorAndroid="transparent"
-              setSort={(item, searchedText) => item.macp.trim().toLowerCase().startsWith(searchedText.toLowerCase())}
-            />
-          </View>
-        </View>
-        <ScrollView>
-          {currentStock ? stockInformation() : null}
-          <View style={styles.content_wp}>
-            <View style={styles.box}>
-              <Text style={styles.textTitle}>Số dư tài khoản</Text>
-              <Text style={{ ...styles.textTitle, fontWeight: 'bold', color: '#000' }}>{currentBank ? Formatter(currentBank?.soDu) : '0'}</Text>
-            </View>
-          </View>
-          <View style={styles.content_wp}>
-            <View style={{ ...styles.box, flexDirection: 'column', alignItems: 'flex-start' }}>
-              <Text style={styles.textTitle}>Khối lượng</Text>
-              <TextInput
-                name="soLuong"
-                style={{ ...styles.textInput, width: '100%', marginLeft: 0 }}
-                onChangeText={text => setOrder({ ...order, soLuong: text })}
-                placeholder="Số lượng"
-                keyboardType='numeric'
-                maxLength={7}
-                value={order.soLuong}
-              />
-            </View>
-            <View style={{ ...styles.box, flexDirection: 'column', alignItems: 'flex-start' }}>
-              <Text style={styles.textTitle}>Giá đặt</Text>
-              <TextInput
-                name="gia"
-                style={{ ...styles.textInput, width: '100%', marginLeft: 0 }}
-                onChangeText={text => setOrder({ ...order, gia: text })}
-                placeholder="Giá"
-                keyboardType='numeric'
-                maxLength={7}
-                value={order.gia}
-              />
-            </View>
-          </View>
+            <ScrollView>
+              {currentStock ? stockInformation() : null}
+              <View style={styles.content_wp}>
+                <View style={styles.box}>
+                  <Text style={styles.textTitle}>Số dư tài khoản</Text>
+                  <Text style={{ ...styles.textTitle, fontWeight: 'bold', color: '#000' }}>{currentBank ? Formatter(currentBank?.soDu) : '0'}</Text>
+                </View>
+              </View>
+              <View style={styles.content_wp}>
+                <View style={{ ...styles.box, flexDirection: 'column', alignItems: 'flex-start' }}>
+                  <Text style={styles.textTitle}>Khối lượng</Text>
+                  <Field
+                    component={CustomInputOrder}
+                    name="soLuong"
+                    placeholder="Số lượng"
+                    value={order.soLuong}
+                    onValueChange={(value) => setOrder({ ...order, soLuong: value })}
+                  />
 
-          <View style={styles.content_wp}>
-            <View style={{ ...styles.box, justifyContent: "center" }}>
-              <Text style={styles.textLabel}>LO</Text>
-              <RadioButton
-                value="LO"
-                label="Carto Base MAp"
-                status={order.loaiLenh === 'LO' ? 'checked' : 'unchecked'}
-                onPress={() => { setOrder({ ...order, loaiLenh: 'LO' }); }}
-              />
-            </View>
-            <View style={{ ...styles.box, justifyContent: "center" }}>
-              <Text style={styles.textLabel}>ATC</Text>
-              <RadioButton
-                value="ATC"
-                status={order.loaiLenh === 'ATC' ? 'checked' : 'unchecked'}
-                onPress={() => { setOrder({ ...order, loaiLenh: 'ATC' }); }}
-              />
-            </View>
-            <View style={{ ...styles.box, justifyContent: "center" }}>
-              <Text style={styles.textLabel}>ATO</Text>
-              <RadioButton
-                value="ATO"
-                status={order.loaiLenh === 'ATO' ? 'checked' : 'unchecked'}
-                onPress={() => { setOrder({ ...order, loaiLenh: 'ATO' }); }}
-              />
-            </View>
-          </View>
-          <View style={styles.content_wp}>
-            <View style={styles.box}>
-              <TouchableOpacity onPress={handleChooseBuy}>
-                {order.loaiGiaoDich ? <LinearGradient
-                  colors={['#1BCC77', Color.green]}
-                  style={styles.appButtonContainer}
-                >
-                  <Text style={styles.appButtonText}>Mua</Text>
-                </LinearGradient> :
+                </View>
+                <View style={{ ...styles.box, flexDirection: 'column', alignItems: 'flex-start' }}>
+                  <Text style={styles.textTitle}>Giá đặt</Text>
+                  <Field
+                    component={CustomInputOrder}
+                    name="gia"
+                    placeholder="Giá"
+                    value={order.gia}
+                    onValueChange={(value) => setOrder({ ...order, gia: value })}
+                  />
+                </View>
+              </View>
+
+              <View style={styles.content_wp}>
+                <View style={{ ...styles.box, justifyContent: "center" }}>
+                  <Text style={styles.textLabel}>LO</Text>
+                  <RadioButton
+                    value="LO"
+                    label="Carto Base MAp"
+                    status={order.loaiLenh === 'LO' ? 'checked' : 'unchecked'}
+                    onPress={() => { setOrder({ ...order, loaiLenh: 'LO' }); }}
+                  />
+                </View>
+                <View style={{ ...styles.box, justifyContent: "center" }}>
+                  <Text style={styles.textLabel}>ATC</Text>
+                  <RadioButton
+                    value="ATC"
+                    status={order.loaiLenh === 'ATC' ? 'checked' : 'unchecked'}
+                    onPress={() => { setOrder({ ...order, loaiLenh: 'ATC' }); }}
+                  />
+                </View>
+                <View style={{ ...styles.box, justifyContent: "center" }}>
+                  <Text style={styles.textLabel}>ATO</Text>
+                  <RadioButton
+                    value="ATO"
+                    status={order.loaiLenh === 'ATO' ? 'checked' : 'unchecked'}
+                    onPress={() => { setOrder({ ...order, loaiLenh: 'ATO' }); }}
+                  />
+                </View>
+              </View>
+              <View style={styles.content_wp}>
+                <View style={styles.box}>
+                  <TouchableOpacity onPress={handleChooseBuy}>
+                    {order.loaiGiaoDich ? <LinearGradient
+                      colors={['#1BCC77', Color.green]}
+                      style={styles.appButtonContainer}
+                    >
+                      <Text style={styles.appButtonText}>Mua</Text>
+                    </LinearGradient> :
+                      <LinearGradient
+                        colors={['#fff', '#fff']}
+                        style={styles.appButtonContainer}
+                      >
+                        <Text style={{ ...styles.appButtonText, color: '#333' }}>Mua</Text>
+                      </LinearGradient>}
+                  </TouchableOpacity>
+                </View>
+                <View style={styles.box}>
+                  <TouchableOpacity onPress={handleChooseSell}>
+                    {!order.loaiGiaoDich ? <LinearGradient
+                      colors={['#F8495A', Color.red]}
+                      style={styles.appButtonContainer}
+                    >
+                      <Text style={styles.appButtonText}>Bán</Text>
+                    </LinearGradient> :
+                      <LinearGradient
+                        colors={['#fff', '#fff']}
+                        style={styles.appButtonContainer}
+                      >
+                        <Text style={{ ...styles.appButtonText, color: '#333' }}>Bán</Text>
+                      </LinearGradient>
+                    }
+                  </TouchableOpacity>
+                </View>
+              </View>
+
+              <View style={{ ...styles.content_wp, justifyContent: 'center', flexDirection: "column" }}>
+                {/* <View style={styles.box}> */}
+                <TouchableOpacity onPress={handleSubmit}>
                   <LinearGradient
-                    colors={['#fff', '#fff']}
-                    style={styles.appButtonContainer}
+                    colors={[Color.btn_color, Color.bg_color]}
+                    style={{ ...styles.appButtonContainer, width: 220 }}
                   >
-                    <Text style={{ ...styles.appButtonText, color: '#333' }}>Mua</Text>
-                  </LinearGradient>}
-              </TouchableOpacity>
-            </View>
-            <View style={styles.box}>
-              <TouchableOpacity onPress={handleChooseSell}>
-                {!order.loaiGiaoDich ? <LinearGradient
-                  colors={['#F8495A', Color.red]}
-                  style={styles.appButtonContainer}
-                >
-                  <Text style={styles.appButtonText}>Bán</Text>
-                </LinearGradient> :
-                  <LinearGradient
-                    colors={['#fff', '#fff']}
-                    style={styles.appButtonContainer}
-                  >
-                    <Text style={{ ...styles.appButtonText, color: '#333' }}>Bán</Text>
+                    <Text style={styles.appButtonText}>Xác nhận</Text>
                   </LinearGradient>
-                }
-              </TouchableOpacity>
-            </View>
-          </View>
-
-          <View style={{ ...styles.content_wp, justifyContent: 'center', flexDirection: "column" }}>
-            {/* <View style={styles.box}> */}
-            <TouchableOpacity onPress={handleSubmitForm}>
-              <LinearGradient
-                colors={[Color.btn_color, Color.bg_color]}
-                style={{ ...styles.appButtonContainer, width: 220 }}
-              >
-                <Text style={styles.appButtonText}>Xác nhận</Text>
-              </LinearGradient>
-            </TouchableOpacity>
-            {/* </View> */}
-          </View>
-          <Text style={{ fontSize: 10, textAlign: 'center' }}>Giá x 1000 VNĐ. Bản quyền thuộc về Công ty Cổ phần chứng khoán NTNT. © 2021</Text>
-        </ScrollView>
-      </SafeAreaView>
-
+                </TouchableOpacity>
+                {/* </View> */}
+              </View>
+              <Text style={{ fontSize: 10, textAlign: 'center' }}>Giá x 1000 VNĐ. Bản quyền thuộc về Công ty Cổ phần chứng khoán NTNT. © 2021</Text>
+            </ScrollView>
+          </SafeAreaView>
+        )}
+      </Formik>
       <Modal
         isVisible={isModalFormVisible}
         onBackdropPress={() => setModalFormVisible(false)}

@@ -1,5 +1,7 @@
 // Fill Your BASE_URL ngrok http https://localhost:5001/
-const BASE_URL = "http://8b4a-171-232-136-235.ngrok.io"
+// http://giaodichchungkhoan-beta.somee.com/
+// const BASE_URL = "http://828e-171-254-65-175.ngrok.io"
+const BASE_URL = "http://giaodichchungkhoan-beta.somee.com"
 const API_URL = BASE_URL + '/api'
 export default {
     BASE_URL,
