@@ -7,6 +7,7 @@ import CustomHeader from '../../components/CustomHeader';
 import HistoryPurchasedScreen from '../../screens/users/Statement/HistoryPurchasedScreen';
 import PurchasedOneDayScreen from '../../screens/users/Statement/PurchasedOneDayScreen';
 import HistoryOrderScreen from '../../screens/users/Statement/HistoryOrderScreen';
+import HistoryAdvanceMoneyScreen from '../../screens/users/Statement/HistoryAdvanceMoneyScreen';
 const Tab = createMaterialTopTabNavigator();
 const createTopTabs = (props) => {
   return <Tab.Navigator
@@ -58,6 +59,10 @@ const createTopTabs = (props) => {
     <Tab.Screen
       name="Lịch sử khớp lệnh"
       component={HistoryOrderScreen}
+    />
+    <Tab.Screen
+      name="Lịch sử ứng tiền"
+      component={HistoryAdvanceMoneyScreen}
     />
   </Tab.Navigator>
 

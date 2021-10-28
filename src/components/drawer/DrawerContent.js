@@ -1,28 +1,19 @@
-import React, { useEffect, useState } from 'react';
-import { View, StyleSheet, Alert } from 'react-native';
-import {
-    useTheme,
-    Avatar,
-    Title,
-    Caption,
-    Paragraph,
-    Drawer,
-    Text,
-    TouchableRipple,
-    Switch
-} from 'react-native-paper';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import {
     DrawerContentScrollView,
     DrawerItem
 } from '@react-navigation/drawer';
-
+import React, { useState } from 'react';
+import { Alert, StyleSheet, View } from 'react-native';
+import {
+    Avatar, Caption, Drawer, Title
+} from 'react-native-paper';
 import Icon from 'react-native-vector-icons/Ionicons';
-import * as Animatable from 'react-native-animatable';
 import { useDispatch, useSelector } from 'react-redux';
-import { removeToken } from '../../store/Token';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { removeAdmin } from '../../store/isAdmin';
 import { removeUser } from '../../store/CurrentUser';
+import { removeAdmin } from '../../store/isAdmin';
+import { removeToken } from '../../store/Token';
+
 export function DrawerContent(props) {
 
     const dispatch = useDispatch()
@@ -166,7 +157,7 @@ export function DrawerContent(props) {
                                     />
                                 )}
                                 label="Ứng trước tiền bán"
-                                onPress={() => { props.navigation.navigate('BookmarkScreen') }}
+                                onPress={() => { props.navigation.navigate('AdvanceMoneyScreen') }}
                             />
 
                         </Drawer.Section>

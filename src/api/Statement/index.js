@@ -1,9 +1,14 @@
 
 import AxiosClient from '../../axios/axiosClient';
 
+export const HistoryAdvanceMoney = (body) => {
+    return AxiosClient.get(`LenhUng?${body}`)
+}
+
 export const HistoryOrder = (body) => {
     return AxiosClient.get(`LichSuLenhKhop?${body}`)
 }
+
 export const HistoryPurchased = (body) => {
     return AxiosClient.get(`LichSuLenhDat?${body}`)
 }

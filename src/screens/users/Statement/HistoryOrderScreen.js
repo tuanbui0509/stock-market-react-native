@@ -255,6 +255,7 @@ export default function HistoryOrderScreen({ navigation }) {
     )
 }
 
+
 const styles = StyleSheet.create({
     container: {
         margin: 5,
@@ -316,12 +317,8 @@ const styles = StyleSheet.create({
         borderRadius: 10,
         paddingVertical: 8,
         paddingHorizontal: 12,
-        width: '50%',
-        padding: 10,
-        justifyContent: 'center',
-        alignItems: 'center',
-        // flex: 1
-        textAlign: 'center'
+        width: '100%'
+
     },
     appButtonText: {
         fontSize: 16,

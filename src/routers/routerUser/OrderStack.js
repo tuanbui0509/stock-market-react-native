@@ -80,6 +80,7 @@ function OrderStack({ navigation, route }) {
     const unsubscribe = navigation.addListener('focus', () => {
       setOrder({
         ...order,
+        stk: BankAccount[0]?.stk,
         maCp: "",
         gia: '',
         soLuong: '',
@@ -300,6 +301,8 @@ function OrderStack({ navigation, route }) {
     setOrder({ ...order, mkdatLenh: values.pin })
     console.log(order);
   };
+  console.log(order);
+
   return (
     <>
       <CustomHeader title="Đặt lệnh" isHome={true} navigation={navigation} />

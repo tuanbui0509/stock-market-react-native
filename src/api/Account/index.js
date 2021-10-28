@@ -9,9 +9,15 @@ export const MyBankAccount = () => {
 }
 
 export const ChangePassword = (body) => {
-    return AxiosClient.put("MatKhau/DangNhap",body)
+    return AxiosClient.put("MatKhau/DangNhap", body)
 }
 
 export const ChangePin = (body) => {
-    return AxiosClient.put("MatKhau/DatLenh",body)
+    return AxiosClient.put("MatKhau/DatLenh", body)
+}
+export const KhaDung = (body) => {
+    return AxiosClient.get(`lenhung/${body.currentBank}/khadung?date=${body.date}`)
+}
+export const PhiUng = (body) => {
+    return AxiosClient.get(`LenhUng/PhiUng/${body}`)
 }

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Button, FlatList, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import * as Api from '../../../api/Statement';
+import * as ApiUser from '../../../api/Account';
 import Formatter from '../../../helpers/formatNumber';
 import queryString from 'query-string';
 import { useForm, Controller } from "react-hook-form";
@@ -18,44 +19,43 @@ import styleModal from '../../../common/styleModal';
 import Styles from '../../../common/StyleTable';
 import { format } from 'date-fns';
 
-export default function HistoryPurchasedScreen({ navigation }) {
+export default function HistoryAdvanceMoneyScreen({ navigation }) {
     const [columns, setColumns] = useState(['MaCK', 'Mua/Bán', 'KL Khớp/Tổng KL', 'Giá', 'Trạng thái'])
-    const [detail, setDetail] = useState(['Mã LD', 'Giá', 'SL Khớp', 'Giá trị khớp'])
     const [tableData, setTableData] = useState([])
-    const [status, setStatus] = useState([])
-    const [currentMaCK, setCurrentMaCK] = useState([])
-
+    const [BankAccount, setBankAccount] = useState([])
     const [data, setData] = useState({
         from: moment().subtract(7, 'd'),
         to: moment(),
-        MaCK: '',
-        MaTT: 'TC',
+        stk: '',
         current: 1,
         pageSize: 10000
     })
+    const fetchApi = async () => {
+        const temp = { ...data, from: data.from.format('MM/DD/YYYY'), to: data.to.format('MM/DD/YYYY') }
+        const paramsString = queryString.stringify(temp);
+        const res = await Api.HistoryAdvanceMoney(paramsString)
+        setTableData(res.data.list)
+    }
+    const fetchBankAccount = async () => {
+        const res = await ApiUser.MyBankAccount()
+        setBankAccount(res.data)
+        setData({ ...data, stk: res.data[0]?.stk })
+    }
     useEffect(() => {
         const unsubscribe = navigation.addListener('focus', () => {
-            const fetchStatus = async () => {
-                const res = await Api.StatusStock()
-                setStatus(res.data)
-            }
-            const fetchApi = async () => {
-                const temp = { ...data, from: data.from.format('MM/DD/YYYY'), to: data.to.format('MM/DD/YYYY') }
-                const paramsString = queryString.stringify(temp);
-                // console.log(paramsString);
-                const res = await Api.HistoryPurchased(paramsString)
-                setTableData(res.data.list)
-            }
             fetchApi()
-            fetchStatus()
+            fetchBankAccount();
         });
         return unsubscribe;
     }, [navigation]);
     const handleSubmit = async () => {
         const temp = { ...data, from: data.from.format('MM/DD/YYYY'), to: data.to.format('MM/DD/YYYY') }
         const paramsString = queryString.stringify(temp);
-        const res = await Api.HistoryPurchased(paramsString)
-        setTableData(res.data.list)
+        const res = await Api.HistoryAdvanceMoney(paramsString)
+        console.log('====================================');
+        console.log(res.data);
+        console.log('====================================');
+        // setTableData(res.data.list)
     }
 
     const [showTo, setShowTo] = useState(false);
@@ -90,89 +90,26 @@ export default function HistoryPurchasedScreen({ navigation }) {
         </View>
     )
 
-    const showStatusPicker = status?.map((item, index) => {
+    const showStatusPicker = BankAccount?.map((item, index) => {
+        const value = item.nganHang.tenNganHang + ' - ' + item.stk.trim()
         return (
-            <Picker.Item key={index} label={item.tenTrangThai} value={item.maTt} />
+            <Picker.Item key={index} label={value} value={item.stk.trim()} />
         )
     })
-    const ClassNameRender = (val) => {
-        if (val === 'CK')
-            return Color.yellow
-        else if (val === 'KH' || val === 'KP')
-            return Color.green
-        else
-            return Color.red
+    let onChangeListBank = (stk) => {
+        setData({ ...data, stk: stk })
     }
-    const tableHeaderDetail = () => (
-        <View style={Styles.tableHeaderDetail}>
-            {
-                detail.map((column, index) => {
-                    {
-                        return (
-                            <TouchableOpacity
-                                key={index}
-                                style={{ ...Styles.columnHeader, width: '25%' }} >
-                                <Text style={{ ...Styles.columnHeaderTxt, fontSize: 13 }}>{column} </Text>
-                            </TouchableOpacity>
-                        )
-                    }
-                })
-            }
-
-        </View>
-    )
-
-
-
-    const [isModalVisible, setModalVisible] = useState(false);
-
-    const toggleModal = (item) => {
-        setCurrentMaCK(item)
-        setModalVisible(!isModalVisible);
-    };
-    const YourOwnComponent = () =>
-        <View style={styleModal.centeredView}>
-            <View style={styleModal.modalView}>
-                <Text style={{ ...Styles.textTitleRBSheet, fontSize: 16 }}>Mã cổ phiếu: {currentMaCK.maCP}</Text>
-                <Text style={{ ...Styles.textTitleRBSheet, fontSize: 16 }}>STK: {currentMaCK.stk}</Text>
-                <Text style={{ ...Styles.textTitleRBSheet, fontSize: 16 }}>Thời gian: {format(new Date(currentMaCK.thoiGian), 'dd/MM/yyyy kk:mm:ss')}</Text>
-                <FlatList
-                    style={{ paddingTop: 5 }}
-                    ListHeaderComponent={tableHeaderDetail()}
-                />
-                <View style={{ ...Styles.tableRow, backgroundColor: "#F0FBFC", paddingBottom: 20 }}>
-                    <Text style={{ ...Styles.textBodyRBSheet, width: '25%', fontSize: 13 }}>{Formatter(currentMaCK.maLD) || '0'}</Text>
-                    <Text style={{ ...Styles.textBodyRBSheet, width: '25%', fontSize: 13 }}>{Formatter(currentMaCK.giaKhop) || '0'}</Text>
-                    <Text style={{ ...Styles.textBodyRBSheet, width: '25%', fontSize: 13 }}>{Formatter(currentMaCK.slKhop) || '0'}</Text>
-                    <Text style={{ ...Styles.textBodyRBSheet, width: '25%', fontSize: 13 }}>{Formatter(currentMaCK.giaTriKhop) || '0'}</Text>
-                </View>
-                <Button title="Đóng" onPress={() => setModalVisible(false)} />
-            </View>
-        </View>;
-
     return (
         <View style={styles.container}>
             <View style={styles.content_wp}>
-                <View style={styles.box}>
-                    <Text style={styles.text_title}>MaCK</Text>
-                    <TextInput
-                        name="maCK"
-                        style={styles.textInput}
-                        onChangeText={text => setData({ ...data, MaCK: text })}
-                        placeholder="MaCK"
-                        value={data.MaCK}
-                    />
+                <View style={styles.textStyle}>
+                    <Picker
+                        selectedValue={data.stk}
+                        onValueChange={onChangeListBank}>
+                        {showStatusPicker}
+                    </Picker>
                 </View>
-                <View style={styles.box}>
-                    <Text style={styles.text_title}>MaTT</Text>
-                    <View style={styles.textStyle}>
-                        <Picker
-                            selectedValue={data.MaTT}
-                            onValueChange={(itemValue) => setData({ ...data, MaTT: itemValue })} >
-                            {showStatusPicker}
-                        </Picker>
-                    </View>
-                </View>
+
             </View>
             <View style={styles.content_wp}>
                 <View style={styles.box}>
@@ -237,23 +174,11 @@ export default function HistoryPurchasedScreen({ navigation }) {
                     )
                 }}
             />
-            <Modal
-                isVisible={isModalVisible}
-                onBackdropPress={() => setModalVisible(false)}
-                testID={'modal'}
-                backdropOpacity={0.8}
-                animationIn="zoomInDown"
-                animationOut="zoomOutUp"
-                animationInTiming={600}
-                animationOutTiming={600}
-                backdropTransitionInTiming={600}
-                backdropTransitionOutTiming={600}
-            >
-                <YourOwnComponent />
-            </Modal>
+
         </View>
     )
 }
+
 
 const styles = StyleSheet.create({
     container: {
@@ -296,8 +221,8 @@ const styles = StyleSheet.create({
     textStyle: {
         paddingVertical: 10,
         height: 40,
-        width: '80%',
-        marginLeft: 10,
+        width: '90%',
+        marginLeft: 20,
         borderWidth: StyleSheet.hairlineWidth,
         borderRadius: 10,
     },
