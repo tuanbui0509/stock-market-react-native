@@ -3,7 +3,7 @@ import {
     DrawerContentScrollView,
     DrawerItem
 } from '@react-navigation/drawer';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Alert, StyleSheet, View } from 'react-native';
 import {
     Avatar, Caption, Drawer, Title
@@ -21,7 +21,13 @@ export function DrawerContent(props) {
     const isAdmin = useSelector(state => state.isAdmin)
     const CurrentUser = useSelector(state => state.CurrentUser)
     const [Loading, setLoading] = useState(false)
-
+    const [user, setUser] = useState('')
+    useEffect(() => {
+        const getUser = async () => {
+            setUser(JSON.parse(await AsyncStorage.getItem('user')))
+        }
+        getUser()
+    }, [])
     const Logout = async () => {
         await AsyncStorage.removeItem('Token')
         await AsyncStorage.removeItem('user')
@@ -62,8 +68,8 @@ export function DrawerContent(props) {
                                 size={60}
                             />
                             <View style={{ marginLeft: 15, flexDirection: 'column' }}>
-                                <Title style={styles.title}>Bùi Ngọc Tuấn</Title>
-                                {isAdmin ? null : <Caption style={styles.caption}>200.000.000đ</Caption>}
+                                <Title style={styles.title}>{user.ho} {user.ten}</Title>
+                                {/* {isAdmin ? null : <Caption style={styles.caption}>200.000.000đ</Caption>} */}
                             </View>
                         </View>
                     </View>

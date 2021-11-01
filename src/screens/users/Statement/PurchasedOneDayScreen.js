@@ -30,8 +30,8 @@ export default function PurchasedOneDayScreen({ navigation }) {
                         return (
                             <TouchableOpacity
                                 key={index}
-                                style={styles.columnHeader}>
-                                <Text style={styles.columnHeaderTxt}>{column}</Text>
+                                style={{ ...styles.columnHeader, width: '25%' }} >
+                                <Text style={{ ...styles.columnHeaderTxt, fontSize: 13 }}>{column} </Text>
                             </TouchableOpacity>
                         )
                     }

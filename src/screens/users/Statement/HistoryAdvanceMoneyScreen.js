@@ -1,26 +1,18 @@
-import React, { useEffect, useState } from 'react';
-import { Button, FlatList, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
-import * as Api from '../../../api/Statement';
-import * as ApiUser from '../../../api/Account';
-import Formatter from '../../../helpers/formatNumber';
-import queryString from 'query-string';
-import { useForm, Controller } from "react-hook-form";
-import Constants from 'expo-constants';
-import { Picker } from '@react-native-picker/picker';
-import { yupResolver } from '@hookform/resolvers/yup'; // install @hookform/resolvers (not @hookform/resolvers/yup)
-import * as yup from 'yup';
 import DateTimePicker from '@react-native-community/datetimepicker';
-import moment from 'moment';
-import Color from '../../../constants/Colors';
-import { Col } from 'react-native-table-component';
-import { LinearGradient } from 'expo-linear-gradient';
-import Modal from "react-native-modal";
-import styleModal from '../../../common/styleModal';
-import Styles from '../../../common/StyleTable';
+import { Picker } from '@react-native-picker/picker';
 import { format } from 'date-fns';
+import { LinearGradient } from 'expo-linear-gradient';
+import moment from 'moment';
+import queryString from 'query-string';
+import React, { useEffect, useState } from 'react';
+import { FlatList, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import * as ApiUser from '../../../api/Account';
+import * as Api from '../../../api/Statement';
+import Styles from '../../../common/StyleTable';
+import Color from '../../../constants/Colors';
 
 export default function HistoryAdvanceMoneyScreen({ navigation }) {
-    const [columns, setColumns] = useState(['MaCK', 'Mua/Bán', 'KL Khớp/Tổng KL', 'Giá', 'Trạng thái'])
+    const [columns, setColumns] = useState(['Mã L.Ứug', 'Ngày Ứng', 'Ngày Bán', 'Số tiền', 'Phí Ứng'])
     const [tableData, setTableData] = useState([])
     const [BankAccount, setBankAccount] = useState([])
     const [data, setData] = useState({
@@ -31,31 +23,28 @@ export default function HistoryAdvanceMoneyScreen({ navigation }) {
         pageSize: 10000
     })
     const fetchApi = async () => {
-        const temp = { ...data, from: data.from.format('MM/DD/YYYY'), to: data.to.format('MM/DD/YYYY') }
+        const res1 = await ApiUser.MyBankAccount()
+        setBankAccount(res1.data)
+        setData({ ...data, stk: res1.data[0]?.stk })
+        const temp = { ...data, from: data.from.format('MM/DD/YYYY'), to: data.to.format('MM/DD/YYYY'), stk: res1.data[0]?.stk }
         const paramsString = queryString.stringify(temp);
         const res = await Api.HistoryAdvanceMoney(paramsString)
         setTableData(res.data.list)
     }
-    const fetchBankAccount = async () => {
-        const res = await ApiUser.MyBankAccount()
-        setBankAccount(res.data)
-        setData({ ...data, stk: res.data[0]?.stk })
-    }
+
     useEffect(() => {
         const unsubscribe = navigation.addListener('focus', () => {
             fetchApi()
-            fetchBankAccount();
         });
         return unsubscribe;
     }, [navigation]);
+
+
     const handleSubmit = async () => {
         const temp = { ...data, from: data.from.format('MM/DD/YYYY'), to: data.to.format('MM/DD/YYYY') }
         const paramsString = queryString.stringify(temp);
         const res = await Api.HistoryAdvanceMoney(paramsString)
-        console.log('====================================');
-        console.log(res.data);
-        console.log('====================================');
-        // setTableData(res.data.list)
+        setTableData(res.data.list)
     }
 
     const [showTo, setShowTo] = useState(false);
@@ -79,8 +68,8 @@ export default function HistoryAdvanceMoneyScreen({ navigation }) {
                         return (
                             <TouchableOpacity
                                 key={index}
-                                style={Styles.columnHeader}>
-                                <Text style={Styles.columnHeaderTxt}>{column}</Text>
+                                style={{ ...Styles.columnHeader, width: '25%' }} >
+                                <Text style={{ ...Styles.columnHeaderTxt, fontSize: 14 }}>{column} </Text>
                             </TouchableOpacity>
                         )
                     }
@@ -96,8 +85,12 @@ export default function HistoryAdvanceMoneyScreen({ navigation }) {
             <Picker.Item key={index} label={value} value={item.stk.trim()} />
         )
     })
-    let onChangeListBank = (stk) => {
+    let onChangeListBank = async (stk) => {
         setData({ ...data, stk: stk })
+        const temp = { ...data, from: data.from.format('MM/DD/YYYY'), to: data.to.format('MM/DD/YYYY'), stk: stk }
+        const paramsString = queryString.stringify(temp);
+        const res = await Api.HistoryAdvanceMoney(paramsString)
+        setTableData(res.data.list)
     }
     return (
         <View style={styles.container}>
@@ -160,15 +153,11 @@ export default function HistoryAdvanceMoneyScreen({ navigation }) {
                     return (
                         <ScrollView >
                             <View style={{ ...Styles.tableRow, backgroundColor: index % 2 == 1 ? "#F0FBFC" : "white" }}>
-                                <Text
-                                    style={{ ...Styles.columnRowTxt, fontWeight: "bold" }}
-                                    onPress={() => toggleModal(item)}
-                                >
-                                    {item.maCP.trim()}</Text>
-                                <Text style={{ ...Styles.columnRowTxt, width: '20%', color: item.loaiGiaoDich ? Color.green : Color.red }}>{item.loaiGiaoDich ? 'Mua' : 'Bán'}</Text>
-                                <Text style={{ ...Styles.columnRowTxtLight, width: '20%' }}>{Formatter(item.soLuong)}/{Formatter(item.slKhop) || '0'}</Text>
-                                <Text style={{ ...Styles.columnRowTxtLight, width: '20%' }}>{Formatter(item.gia)}</Text>
-                                <Text style={{ ...Styles.columnRowTxt, width: '20%', color: ClassNameRender(item.maTT.trim()) }}>{item.tenTrangThai}</Text>
+                                <Text style={{ ...Styles.columnRowTxt, width: '15%' }}> {item.maLU}</Text>
+                                <Text style={{ ...Styles.columnRowTxtLight, width: '22%' }}>{format(new Date(item.ngayYeuCau), 'dd/MM/yyyy')}</Text>
+                                <Text style={{ ...Styles.columnRowTxtLight, width: '22%' }}>{format(new Date(item.ngayBan), 'dd/MM/yyyy')}</Text>
+                                <Text style={{ ...Styles.columnRowTxtLight, width: '20%' }}>{item.soTien}</Text>
+                                <Text style={{ ...Styles.columnRowTxtLight, width: '20%' }}>{item.phiUng}</Text>
                             </View>
                         </ScrollView>
                     )

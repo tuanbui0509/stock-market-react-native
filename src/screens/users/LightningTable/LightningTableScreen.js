@@ -1,7 +1,7 @@
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import _ from "lodash";
 import React, { useEffect, useRef, useState } from 'react';
-import { FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { FlatList, StyleSheet, Text, TouchableOpacity, View, Dimensions } from 'react-native';
 import RBSheet from 'react-native-raw-bottom-sheet';
 import * as Api from '../../../api/LightningTable';
 import CustomHeader from '../../../components/CustomHeader';
@@ -9,7 +9,9 @@ import Color from '../../../constants/Colors';
 import Formatter from '../../../helpers/formatNumber'
 import * as Price from '../../../constants/Price';
 import styles from '../../../common/StyleTable';
+// import *as ScreenOrientation from 'expo-screen-orientation';
 function LightningTableScreen(props) {
+    const [orientation, setOrientation] = useState("PORTRAIT");
     const refRBSheet = useRef();
     let { navigation } = props
     const [columns, setColumns] = useState(['MaCK', 'TC', 'Trần', 'Sàn', 'Tổng KL'])
@@ -20,7 +22,6 @@ function LightningTableScreen(props) {
     const [selectedColumn, setSelectedColumn] = useState(null)
     const [tableData, setTableData] = useState([])
     const [currentStock, setCurrentStock] = useState([])
-
     useEffect(() => {
         const unsubscribe = navigation.addListener('focus', () => {
             const fetchApi = async () => {
@@ -29,9 +30,21 @@ function LightningTableScreen(props) {
             }
             fetchApi()
         });
-
         return unsubscribe;
     }, [navigation]);
+
+
+    useEffect(() => {
+        Dimensions.addEventListener('change', ({ window: { width, height } }) => {
+            if (width < height) {
+                //this is portrait mode
+                console.log('portrait');
+            } else {
+                // landscape
+                console.log('landscape');
+            }
+        })
+    })
     const tableHeader = () => (
         <View style={styles.tableHeader}>
             {
@@ -163,6 +176,8 @@ function LightningTableScreen(props) {
                 </View>
             </View>
         </View>;
+
+    // ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.PORTRAIT)
     return (
         <View style={styles.container} >
             <CustomHeader title="Bảng diện thị trường" isHome={true} navigation={navigation} />
@@ -190,7 +205,7 @@ function LightningTableScreen(props) {
                 }}
             />
 
-            <RBSheet
+            {/* <RBSheet
                 ref={refRBSheet}
                 closeOnDragDown={true}
                 closeOnPressMask={true}
@@ -208,7 +223,7 @@ function LightningTableScreen(props) {
                 }}
             >
                 <YourOwnComponent />
-            </RBSheet>
+            </RBSheet> */}
         </View>
 
     )

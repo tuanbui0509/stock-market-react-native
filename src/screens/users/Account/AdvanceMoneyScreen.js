@@ -50,6 +50,20 @@ function AdvanceMoneyScreen({ navigation }) {
         const res = await ApiUser.PhiUng(data.soTien)
         setPhiUng(res.data.data)
     }
+
+    const fetchLenhUng = async () => {
+        try {
+
+            const res = await ApiUser.LenhUng(data)
+            Alert.alert('Thành công', 'Bạn đã ứng tiền thành công')
+            setModalVisible(!isModalVisible)
+            fetchKhaDung(data.ngayBan, data.stk)
+            setData({ ...data, soTien: '' })
+        } catch (error) {
+            Alert.alert('Thất bại', error.data.message)
+
+        }
+    }
     useEffect(() => {
         fetchBank()
     }, []);
@@ -60,11 +74,38 @@ function AdvanceMoneyScreen({ navigation }) {
         fetchPhiUng()
         setModalVisible(!isModalVisible)
     }
+
+    const handleSubmitLend = () => {
+        fetchLenhUng()
+    }
+
+
     const YourOwnComponent = () =>
         <View style={styleModal.centeredView}>
-            <Text>{PhiUng}</Text>
-            <Button title="Đóng" onPress={() => setModalVisible(false)} />
-        </View>
+            <View style={styleModal.modalView}>
+                <Text style={{ ...styles.textTitleRBSheet, fontSize: 18, fontWeight: 'bold', marginBottom: 10, textAlign: 'center' }}>{`Số tiền bạn muốn ứng là: ${data.soTien}`}</Text>
+                <Text style={{ ...styles.textTitleRBSheet, fontSize: 16, marginBottom: 20 }}>{`Phí ứng: ${PhiUng}`}</Text>
+                <View style={styles.wrapperLabel}>
+                    <TouchableOpacity onPress={handleSubmitLend}>
+                        <LinearGradient
+                            colors={['#F8495A', Color.red]}
+                            style={{ ...styles.appButtonContainer, width: 120, marginRight: 20 }}
+                        >
+                            <Text style={styles.appButtonText}>Xác nhận</Text>
+                        </LinearGradient>
+                    </TouchableOpacity>
+                    <TouchableOpacity onPress={() => setModalVisible(false)}>
+                        <LinearGradient
+                            colors={['#fff', '#fff']}
+                            style={{ ...styles.appButtonContainer, width: 120 }}
+                        >
+                            <Text style={{ ...styles.appButtonText, color: '#333' }}>Đóng</Text>
+                        </LinearGradient>
+                    </TouchableOpacity>
+                </View>
+            </View>
+        </View>;
+
     const showStatusPicker = ListBankAccount?.map((item, index) => {
         const value = item.nganHang.tenNganHang + ' - ' + item.stk.trim()
         return (
@@ -209,7 +250,7 @@ const styles = StyleSheet.create({
         marginLeft: 5,
         borderWidth: StyleSheet.hairlineWidth,
         borderRadius: 10,
-        fontSize: 18
+        fontSize: 16
 
     },
     appButtonContainer: {
@@ -225,5 +266,18 @@ const styles = StyleSheet.create({
         fontWeight: "bold",
         alignSelf: "center",
         textTransform: "uppercase"
+    },
+
+    wrapperLabel: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between'
+    },
+    contentLabel: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'flex-start',
+        flex: 1,
+        marginBottom: 10
     }
 })

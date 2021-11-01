@@ -79,8 +79,8 @@ export default function HistoryPurchasedScreen({ navigation }) {
                         return (
                             <TouchableOpacity
                                 key={index}
-                                style={Styles.columnHeader}>
-                                <Text style={Styles.columnHeaderTxt}>{column}</Text>
+                                style={{ ...Styles.columnHeader, width: '25%' }} >
+                                <Text style={{ ...Styles.columnHeaderTxt, fontSize: 14 }}>{column} </Text>
                             </TouchableOpacity>
                         )
                     }
@@ -133,7 +133,7 @@ export default function HistoryPurchasedScreen({ navigation }) {
     const YourOwnComponent = () =>
         <View style={styleModal.centeredView}>
             <View style={styleModal.modalView}>
-                <Text style={{ ...Styles.textTitleRBSheet, fontSize: 16 }}>Mã cổ phiếu: {currentMaCK.maCP}</Text>
+                {/* <Text style={{ ...Styles.textTitleRBSheet, fontSize: 16 }}>Mã cổ phiếu: {currentMaCK.maCP}</Text> */}
                 <Text style={{ ...Styles.textTitleRBSheet, fontSize: 16 }}>STK: {currentMaCK.stk}</Text>
                 <Text style={{ ...Styles.textTitleRBSheet, fontSize: 16 }}>Thời gian: {format(new Date(currentMaCK.thoiGian), 'dd/MM/yyyy kk:mm:ss')}</Text>
                 <FlatList

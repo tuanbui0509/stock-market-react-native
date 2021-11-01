@@ -60,8 +60,9 @@ function OrderStack({ navigation, route }) {
     const res = await ApiUser.MyBankAccount()
     setBankAccount(res.data)
     setCurrentBank(res.data[0])
-
+    setOrder({ ...order, stk: res.data[0].stk })
   }
+  console.log(currentBank);
   const fetchApiStocks = async () => {
     const res = await ApiLT.LightningTable()
     // setStocks(res.data);
@@ -337,7 +338,8 @@ function OrderStack({ navigation, route }) {
               </View>
             </View>
             <ScrollView>
-              {currentStock ? stockInformation() : null}
+              {/* {currentStock ? stockInformation() : null} */}
+              {stockInformation()}
               <View style={styles.content_wp}>
                 <View style={styles.box}>
                   <Text style={styles.textTitle}>Số dư tài khoản</Text>

@@ -21,3 +21,7 @@ export const KhaDung = (body) => {
 export const PhiUng = (body) => {
     return AxiosClient.get(`LenhUng/PhiUng/${body}`)
 }
+
+export const LenhUng = (body) => {
+    return AxiosClient.post('LenhUng', body)
+}
