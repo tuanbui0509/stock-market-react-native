@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { FlatList, Text, TouchableOpacity, View } from 'react-native';
+import { FlatList, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import * as Api from '../../../api/Statement';
-import styles from '../../../common/StyleTable';
+import Styles from '../../../common/StyleTable';
 import Formatter from '../../../helpers/formatNumber';
 import queryString from 'query-string';
-
+import Color from '../../../constants/Colors';
 export default function PurchasedOneDayScreen({ navigation }) {
     const [columns, setColumns] = useState(['MaCK', 'Mua/Bán', 'KL Khớp/Tổng KL', 'Trạng thái', 'Hùy lệnh'])
 
@@ -23,15 +23,15 @@ export default function PurchasedOneDayScreen({ navigation }) {
     }, [navigation]);
 
     const tableHeader = () => (
-        <View style={styles.tableHeaderDetail}>
+        <View style={Styles.tableHeaderDetail}>
             {
                 columns.map((column, index) => {
                     {
                         return (
                             <TouchableOpacity
                                 key={index}
-                                style={{ ...styles.columnHeader, width: '25%' }} >
-                                <Text style={{ ...styles.columnHeaderTxt, fontSize: 13 }}>{column} </Text>
+                                style={{ ...Styles.columnHeader, width: '25%' }} >
+                                <Text style={{ ...Styles.columnHeaderTxt, fontSize: 13 }}>{column} </Text>
                             </TouchableOpacity>
                         )
                     }
@@ -49,7 +49,7 @@ export default function PurchasedOneDayScreen({ navigation }) {
             return Color.red
     }
     return (
-        <View style={styles.container}>
+        <View style={Styles.container}>
             <FlatList
                 data={tableData}
                 style={{ width: "100%", marginTop: 10, }}
@@ -58,7 +58,7 @@ export default function PurchasedOneDayScreen({ navigation }) {
                 stickyHeaderIndices={[0]}
                 renderItem={({ item, index }) => {
                     return (
-                        <ScrollView >
+                        <ScrollView>
                             <View style={{ ...Styles.tableRow, backgroundColor: index % 2 == 1 ? "#F0FBFC" : "white" }}>
                                 <Text
                                     style={{ ...Styles.columnRowTxt, fontWeight: "bold" }}

@@ -31,15 +31,15 @@ function AdvanceMoneyScreen({ navigation }) {
         setData({ ...data, stk: res.data[0]?.stk })
         let temp = data.ngayBan.format('MM-DD-YYYY')
         const res1 = await ApiUser.KhaDung({ currentBank: res.data[0]?.stk, date: temp })
-        console.log(res1.data)
-        setKhaDung(Formatter(res1.data.data))
+        const res2 = await ApiUser.PhiUng(res1.data.data)
+        setKhaDung(Formatter(res1.data.data - res2.data.data))
     }
     const fetchKhaDung = async (date, stk) => {
         try {
             let temp = date.format('MM-DD-YYYY')
             const res = await ApiUser.KhaDung({ currentBank: stk, date: temp })
-            console.log(res.data)
-            setKhaDung(Formatter(res.data.data))
+            const res1 = await ApiUser.PhiUng(res.data.data)
+            setKhaDung(Formatter(res.data.data - res1.data.data))
         } catch (error) {
             Alert.alert('Thất bại!', error.data.message)
             setData({ ...data, ngayBan: moment() })
@@ -61,7 +61,6 @@ function AdvanceMoneyScreen({ navigation }) {
             setData({ ...data, soTien: '' })
         } catch (error) {
             Alert.alert('Thất bại', error.data.message)
-
         }
     }
     useEffect(() => {
@@ -137,7 +136,7 @@ function AdvanceMoneyScreen({ navigation }) {
                     </View>
                 </View>
                 <View style={styles.content_wp}>
-                    <Text style={{ ...styles.text_title, textAlign: 'center' }}>Khả dụng: </Text>
+                    <Text style={{ ...styles.text_title, textAlign: 'center' }}>Số tiến ứng tối đa: </Text>
                     <Text style={{ ...styles.text_title, textAlign: 'center' }}>{khaDung}</Text>
                 </View>
                 <View style={styles.content_wp}>

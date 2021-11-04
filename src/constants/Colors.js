@@ -8,12 +8,12 @@ export default {
     gray: '#CCCCCC',
     red: '#ff5454',
     gold: 'gold',
-    yellow:'#CCCC00',
+    yellow: '#CCCC00',
     purple: 'purple',
     skyBlue: 'skyblue',
     standard: 'rgb(246, 155, 11)',
-    ceil: 'rgb(0, 105, 196)',
-    floor: 'rgb(190, 0, 190)',
+    floor: 'rgb(0, 105, 196)',
+    ceil: 'rgb(190, 0, 190)',
 
     //radiant color and background
     btn_color: '#08d4c4',

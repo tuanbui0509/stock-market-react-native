@@ -1,6 +1,6 @@
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import React from 'react';
-import { Image } from 'react-native';
+import { Image, StyleSheet } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { useDispatch, useSelector } from 'react-redux';
 import ManagementAccountStack from '../../routers/routerAdmin/ManagementAccountStack';
@@ -22,7 +22,7 @@ function TabNavigator() {
     const dispatch = useDispatch()
     const isAdmin = useSelector(state => state.isAdmin)
     return (
-        <Tab.Navigator>
+        <Tab.Navigator >
             {isAdmin ?
                 <>
                     <Tab.Screen name="ManagementRegisterForms" component={ManagementRegisterFormStack}

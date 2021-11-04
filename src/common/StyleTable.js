@@ -56,6 +56,7 @@ const styles = StyleSheet.create({
         width: "20%",
         textAlign: "center",
         fontSize: 16,
+        color: '#000',
         fontWeight: "bold",
 
     },
@@ -67,6 +68,13 @@ const styles = StyleSheet.create({
         width: "25%",
         textAlign: "center",
         fontSize: 16,
+    },
+    columnRowTxtLandscape: {
+        width: "5.263157894736842%",
+        textAlign: "center",
+        fontSize: 12,
+        fontWeight: "bold",
+        color: '#000'
 
     },
     columnRowTxt3: {

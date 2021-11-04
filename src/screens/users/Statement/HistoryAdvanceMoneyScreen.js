@@ -7,12 +7,13 @@ import queryString from 'query-string';
 import React, { useEffect, useState } from 'react';
 import { FlatList, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import * as ApiUser from '../../../api/Account';
+import Formatter from '../../../helpers/formatNumber'
 import * as Api from '../../../api/Statement';
 import Styles from '../../../common/StyleTable';
 import Color from '../../../constants/Colors';
 
 export default function HistoryAdvanceMoneyScreen({ navigation }) {
-    const [columns, setColumns] = useState(['Mã L.Ứug', 'Ngày Ứng', 'Ngày Bán', 'Số tiền', 'Phí Ứng'])
+    const [columns, setColumns] = useState(['Ngày Ứng', 'Ngày Bán', 'Số tiền', 'Phí Ứng'])
     const [tableData, setTableData] = useState([])
     const [BankAccount, setBankAccount] = useState([])
     const [data, setData] = useState({
@@ -153,11 +154,10 @@ export default function HistoryAdvanceMoneyScreen({ navigation }) {
                     return (
                         <ScrollView >
                             <View style={{ ...Styles.tableRow, backgroundColor: index % 2 == 1 ? "#F0FBFC" : "white" }}>
-                                <Text style={{ ...Styles.columnRowTxt, width: '15%' }}> {item.maLU}</Text>
-                                <Text style={{ ...Styles.columnRowTxtLight, width: '22%' }}>{format(new Date(item.ngayYeuCau), 'dd/MM/yyyy')}</Text>
-                                <Text style={{ ...Styles.columnRowTxtLight, width: '22%' }}>{format(new Date(item.ngayBan), 'dd/MM/yyyy')}</Text>
-                                <Text style={{ ...Styles.columnRowTxtLight, width: '20%' }}>{item.soTien}</Text>
-                                <Text style={{ ...Styles.columnRowTxtLight, width: '20%' }}>{item.phiUng}</Text>
+                                <Text style={{ ...Styles.columnRowTxtLight, width: '30%' }}>{format(new Date(item.ngayYeuCau), 'dd/MM/yyyy kk:mm:ss')}</Text>
+                                <Text style={{ ...Styles.columnRowTxtLight, width: '30%' }}>{format(new Date(item.ngayBan), 'dd/MM/yyyy kk:mm:ss')}</Text>
+                                <Text style={{ ...Styles.columnRowTxtLight, width: '20%' }}>{Formatter(item.soTien)}</Text>
+                                <Text style={{ ...Styles.columnRowTxtLight, width: '20%' }}>{Formatter(item.phiUng)}</Text>
                             </View>
                         </ScrollView>
                     )
