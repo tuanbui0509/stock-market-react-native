@@ -5,8 +5,10 @@ import Styles from '../../../common/StyleTable';
 import Formatter from '../../../helpers/formatNumber';
 import queryString from 'query-string';
 import Color from '../../../constants/Colors';
+import { Icon } from 'react-native-vector-icons/FontAwesome';
+import Colors from '../../../constants/Colors';
 export default function PurchasedOneDayScreen({ navigation }) {
-    const [columns, setColumns] = useState(['MaCK', 'Mua/Bán', 'KL Khớp/Tổng KL', 'Trạng thái', 'Hùy lệnh'])
+    const [columns, setColumns] = useState(['MaCK', 'Mua/Bán', 'KLượng Khớp/Tổng KLượng', 'Trạng thái', 'Hùy lệnh'])
 
     const [tableData, setTableData] = useState([])
     useEffect(() => {
@@ -52,7 +54,7 @@ export default function PurchasedOneDayScreen({ navigation }) {
         <View style={Styles.container}>
             <FlatList
                 data={tableData}
-                style={{ width: "100%", marginTop: 10, }}
+                style={{ width: "100%", marginTop: 10,height: 380 }}
                 keyExtractor={(item, index) => index + ""}
                 ListHeaderComponent={tableHeader}
                 stickyHeaderIndices={[0]}
@@ -67,8 +69,8 @@ export default function PurchasedOneDayScreen({ navigation }) {
                                     {item.maCP.trim()}</Text>
                                 <Text style={{ ...Styles.columnRowTxt, width: '20%', color: item.loaiGiaoDich ? Color.green : Color.red }}>{item.loaiGiaoDich ? 'Mua' : 'Bán'}</Text>
                                 <Text style={{ ...Styles.columnRowTxtLight, width: '20%' }}>{Formatter(item.soLuong)}/{Formatter(item.slKhop) || '0'}</Text>
-                                <Text style={{ ...Styles.columnRowTxtLight, width: '20%' }}>{Formatter(item.gia)}</Text>
                                 <Text style={{ ...Styles.columnRowTxt, width: '20%', color: ClassNameRender(item.maTT.trim()) }}>{item.tenTrangThai}</Text>
+                                <Text style={{ ...Styles.columnRowTxtLight, width: '20%' }}><Icon name="times" color={Colors.red} size={15} /></Text>
                             </View>
                         </ScrollView>
                     )

@@ -146,7 +146,7 @@ export default function HistoryAdvanceMoneyScreen({ navigation }) {
             </TouchableOpacity>
             <FlatList
                 data={tableData}
-                style={{ width: "100%", marginTop: 10, }}
+                style={{ width: "100%", marginTop: 10, height: 380 }}
                 keyExtractor={(item, index) => index + ""}
                 ListHeaderComponent={tableHeader}
                 stickyHeaderIndices={[0]}

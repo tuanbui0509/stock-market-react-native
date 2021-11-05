@@ -19,7 +19,7 @@ import Styles from '../../../common/StyleTable';
 import { format } from 'date-fns';
 
 export default function HistoryPurchasedScreen({ navigation }) {
-    const [columns, setColumns] = useState(['MaCK', 'Mua/Bán', 'KL Khớp/Tổng KL', 'Giá', 'Trạng thái'])
+    const [columns, setColumns] = useState(['MaCK', 'Mua/Bán', 'KLượng Khớp/Tổng KLượng', 'Giá khớp', 'Trạng thái'])
     const [detail, setDetail] = useState(['Mã LD', 'Giá', 'SL Khớp', 'Giá trị khớp'])
     const [tableData, setTableData] = useState([])
     const [status, setStatus] = useState([])
@@ -215,7 +215,7 @@ export default function HistoryPurchasedScreen({ navigation }) {
             </TouchableOpacity>
             <FlatList
                 data={tableData}
-                style={{ width: "100%", marginTop: 10, }}
+                style={{ width: "100%", marginTop: 10, height: 380 }}
                 keyExtractor={(item, index) => index + ""}
                 ListHeaderComponent={tableHeader}
                 stickyHeaderIndices={[0]}

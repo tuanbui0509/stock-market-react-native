@@ -54,14 +54,16 @@ const styles = StyleSheet.create({
     textStyle: {
         paddingVertical: 10,
         paddingHorizontal: 10,
-        borderWidth: 1,
+        borderWidth: 0,
         height: 40,
         width: '100%',
         marginBottom: 10,
         backgroundColor: 'white',
-        borderColor: 'gray',
-        borderWidth: StyleSheet.hairlineWidth,
-        borderRadius: 10,
+        borderBottomWidth: 1,
+        borderBottomColor: '#f2f2f2',
+        // borderColor: 'gray',
+        // borderWidth: StyleSheet.hairlineWidth,
+        // borderRadius: 10,
     }
 })
 

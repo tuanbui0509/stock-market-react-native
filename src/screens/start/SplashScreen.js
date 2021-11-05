@@ -81,7 +81,7 @@ const styles = StyleSheet.create({
         backgroundColor: '#fff',
         borderTopLeftRadius: 30,
         borderTopRightRadius: 30,
-        paddingVertical: 50,
+        paddingVertical: 30,
         paddingHorizontal: 30
     },
     logo: {

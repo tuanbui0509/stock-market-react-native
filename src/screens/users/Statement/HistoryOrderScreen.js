@@ -19,7 +19,7 @@ import Styles from '../../../common/StyleTable';
 import { format } from 'date-fns';
 
 export default function HistoryOrderScreen({ navigation }) {
-    const [columns, setColumns] = useState(['MaCK', 'Mua/Bán', 'KL Khớp/Tổng KL', 'Giá', 'Trạng thái'])
+    const [columns, setColumns] = useState(['MaCK', 'Mua/Bán', 'KLượng Khớp/Tổng KLượng', 'Giá khớp', 'Trạng thái'])
     const [detail, setDetail] = useState(['Mã LD', 'Giá', 'SL Khớp', 'Giá trị khớp'])
     const [tableData, setTableData] = useState([])
     const [status, setStatus] = useState([])
@@ -81,7 +81,7 @@ export default function HistoryOrderScreen({ navigation }) {
                             <TouchableOpacity
                                 key={index}
                                 style={{ ...Styles.columnHeader, width: '25%' }} >
-                                <Text style={{ ...Styles.columnHeaderTxt, fontSize: 15 }}>{column} </Text>
+                                <Text style={{ ...Styles.columnHeaderTxt, fontSize: 13 }}>{column} </Text>
                             </TouchableOpacity>
                         )
                     }
@@ -216,13 +216,13 @@ export default function HistoryOrderScreen({ navigation }) {
             </TouchableOpacity>
             <FlatList
                 data={tableData}
-                style={{ width: "100%", marginTop: 10, }}
+                style={{ width: "100%", marginTop: 10, height: 380 }}
                 keyExtractor={(item, index) => index + ""}
                 ListHeaderComponent={tableHeader}
                 stickyHeaderIndices={[0]}
                 renderItem={({ item, index }) => {
                     return (
-                        <ScrollView >
+                        <ScrollView>
                             <View style={{ ...Styles.tableRow, backgroundColor: index % 2 == 1 ? "#F0FBFC" : "white" }}>
                                 <Text
                                     style={{ ...Styles.columnRowTxt, fontWeight: "bold" }}

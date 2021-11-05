@@ -44,7 +44,8 @@ const styles = StyleSheet.create({
         // borderColor: 'gray',
         // borderWidth: StyleSheet.hairlineWidth,
         borderRadius: 10,
-
+        borderBottomWidth: 1,
+        borderBottomColor: '#f2f2f2',
         flex: 1,
         marginTop: Platform.OS === 'ios' ? 0 : -12,
         padding: 10,

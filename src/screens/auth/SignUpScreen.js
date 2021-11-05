@@ -2,7 +2,7 @@ import { Picker } from '@react-native-picker/picker';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Field, Formik } from 'formik';
 import moment from 'moment';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import {
     Alert, Platform, ScrollView,
     StatusBar, StyleSheet, Text, TouchableOpacity, View
@@ -51,8 +51,7 @@ const signUpValidationSchema = yup.object().shape({
 })
 
 const SignInScreen = ({ navigation }) => {
-
-    const [data, setData] = React.useState({
+    const [data, setData] = useState({
         ho: '',
         ten: '',
         ngaySinh: moment(),
@@ -66,15 +65,16 @@ const SignInScreen = ({ navigation }) => {
         ngayCapCMND: moment()
 
     });
+
+    useEffect(() => {
+
+    }, [])
     const { colors } = useTheme();
     const onSubmit = async (values) => {
         console.log('data: ', data);
-        // console.log('value: ', values);
+        console.log('value: ', values);
         try {
             const res = await ApiAuthentication.register(data);
-            console.log('====================================');
-            console.log(res.data);
-            console.log('====================================');
             if (res.data.status === 0) {
                 Alert.alert('Thành công!', res.data.message, [
                     { text: 'Xác nhận' }
@@ -83,14 +83,11 @@ const SignInScreen = ({ navigation }) => {
 
             }
             else {
-                console.log('====================================');
-                console.log(res.data.message);
-                console.log('====================================');
+                Alert.alert('Thất bại!', res.data.message);
 
             }
 
         } catch (err) {
-            console.log(err.data);
             Alert.alert('Lỗi đăng nhập!', err.data.message, [
                 { text: 'Trở lại' }
             ]);
@@ -136,7 +133,6 @@ const SignInScreen = ({ navigation }) => {
                                         name="ten"
                                         placeholder="Tên của bạn"
                                         onValueChange={(value) => setData({ ...data, ten: value })}
-
                                     />
                                 </View>
 
@@ -150,7 +146,7 @@ const SignInScreen = ({ navigation }) => {
                                             selectedValue={data.phai}
                                             onValueChange={(itemValue) => setData({ ...data, phai: itemValue })}
                                         >
-                                            <Picker.Item label="Chọn giới tính" value='' />
+                                            {/* <Picker.Item label="Chọn giới tính" value='' /> */}
                                             <Picker.Item label="Nam" value={true} />
                                             <Picker.Item label="Nữ" value={false} />
                                         </Picker>
@@ -161,15 +157,10 @@ const SignInScreen = ({ navigation }) => {
                                     color: colors.text,
                                 }]}>Ngày sinh</Text>
                                 <View style={styles.action}>
-                                    {/* <CustomDatePicker
-                                        name="ngaySinh"
-                                        onDateChange={(value) => setData({ ...data, ngaySinh: value })}
-                                    /> */}
                                     <Field
                                         component={CustomDatePicker}
                                         name="ngaySinh"
                                         onDateChange={(value) => setData({ ...data, ngaySinh: value })}
-                                    // placeholder=""
                                     />
                                 </View>
                                 <Text style={[styles.text_footer, {
@@ -344,8 +335,8 @@ const styles = StyleSheet.create({
     action: {
         // flexDirection: 'row',
         marginTop: 10,
-        borderBottomWidth: 1,
-        borderBottomColor: '#f2f2f2',
+        // borderBottomWidth: 1,
+        // borderBottomColor: '#f2f2f2',
         paddingBottom: 5
     },
     textInput: {
@@ -400,13 +391,20 @@ const styles = StyleSheet.create({
     styleSelect: {
         paddingVertical: 10,
         paddingHorizontal: 10,
-        borderWidth: 1,
-        height: 40,
+        // borderWidth: 1,
+        height: 45,
         width: '100%',
+        fontSize: 13,
         marginBottom: 10,
         backgroundColor: 'white',
-        borderColor: 'gray',
-        borderWidth: StyleSheet.hairlineWidth,
+        // borderColor: 'gray',
+        // borderWidth: StyleSheet.hairlineWidth,
+        borderBottomWidth: 1,
+        borderBottomColor: '#f2f2f2',
         borderRadius: 10,
-    }
+    }, errorMsg: {
+        color: '#FF0000',
+        fontSize: 14,
+        textAlign: 'center'
+    },
 });
