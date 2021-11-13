@@ -49,6 +49,7 @@ function OrderScreen({ navigation, route }) {
         ErrorMaCp: false,
         ErrorGia: false,
         ErrorSoLuong: false,
+        ErrorMkdatLenh: false,
     });
     const fetchBankAccount = async () => {
         const res = await ApiUser.MyBankAccount()
@@ -88,6 +89,7 @@ function OrderScreen({ navigation, route }) {
             SetErrorOrder({
                 ErrorMaCp: false,
                 ErrorGia: false,
+                ErrorMkdatLenh: false,
                 ErrorSoLuong: false,
             })
         });
@@ -101,7 +103,6 @@ function OrderScreen({ navigation, route }) {
         )
     })
     const mapMyStockToLightningTable = () => {
-        // const temp = [...LightningTable]
         const result = LightningTable.filter(o1 => MyStock?.some(o2 => o1.macp.trim() === o2.maCp.trim()));
         const suggestions = result.map((item) => ({
             id: item.macp,
@@ -110,7 +111,6 @@ function OrderScreen({ navigation, route }) {
         setStocks(suggestions)
     }
     const handleSelectItem = (item) => {
-        console.log(item);
         if (item === null) {
             SetErrorOrder({ ...errorOrder, ErrorMaCp: true })
         } else {
@@ -160,7 +160,7 @@ function OrderScreen({ navigation, route }) {
         return (<View style={{ ...styles.content_wp, borderBottomWidth: 1 }}>
             <View style={styles.box_cp}>
                 <Text style={{ fontSize: 24 }}>Giá: {tempStock?.gia / Price.PRICE || null}</Text>
-                <Text style={styles.textTitle}>KL: {tempStock?.kl || null}</Text>
+                {/* <Text style={styles.textTitle}>KL: {tempStock?.kl || null}</Text> */}
             </View>
             <View style={styles.box_cp}>
                 <Text style={{ ...styles.textTitle, color: Color.ceil }}>Trần: {(tempStock?.giaTran / Price.PRICE) || null}</Text>
@@ -211,7 +211,7 @@ function OrderScreen({ navigation, route }) {
                     </View>
                 </View>
                 <View style={styles.wrapperLabel}>
-                    <TouchableOpacity onPress={handleConfirm}>
+                    <TouchableOpacity onPress={handleFinish}>
                         <LinearGradient
                             colors={['#F8495A', Color.red]}
                             style={{ ...styles.appButtonContainer, width: 140, marginRight: 20 }}
@@ -219,7 +219,7 @@ function OrderScreen({ navigation, route }) {
                             <Text style={styles.appButtonText}>Xác nhận</Text>
                         </LinearGradient>
                     </TouchableOpacity>
-                    <TouchableOpacity onPress={handleSubmitForm}>
+                    <TouchableOpacity onPress={() => setModalFormVisible(!isModalFormVisible)}>
                         <LinearGradient
                             colors={['#fff', '#fff']}
                             style={{ ...styles.appButtonContainer, width: 140 }}
@@ -231,69 +231,10 @@ function OrderScreen({ navigation, route }) {
             </View>
         </View>;
 
-
-    const ComponentConFirm = () =>
-        <View style={styleModal.centeredView}>
-            <View style={styleModal.modalView}>
-                <Text style={{ ...styles.textTitle, fontWeight: 'bold', fontSize: 18, color: '#000' }}>Nhập mã Pin của bạn?</Text>
-                <Formik
-                    validationSchema={pinValidationSchema}
-                    initialValues={{ pin: '' }}
-                    onSubmit={handleFinish}
-                >
-                    {({
-                        handleChange,
-                        handleBlur,
-                        handleSubmit,
-                        values,
-                        errors,
-                        isValid,
-                    }) => (
-                        <>
-                            <TextInput
-                                name="pin"
-                                style={{ ...styles.textInput, width: '80%', marginLeft: 0, marginBottom: 20 }}
-                                placeholder="Mã Pin của bạn"
-                                onChangeText={handleChange('pin')}
-                                onBlur={handleBlur('pin')}
-                                value={values.pin}
-                                maxLength={6}
-                                secureTextEntry
-                            />
-                            {errors.pin &&
-                                <Text style={{ ...styles.errorMsg, marginBottom: 20 }}>{errors.pin}</Text>
-                            }
-
-                            <View style={styles.wrapperLabel}>
-                                <TouchableOpacity onPress={handleSubmit}>
-                                    <LinearGradient
-                                        colors={['#F8495A', Color.red]}
-                                        style={{ ...styles.appButtonContainer, width: 140, marginRight: 20 }}
-                                    >
-                                        <Text style={styles.appButtonText}>Xác nhận</Text>
-                                    </LinearGradient>
-                                </TouchableOpacity>
-                                <TouchableOpacity onPress={() => { setModalConfirmVisible(false), setOrder({ ...order, mkdatLenh: null }) }}>
-                                    <LinearGradient
-                                        colors={['#fff', '#fff']}
-                                        style={{ ...styles.appButtonContainer, width: 140 }}
-                                    >
-                                        <Text style={{ ...styles.appButtonText, color: '#333' }}>Hủy bỏ</Text>
-                                    </LinearGradient>
-                                </TouchableOpacity>
-                            </View>
-                        </>
-                    )}
-                </Formik>
-            </View>
-        </View>;
     const [isModalFormVisible, setModalFormVisible] = useState(false);
-    const [isModalConfirmVisible, setModalConfirmVisible] = useState(false);
-
-    const handleSubmitForm = () => {
-        console.log(order);
-        if ((order.maCp === '' || order.maCp === undefined) && order.soLuong === '' && order.gia === '') {
-            SetErrorOrder({ ErrorMaCp: true, ErrorSoLuong: true, ErrorGia: true })
+    const handleSubmitForm = async () => {
+        if ((order.maCp === '' || order.maCp === undefined) && order.soLuong === '' && order.gia === '' && order.mkdatLenh === '') {
+            SetErrorOrder({ ErrorMaCp: true, ErrorSoLuong: true, ErrorGia: true, ErrorMkdatLenh: true })
             return
         }
         if (order.maCp === '' || order.maCp === undefined) {
@@ -308,17 +249,25 @@ function OrderScreen({ navigation, route }) {
             SetErrorOrder({ ...errorOrder, ErrorGia: true })
             return
         }
-        setModalFormVisible(!isModalFormVisible);
+        if (order.mkdatLenh === '') {
+            SetErrorOrder({ ...errorOrder, ErrorMkdatLenh: true })
+            return
+        }
+        const res = await ApiOrder.CheckOrder(order)
+        console.log('====================================');
+        console.log(res.data);
+        console.log('====================================');
+        if (res.data.status === 0) {
+            setModalFormVisible(!isModalFormVisible);
+        }
+        else {
+            Alert.alert("Giao dịch thất bại", res.data.message)
+        }
+
     };
 
-    const handleConfirm = () => {
-        setModalFormVisible(!isModalFormVisible);
-        setModalConfirmVisible(!isModalConfirmVisible);
-    };
-
-    const handleFinish = async (values) => {
-        const temp = { ...order, mkdatLenh: values.pin }
-        const res = await ApiOrder.Order(temp)
+    const handleFinish = async () => {
+        const res = await ApiOrder.Order(order)
         if (res.data.status === 0) {
             setOrder({
                 stk: BankAccount[0]?.stk,
@@ -330,17 +279,73 @@ function OrderScreen({ navigation, route }) {
                 loaiLenh: 'LO'// Trạng thái Loai: ATO, ATC, LO
             })
             Alert.alert("Giao dịch thành công", res.data.message)
+            setModalFormVisible(!isModalFormVisible);
         }
         else {
             console.log(res);
             Alert.alert("Giao dịch thất bại", res.data.message)
+            setModalFormVisible(!isModalFormVisible);
         }
-        setModalConfirmVisible(!isModalConfirmVisible);
     };
 
     const onClearPress = useCallback(() => {
         SetErrorOrder({ ...errorOrder, ErrorMaCp: true })
     }, [])
+
+
+    const handleChangeSoLuong = (value) => {
+        if (value.trim().length >= 1) {
+            SetErrorOrder({ ...errorOrder, ErrorSoLuong: false })
+        } else {
+            SetErrorOrder({ ...errorOrder, ErrorSoLuong: true })
+        }
+        setOrder({ ...order, soLuong: value })
+    }
+
+    const handleBlurSoluong = () => {
+        const { soLuong } = order
+        if (soLuong.trim().length >= 1) {
+            SetErrorOrder({ ...errorOrder, ErrorSoLuong: false })
+        } else {
+            SetErrorOrder({ ...errorOrder, ErrorSoLuong: true })
+        }
+    }
+
+    const handleChangeGia = (value) => {
+        if (value.trim().length >= 1) {
+            SetErrorOrder({ ...errorOrder, ErrorGia: false })
+        } else {
+            SetErrorOrder({ ...errorOrder, ErrorGia: true })
+        }
+        setOrder({ ...order, gia: value })
+    }
+
+    const handleBlurGia = () => {
+        const { gia } = order
+        if (gia.trim().length >= 1) {
+            SetErrorOrder({ ...errorOrder, ErrorGia: false })
+        } else {
+            SetErrorOrder({ ...errorOrder, ErrorGia: true })
+        }
+    }
+
+    const handleChangeMkdatLenh = (value) => {
+        if (value.trim().length >= 1) {
+            SetErrorOrder({ ...errorOrder, ErrorMkdatLenh: false })
+        } else {
+            SetErrorOrder({ ...errorOrder, ErrorMkdatLenh: true })
+        }
+        setOrder({ ...order, mkdatLenh: value })
+    }
+
+    const handleBlurMkdatLenh = () => {
+        const { mkdatLenh } = order
+        if (mkdatLenh.trim().length >= 1) {
+            SetErrorOrder({ ...errorOrder, ErrorMkdatLenh: false })
+        } else {
+            SetErrorOrder({ ...errorOrder, ErrorMkdatLenh: true })
+        }
+    }
 
     return (
         <>
@@ -392,14 +397,10 @@ function OrderScreen({ navigation, route }) {
                                 placeholder="Khối lượng"
                                 style={styles.textInput}
                                 value={order.soLuong}
-                                onChangeText={(value) => {
-                                    setOrder({ ...order, soLuong: value })
-                                    console.log(value)
-                                    if (value !== '')
-                                        SetErrorOrder({ ...errorOrder, ErrorSoLuong: false })
-                                }}
+                                onChangeText={handleChangeSoLuong}
+                                onBlur={e => handleBlurSoluong()}
                             />
-                            {errorOrder.ErrorSoLuong ? <Text style={styles.errorMsg}>Khối lượng không được để trống!</Text> : null}
+                            {errorOrder.ErrorSoLuong ? <Text style={styles.errorMsg}>Không được để trống!</Text> : null}
                         </View>
                         <View style={{ ...styles.box, flexDirection: 'column', alignItems: 'flex-start' }}>
                             <Text style={styles.textTitle}>Giá đặt</Text>
@@ -408,13 +409,10 @@ function OrderScreen({ navigation, route }) {
                                 placeholder="Giá"
                                 style={styles.textInput}
                                 value={order.gia}
-                                onChangeText={(value) => {
-                                    setOrder({ ...order, gia: value })
-                                    if (value !== '')
-                                        SetErrorOrder({ ...errorOrder, ErrorGia: false })
-                                }}
+                                onChangeText={handleChangeGia}
+                                onBlur={e => handleBlurGia()}
                             />
-                            {errorOrder.ErrorSoLuong ? <Text style={styles.errorMsg}>Giá không được để trống!</Text> : null}
+                            {errorOrder.ErrorGia ? <Text style={styles.errorMsg}>Không được để trống!</Text> : null}
                         </View>
                     </View>
 
@@ -462,6 +460,7 @@ function OrderScreen({ navigation, route }) {
                                     </LinearGradient>}
                             </TouchableOpacity>
                         </View>
+
                         <View style={styles.box}>
                             <TouchableOpacity onPress={handleChooseSell}>
                                 {!order.loaiGiaoDich ? <LinearGradient
@@ -481,6 +480,25 @@ function OrderScreen({ navigation, route }) {
                         </View>
                     </View>
 
+                    <View style={styles.content_wp}>
+                        <View style={{ ...styles.box, flexDirection: 'column', alignItems: 'flex-start' }}>
+                            <Text style={styles.textTitle}>Mật khẩu đặt lệnh</Text>
+                            <TextInput
+                                name="mkdatLenh"
+                                placeholder="******"
+                                style={styles.textInput}
+                                value={order.mkdatLenh}
+                                onChangeText={handleChangeMkdatLenh}
+                                onBlur={e => handleBlurMkdatLenh()}
+                                maxLength={6}
+                                secureTextEntry
+                            />
+                            {errorOrder.ErrorMkdatLenh ? <Text style={styles.errorMsg}>Không được để trống!</Text> : null}
+                        </View>
+                        <View style={{ ...styles.box, flexDirection: 'column', alignItems: 'flex-start' }}>
+                        </View>
+                    </View>
+
                     <View style={{ ...styles.content_wp, justifyContent: 'center', flexDirection: "column" }}>
                         {/* <View style={styles.box}> */}
                         <TouchableOpacity onPress={handleSubmitForm}>
@@ -493,7 +511,7 @@ function OrderScreen({ navigation, route }) {
                         </TouchableOpacity>
                         {/* </View> */}
                     </View>
-                    <Text style={{ fontSize: 10, textAlign: 'center' }}>Giá x 1000 VNĐ. Bản quyền thuộc về Công ty Cổ phần chứng khoán NTNT. © 2021</Text>
+                    <Text style={{ fontSize: 11, textAlign: 'center' }}>Giá x 1000 VNĐ. Bản quyền thuộc về Công ty Cổ phần chứng khoán NTNT. © 2021</Text>
                 </ScrollView>
             </SafeAreaView>
 
@@ -510,21 +528,6 @@ function OrderScreen({ navigation, route }) {
                 backdropTransitionOutTiming={600}
             >
                 <ComponentForm />
-            </Modal>
-
-            <Modal
-                isVisible={isModalConfirmVisible}
-                // onBackdropPress={() => setModalConfirmVisible(false)}
-                testID={'modal'}
-                backdropOpacity={0.8}
-                animationIn="zoomInDown"
-                animationOut="zoomOutUp"
-                animationInTiming={600}
-                animationOutTiming={600}
-                backdropTransitionInTiming={600}
-                backdropTransitionOutTiming={600}
-            >
-                <ComponentConFirm />
             </Modal>
         </>
     );

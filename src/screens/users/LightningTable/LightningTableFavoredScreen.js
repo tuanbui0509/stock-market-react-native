@@ -5,27 +5,30 @@ import { useDispatch, useSelector } from 'react-redux';
 import * as Api from '../../../api/LightningTable';
 import config from "../../../axios/config";
 import styles from '../../../common/StyleTable';
-import CustomHeader from '../../../components/CustomHeader';
 import Color from '../../../constants/Colors';
 import * as Price from '../../../constants/Price';
 import Formatter from '../../../helpers/formatNumber';
-import { FetchChangeListStocks, fetchLightningTable } from '../../../store/common/LightningTable';
+import { fetchLightningTable } from '../../../store/common/LightningTable';
+import { FetchChangeListStocks, fetchLightningTableFavored } from '../../../store/common/LightningTableFavored';
 
-function LightningTableScreen(props) {
+function LightningTableFavoredScreen(props) {
     let { navigation } = props
     const columnPortrait = ['MaCK', 'TC', 'Trần', 'Sàn', 'Tổng KL']
     const columnLandscape = ['MaCK', 'TC', 'Trần', 'Sàn', 'Giá mua 3', 'KL 3', 'Giá mua 2', 'KL 2', 'Giá mua 1', 'KL 1', 'Giá khớp', 'KL khớp', 'Giá bán 1', 'KL 1', 'Giá bán 2', 'KL 2', 'Giá bán 3', 'KL 3', 'Tổng KL']
     const [columns, setColumns] = useState([])
     const [orientation, setOrientation] = useState("PORTRAIT");
-    const dispatch = useDispatch();
     const LightningTable = useSelector(state => state.LightningTable)
+    const LightningTableFavored = useSelector(state => state.LightningTableFavored)
+    const dispatch = useDispatch();
+    const [favored, setFavored] = useState([])
 
+    // const [filteredStocks, setFilteredStocks] = useState([]);
     useEffect(() => {
         const unsubscribe = navigation.addListener('focus', () => {
-            const fetchApi = async () => {
-                const res = await Api.LightningTable()
-                dispatch(fetchLightningTable(res.data))
-            }
+            // const fetchApi = async () => {
+            //     const res = await Api.LightningTableFavored()
+            //     dispatch(fetchLightningTableFavored(res.data))
+            // }
             const isPortrait = () => {
                 const dim = Dimensions.get('screen');
                 return dim.height >= dim.width;
@@ -37,17 +40,28 @@ function LightningTableScreen(props) {
                 setOrientation("LANDSCAPE")
                 setColumns(columnLandscape)
             }
-            fetchApi()
+
+            // fetchApi()
+
         });
         return unsubscribe;
     }, [navigation]);
+    if (LightningTableFavored && LightningTable) {
+        console.log(LightningTableFavored);
+        const result = LightningTable?.filter(o1 => LightningTableFavored?.some(o2 => o1.macp.trim() === o2.trim()));
+        // setFavored(result)
+        console.log(result);
+    }
+    // const mapFavoredToLightningTable = () => {
 
+    //     console.log(LightningTable);
+
+    // }
     useEffect(() => {
         Dimensions.addEventListener('change', ({ window: { width, height } }) => {
             if (width < height) {
                 setColumns(columnPortrait)
                 setOrientation("PORTRAIT")
-                console.log('PORTRAIT');
             } else {
                 console.log('LANDSCAPE');
                 setColumns(columnLandscape)
@@ -67,6 +81,11 @@ function LightningTableScreen(props) {
         });
         hubConnection.start()
     }, []);
+
+
+
+
+
     const tableHeader = () => (
         <View style={styles.tableHeader}>
             {orientation === 'PORTRAIT' ?
@@ -110,14 +129,10 @@ function LightningTableScreen(props) {
             return Color.green
     }
 
-    const handleChooseFavored = () => {
-        
-    }
-
     return (
         <View style={styles.container} >
             <FlatList
-                data={LightningTable}
+                data={favored}
                 style={{ width: "99%", paddingTop: 10 }}
                 keyExtractor={(item, index) => index + ""}
                 ListHeaderComponent={tableHeader}
@@ -129,9 +144,8 @@ function LightningTableScreen(props) {
                                 <>
                                     <Text
                                         style={{ ...styles.columnRowTxt, fontWeight: "bold", color: ClassNameRender(item.giaTran, item.giaSan, item.giaTC, item.gia) }}
-                                        onPress={() => handleChooseFavored()}
                                     >
-                                        {item.macp?.trim()}</Text>
+                                        {item?.macp?.trim()}</Text>
                                     <Text style={styles.columnRowStandard}>{item.giaTC / Price.PRICE}</Text>
                                     <Text style={styles.columnRowCeil}>{item.giaTran / Price.PRICE}</Text>
                                     <Text style={styles.columnRowFloor}>{item.giaSan / Price.PRICE}</Text>
@@ -141,7 +155,7 @@ function LightningTableScreen(props) {
                                     <Text
                                         style={{ ...styles.columnRowTxt, fontSize: 12, fontWeight: "bold", width: "5.263157894736842%", color: ClassNameRender(item.giaTran, item.giaSan, item.giaTC, item.gia) }}
                                     >
-                                        {item?.macp.trim()}</Text>
+                                        {item?.macp?.trim()}</Text>
                                     <Text style={{ ...styles.columnRowStandard, fontSize: 12, width: "5.263157894736842%" }}>{item.giaTC / Price.PRICE}</Text>
                                     <Text style={{ ...styles.columnRowCeil, fontSize: 12, width: "5.263157894736842%" }}>{item.giaTran / Price.PRICE}</Text>
                                     <Text style={{ ...styles.columnRowFloor, fontSize: 12, width: "5.263157894736842%" }}>{item.giaSan / Price.PRICE}</Text>
@@ -173,4 +187,4 @@ function LightningTableScreen(props) {
 
     )
 }
-export default LightningTableScreen
+export default LightningTableFavoredScreen

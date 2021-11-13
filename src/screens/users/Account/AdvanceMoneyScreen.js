@@ -122,6 +122,12 @@ function AdvanceMoneyScreen({ navigation }) {
         setData({ ...data, ngayBan: moment(current) })
         fetchKhaDung(moment(current), data.stk)
     }
+    const handleChange = (value) => {
+        const str = (Number(value)).toLocaleString()
+        console.log(str)
+        setData({ ...data, soTien: str })
+
+    };
     return (
         <View style={styles.container}>
             <CustomHeader title="" navigation={navigation} />
@@ -159,7 +165,7 @@ function AdvanceMoneyScreen({ navigation }) {
                     <TextInput
                         name="soTien"
                         style={styles.textInput}
-                        onChangeText={text => setData({ ...data, soTien: text })}
+                        onChangeText={handleChange}
                         placeholder="Số tiền"
                         value={data.soTien}
                     />

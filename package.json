@@ -33,7 +33,7 @@
     "lodash": "^4.17.21",
     "moment": "^2.29.1",
     "query-string": "^7.0.1",
-    "react": "16.13.1",
+    "react": "^17.0.2",
     "react-dom": "16.13.1",
     "react-hook-form": "^7.17.4",
     "react-native": "https://github.com/expo/react-native/archive/sdk-42.0.0.tar.gz",

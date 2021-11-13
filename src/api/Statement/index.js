@@ -18,3 +18,8 @@ export const PurchasedOneDay = () => {
 export const StatusStock = () => {
     return AxiosClient.get("TrangThai/lenhdat")
 }
+
+export const CancelStock = (id) => {
+    return AxiosClient.put(`lenhdat/${id}`)
+}
+

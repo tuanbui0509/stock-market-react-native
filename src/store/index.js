@@ -6,6 +6,7 @@ import CurrentUser from './CurrentUser';
 import BankAccount from './users/BankAccount';
 import MyStock from './users/MyStock';
 import LightningTable from './common/LightningTable';
+import LightningTableFavored from './common/LightningTableFavored';
 import {
     persistStore, persistReducer, FLUSH,
     REHYDRATE,
@@ -22,7 +23,8 @@ const reducer = combineReducers({
     CurrentUser,
     BankAccount,
     LightningTable,
-    MyStock
+    MyStock,
+    LightningTableFavored
 })
 
 const persistConfig = {

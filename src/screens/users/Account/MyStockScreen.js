@@ -8,8 +8,8 @@ import styleModal from '../../../common/styleModal';
 
 
 export default function MyStockScreen({ navigation }) {
-    const [columns, setColumns] = useState(['MaCP', 'Tổng', 'Khả dụng', 'Giá TT'])
-    const [detail, setDetail] = useState(['Số dư T0', 'Số dư T1', 'Số dư T2', 'Giá trị TT'])
+    const [columns, setColumns] = useState(['MaCP', 'Tổng', 'Khả dụng', 'Giá TT', 'Giá trị TT'])
+    const [detail, setDetail] = useState(['MaCP', 'Số dư T0', 'Số dư T1', 'Số dư T2'])
     const [tableData, setTableData] = useState([])
     const [currentSTK, setCurrentSTK] = useState([])
 
@@ -83,16 +83,15 @@ export default function MyStockScreen({ navigation }) {
     const YourOwnComponent = () =>
         <View style={styleModal.centeredView}>
             <View style={styleModal.modalView}>
-                <Text style={{ ...styles.textTitleRBSheet, fontSize: 15 }}>Mã cổ phiếu: {currentSTK.maCp}</Text>
                 <FlatList
                     style={{ paddingTop: 5 }}
                     ListHeaderComponent={tableHeaderDetail()}
                 />
                 <View style={{ ...styles.tableRow, backgroundColor: "#F0FBFC", paddingBottom: 20 }}>
+                    <Text style={{ ...styles.textBodyRBSheet, width: '25%', fontSize: 13 }}>{(currentSTK.maCp.trim())}</Text>
                     <Text style={{ ...styles.textBodyRBSheet, width: '25%', fontSize: 13 }}>{Formatter(currentSTK.soLuongT0) || '0'}</Text>
                     <Text style={{ ...styles.textBodyRBSheet, width: '25%', fontSize: 13 }}>{Formatter(currentSTK.soLuongT1) || '0'}</Text>
                     <Text style={{ ...styles.textBodyRBSheet, width: '25%', fontSize: 13 }}>{Formatter(currentSTK.soLuongT2) || '0'}</Text>
-                    <Text style={{ ...styles.textBodyRBSheet, width: '25%', fontSize: 13 }}>{Formatter(currentSTK.soLuong) || '0'}</Text>
                 </View>
                 <Button title="Đóng" onPress={() => setModalVisible(false)} />
             </View>
@@ -114,9 +113,10 @@ export default function MyStockScreen({ navigation }) {
                                 onPress={() => toggleModal(item)}
                             >
                                 {item.maCp.trim()}</Text>
-                            <Text style={styles.columnRowTxt4}>{item.tongSo}</Text>
-                            <Text style={styles.columnRowTxt4}>{item.giaTT}</Text>
-                            <Text style={styles.columnRowTxt4}>{item.giaTriTT}</Text>
+                            <Text style={styles.columnRowTxt}>{item.tongSo}</Text>
+                            <Text style={styles.columnRowTxt}>{item.soLuong}</Text>
+                            <Text style={styles.columnRowTxt}>{item.giaTT}</Text>
+                            <Text style={styles.columnRowTxt}>{item.giaTriTT}</Text>
                         </View>
 
                     )
