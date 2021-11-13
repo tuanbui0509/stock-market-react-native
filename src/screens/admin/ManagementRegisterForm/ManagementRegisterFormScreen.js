@@ -66,7 +66,7 @@ export default function ManagementRegisterFormScreen({ navigation }) {
                                 // onPress={() => onClickStock(item)}
                                 >
                                     {item.maDon}</Text>
-                                <Text style={{ ...Styles.columnRowTxt, width: '30%' }}>{item.ho} {item.ten}</Text>
+                                <Text style={{ ...Styles.columnRowTxtLight, width: '30%' }}>{item.ho} {item.ten}</Text>
                                 <Text style={{ ...Styles.columnRowTxtLight, width: '25%' }}>{format(new Date(item.ngaySinh), 'dd/MM/yyyy')}</Text>
                                 <Text style={{ ...Styles.columnRowTxtLight, width: '25%' }}>{item.sdt}</Text>
                             </View>

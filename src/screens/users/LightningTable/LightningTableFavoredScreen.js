@@ -20,15 +20,13 @@ function LightningTableFavoredScreen(props) {
     const LightningTable = useSelector(state => state.LightningTable)
     const LightningTableFavored = useSelector(state => state.LightningTableFavored)
     const dispatch = useDispatch();
-    const [favored, setFavored] = useState([])
-
     // const [filteredStocks, setFilteredStocks] = useState([]);
     useEffect(() => {
         const unsubscribe = navigation.addListener('focus', () => {
-            // const fetchApi = async () => {
-            //     const res = await Api.LightningTableFavored()
-            //     dispatch(fetchLightningTableFavored(res.data))
-            // }
+            const fetchApiFavored = async () => {
+                const res = await Api.LightningTableFavored()
+                dispatch(fetchLightningTableFavored(res.data))
+            }
             const isPortrait = () => {
                 const dim = Dimensions.get('screen');
                 return dim.height >= dim.width;
@@ -41,29 +39,25 @@ function LightningTableFavoredScreen(props) {
                 setColumns(columnLandscape)
             }
 
-            // fetchApi()
-
+            fetchApiFavored()
         });
         return unsubscribe;
     }, [navigation]);
-    if (LightningTableFavored && LightningTable) {
-        console.log(LightningTableFavored);
+
+
+    let tempFavored = []
+    if (LightningTable.length > 0 && LightningTableFavored.length > 0) {
         const result = LightningTable?.filter(o1 => LightningTableFavored?.some(o2 => o1.macp.trim() === o2.trim()));
-        // setFavored(result)
-        console.log(result);
+        tempFavored = result
     }
-    // const mapFavoredToLightningTable = () => {
 
-    //     console.log(LightningTable);
 
-    // }
     useEffect(() => {
         Dimensions.addEventListener('change', ({ window: { width, height } }) => {
             if (width < height) {
                 setColumns(columnPortrait)
                 setOrientation("PORTRAIT")
             } else {
-                console.log('LANDSCAPE');
                 setColumns(columnLandscape)
                 setOrientation("LANDSCAPE")
             }
@@ -81,9 +75,6 @@ function LightningTableFavoredScreen(props) {
         });
         hubConnection.start()
     }, []);
-
-
-
 
 
     const tableHeader = () => (
@@ -132,7 +123,7 @@ function LightningTableFavoredScreen(props) {
     return (
         <View style={styles.container} >
             <FlatList
-                data={favored}
+                data={tempFavored}
                 style={{ width: "99%", paddingTop: 10 }}
                 keyExtractor={(item, index) => index + ""}
                 ListHeaderComponent={tableHeader}

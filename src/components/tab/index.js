@@ -28,7 +28,7 @@ function TabNavigator() {
                     <Tab.Screen name="ManagementRegisterForms" component={ManagementRegisterFormStack}
                         // options={navOptionHandler} 
                         options={{
-                            tabBarLabel: 'QL Đơn đăng ký',
+                            tabBarLabel: 'Đơn đăng ký',
                             tabBarColor: '#37C2D0',
                             tabBarIcon: ({ color }) => (
                                 <Icon name="ios-person" color={color} size={26} />
@@ -36,37 +36,6 @@ function TabNavigator() {
                             headerShown: false
                         }}
                     />
-                    <Tab.Screen name="ManagementStocks" component={ManagementStockStack}
-                        options={{
-                            tabBarLabel: 'QL Cỗ phiếu',
-                            tabBarColor: '#37C2D0',
-                            tabBarIcon: ({ color }) => (
-                                <Icon name="md-bar-chart-sharp" color={color} size={26} />
-                            ),
-                            headerShown: false
-                        }}
-                    />
-                    <Tab.Screen name="ManagementAccounts" component={ManagementAccountStack} options={navOptionHandler}
-
-                        options={{
-                            tabBarLabel: 'QL Nhà đầu tư',
-                            tabBarColor: '#37C2D0',
-                            tabBarIcon: ({ color }) => (
-                                <Icon name="ios-reader" color={color} size={26} />
-                            ),
-                            headerShown: false
-                        }}
-                    />
-                    {/* <Tab.Screen name="Orders" component={OrderStack}
-                        options={{
-                            tabBarLabel: 'Đặt lệnh',
-                            tabBarColor: '#37C2D0',
-                            tabBarIcon: ({ color }) => (
-                                <Icon name="md-construct-sharp" color={color} size={26} />
-                            ),
-                            headerShown: false
-                        }}
-                    /> */}
                 </> :
                 <>
                     <Tab.Screen name="Users" component={UserStack}

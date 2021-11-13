@@ -1,13 +1,10 @@
 import { createSlice } from "@reduxjs/toolkit";
-
-
 const LightningTableFavoredSlice = createSlice({
     name: 'LightningTableFavored',
     initialState: [],
     reducers: {
         fetchLightningTableFavored: (state, action) => {
-            state = action.payload
-            return [...state]
+            return action.payload
         },
         FetchChangeListStocks: (state, action) => {
             let element = action.payload;
@@ -18,12 +15,14 @@ const LightningTableFavoredSlice = createSlice({
 })
 
 const findIndex = (stocks, element) => {
-    for (let i = 0; i < stocks.length; i++) {
-        if (stocks[i].macp.trim() === element.macp.trim()) { return i }
+    console.log(stocks);
+    if (stocks) {
+        for (let i = 0; i < stocks?.length; i++) {
+            if (stocks[i]?.macp?.trim() === element?.macp?.trim()) { return i }
+        }
     }
     return -1;
 }
-
 
 const { actions, reducer } = LightningTableFavoredSlice;
 

@@ -55,8 +55,6 @@ export function DrawerContent(props) {
             //clicking out side of alert will not cancel
         );
     };
-    // console.log(CurrentUser);
-    // console.log('====================================');
     return (
         <View style={{ flex: 1 }}>
             <DrawerContentScrollView {...props}>
@@ -85,28 +83,6 @@ export function DrawerContent(props) {
                                 )}
                                 label="Danh sách đơn đăng ký"
                                 onPress={() => { props.navigation.navigate('Users') }}
-                            />
-                            <DrawerItem
-                                icon={({ color, size }) => (
-                                    <Icon
-                                        name="ios-card-outline"
-                                        color={color}
-                                        size={size}
-                                    />
-                                )}
-                                label="Danh sách nhà đầu tư"
-                                onPress={() => { props.navigation.navigate('Users') }}
-                            />
-                            <DrawerItem
-                                icon={({ color, size }) => (
-                                    <Icon
-                                        name="ios-key-outline"
-                                        color={color}
-                                        size={size}
-                                    />
-                                )}
-                                label="Danh sách cổ phiếu"
-                                onPress={() => { props.navigation.navigate('BookmarkScreen') }}
                             />
                         </Drawer.Section> :
                         <Drawer.Section style={styles.drawerSection}>

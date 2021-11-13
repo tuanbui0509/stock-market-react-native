@@ -30,7 +30,7 @@ const reducer = combineReducers({
 const persistConfig = {
     key: 'root',
     storage: AsyncStorage,
-    whitelist: ['isAdmin', 'token', 'currentUser'] //
+    whitelist: ['isAdmin', 'token', 'currentUser', 'LightningTableFavored', 'LightningTable']
 }
 
 const persistedReducer = persistReducer(persistConfig, reducer)

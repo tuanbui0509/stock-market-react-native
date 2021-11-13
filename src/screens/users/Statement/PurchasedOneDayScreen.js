@@ -14,8 +14,8 @@ import { format } from 'date-fns';
 import { LinearGradient } from 'expo-linear-gradient';
 
 export default function PurchasedOneDayScreen({ navigation }) {
-    const [columns, setColumns] = useState(['MaCK', 'Mua/Bán', 'KLượng Khớp/Tổng KLượng', 'Trạng thái', 'Hùy lệnh'])
-    const [detail, setDetail] = useState(['Giá', 'Tổng KL', 'SL Khớp', 'Giá trị khớp'])
+    const [columns, setColumns] = useState(['MaCK', 'Mua/Bán', 'KLượng Khớp/Tổng KLượng', 'Trạng thái', 'Giá khớp'])
+    const [detail, setDetail] = useState(['Giá', 'Tổng KL', 'SL Khớp', 'Hủy lệnh'])
     const [currentMaCK, setCurrentMaCK] = useState([])
     const [tableData, setTableData] = useState([])
     useEffect(() => {
@@ -98,7 +98,14 @@ export default function PurchasedOneDayScreen({ navigation }) {
                     <Text style={{ ...Styles.textBodyRBSheet, width: '25%', fontSize: 13 }}>{Formatter(currentMaCK.gia) || '0'}</Text>
                     <Text style={{ ...Styles.textBodyRBSheet, width: '25%', fontSize: 13 }}>{Formatter(currentMaCK.soLuong) || '0'}</Text>
                     <Text style={{ ...Styles.textBodyRBSheet, width: '25%', fontSize: 13 }}>{Formatter(currentMaCK.slKhop) || '0'}</Text>
-                    <Text style={{ ...Styles.textBodyRBSheet, width: '25%', fontSize: 13 }}>{Formatter(currentMaCK.giaTriKhop) || '0'}</Text>
+                    {/* <Text style={{ ...Styles.textBodyRBSheet, width: '25%', fontSize: 13 }}>{Formatter(currentMaCK.giaTriKhop) || '0'}</Text> */}
+                    <Text style={{ ...Styles.columnRowTxtLight, width: '20%' }} onPress={() => toggleModalCancel(currentMaCK)}>
+                        {currentMaCK.maTT.trim() === 'CK' ? <Icon
+                            name="times"
+                            color={Color.red}
+                            size={15}
+                        /> : null}
+                    </Text>
                 </View>
                 <Button title="Đóng" onPress={() => setModalVisible(false)} />
             </View>
@@ -155,20 +162,15 @@ export default function PurchasedOneDayScreen({ navigation }) {
                         <ScrollView>
                             <View style={{ ...Styles.tableRow, backgroundColor: index % 2 == 1 ? "#F0FBFC" : "white" }}>
                                 <Text
-                                    style={{ ...Styles.columnRowTxt, fontWeight: "bold" }}
+                                    style={{ ...Styles.columnRowTxt, fontWeight: "bold", width: '20%', }}
                                     onPress={() => toggleModal(item)}
                                 >
+
                                     {item.maCP.trim()}</Text>
                                 <Text style={{ ...Styles.columnRowTxt, width: '20%', color: item.loaiGiaoDich ? Color.green : Color.red }}>{item.loaiGiaoDich ? 'Mua' : 'Bán'}</Text>
-                                <Text style={{ ...Styles.columnRowTxtLight, width: '20%' }}>{Formatter(item.soLuong)}/{Formatter(item.slKhop) || '0'}</Text>
+                                <Text style={{ ...Styles.columnRowTxtLight, width: '20%' }}>{Formatter(item.slKhop) || '0'}/{Formatter(item.soLuong)}</Text>
                                 <Text style={{ ...Styles.columnRowTxt, width: '20%', color: ClassNameRender(item.maTT.trim()) }}>{item.tenTrangThai}</Text>
-                                <Text style={{ ...Styles.columnRowTxtLight, width: '20%' }} onPress={() => toggleModalCancel(item)}>
-                                    {item.maTT.trim() === 'CK' ? <Icon
-                                        name="times"
-                                        color={Color.red}
-                                        size={15}
-                                    /> : null}
-                                </Text>
+                                <Text style={{ ...Styles.columnRowTxt, width: '20%', color: ClassNameRender(item.maTT.trim()) }}>{item.gia}</Text>
                             </View>
                         </ScrollView>
                     )

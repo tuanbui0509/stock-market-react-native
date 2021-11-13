@@ -1,11 +1,12 @@
 import { createDrawerNavigator } from '@react-navigation/drawer';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import TabNavigator from '../../components/tab';
 import AdvanceMoneyScreen from '../../screens/users/Account/AdvanceMoneyScreen';
 import ChangePasswordScreen from '../../screens/users/Account/ChangePasswordScreen';
 import ChangePinScreen from '../../screens/users/Account/ChangePinScreen';
 import { DrawerContent } from './DrawerContent';
 import InformationScreen from './InformationScreen';
+import RegisterScreen from './RegisterScreen';
 
 const navOptionHandler = () => ({
   headerShown: false
@@ -13,7 +14,6 @@ const navOptionHandler = () => ({
 
 const Drawer = createDrawerNavigator();
 export default function DrawerNavigator({ navigation }) {
-  const [Loading, setLoading] = useState(false)
   return (
     <Drawer.Navigator initialRouteName="MenuTab"
       drawerContent={() => <DrawerContent navigation={navigation} />}>
@@ -22,6 +22,7 @@ export default function DrawerNavigator({ navigation }) {
       <Drawer.Screen name="ChangePasswordScreen" component={ChangePasswordScreen} options={navOptionHandler} />
       <Drawer.Screen name="ChangePinScreen" component={ChangePinScreen} options={navOptionHandler} />
       <Drawer.Screen name="AdvanceMoneyScreen" component={AdvanceMoneyScreen} options={navOptionHandler} />
+      <Drawer.Screen name="RegisterScreen" component={RegisterScreen} options={navOptionHandler} />
     </Drawer.Navigator>
   )
 }

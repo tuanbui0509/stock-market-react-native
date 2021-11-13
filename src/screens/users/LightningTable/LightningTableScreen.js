@@ -1,6 +1,6 @@
 import { HubConnectionBuilder, LogLevel } from '@aspnet/signalr';
 import React, { useEffect, useState } from 'react';
-import { Dimensions, FlatList, Text, TouchableOpacity, View } from 'react-native';
+import { Dimensions, FlatList, Text, TouchableOpacity, View, Pressable, StyleSheet } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import * as Api from '../../../api/LightningTable';
 import config from "../../../axios/config";
@@ -10,7 +10,14 @@ import Color from '../../../constants/Colors';
 import * as Price from '../../../constants/Price';
 import Formatter from '../../../helpers/formatNumber';
 import { FetchChangeListStocks, fetchLightningTable } from '../../../store/common/LightningTable';
-
+import { MaterialCommunityIcons } from "@expo/vector-icons";
+import Animated, {
+    useSharedValue,
+    withSpring,
+    useAnimatedStyle,
+    Extrapolate,
+    interpolate,
+} from "react-native-reanimated";
 function LightningTableScreen(props) {
     let { navigation } = props
     const columnPortrait = ['MaCK', 'TC', 'Trần', 'Sàn', 'Tổng KL']
@@ -19,7 +26,8 @@ function LightningTableScreen(props) {
     const [orientation, setOrientation] = useState("PORTRAIT");
     const dispatch = useDispatch();
     const LightningTable = useSelector(state => state.LightningTable)
-
+    const LightningTableFavored = useSelector(state => state.LightningTableFavored)
+    
     useEffect(() => {
         const unsubscribe = navigation.addListener('focus', () => {
             const fetchApi = async () => {
@@ -47,9 +55,7 @@ function LightningTableScreen(props) {
             if (width < height) {
                 setColumns(columnPortrait)
                 setOrientation("PORTRAIT")
-                console.log('PORTRAIT');
             } else {
-                console.log('LANDSCAPE');
                 setColumns(columnLandscape)
                 setOrientation("LANDSCAPE")
             }
@@ -111,7 +117,7 @@ function LightningTableScreen(props) {
     }
 
     const handleChooseFavored = () => {
-        
+
     }
 
     return (
@@ -127,6 +133,7 @@ function LightningTableScreen(props) {
                         <View style={{ ...styles.tableRow, backgroundColor: index % 2 == 1 ? "#F0FBFC" : "white" }}>
                             {orientation === 'PORTRAIT' ?
                                 <>
+                                   
                                     <Text
                                         style={{ ...styles.columnRowTxt, fontWeight: "bold", color: ClassNameRender(item.giaTran, item.giaSan, item.giaTC, item.gia) }}
                                         onPress={() => handleChooseFavored()}

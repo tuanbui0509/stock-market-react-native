@@ -1,6 +1,4 @@
 import { createSlice } from "@reduxjs/toolkit";
-
-
 const LightningTableSlice = createSlice({
     name: 'LightningTable',
     initialState: [],
@@ -17,8 +15,11 @@ const LightningTableSlice = createSlice({
 })
 
 const findIndex = (stocks, element) => {
-    for (let i = 0; i < stocks.length; i++) {
-        if (stocks[i].macp.trim() === element.macp.trim()) { return i }
+    console.log(stocks);
+    if (stocks) {
+        for (let i = 0; i < stocks?.length; i++) {
+            if (stocks[i]?.macp?.trim() === element?.macp?.trim()) { return i }
+        }
     }
     return -1;
 }

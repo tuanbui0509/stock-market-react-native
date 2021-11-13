@@ -71,16 +71,7 @@ function LightningTableStack({ navigation, route }) {
 
   useEffect(() => {
     const unsubscribe = navigation.addListener('focus', () => {
-      const fetchApiFavored = async () => {
-        const res = await Api.LightningTableFavored()
-        dispatch(fetchLightningTableFavored(res.data))
-      }
-      const fetchApi = async () => {
-        const res = await Api.LightningTable()
-        dispatch(fetchLightningTable(res.data))
-      }
-      fetchApi()
-      fetchApiFavored()
+
     });
     return unsubscribe;
   }, [navigation]);
