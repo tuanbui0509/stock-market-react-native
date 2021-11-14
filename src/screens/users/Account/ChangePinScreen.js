@@ -1,25 +1,24 @@
 import { LinearGradient } from 'expo-linear-gradient';
-import React, { useEffect, useState } from 'react';
+import { Field, Formik } from 'formik';
+import React, { useState } from 'react';
 import {
     Alert,
-    Platform, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View
+    Platform, ScrollView, StyleSheet, Text, TouchableOpacity, View
 } from 'react-native';
 import * as Animatable from 'react-native-animatable';
-import Feather from 'react-native-vector-icons/Feather';
-import CustomHeader from '../../../components/CustomHeader';
-import * as TextInfo from '../../../constants/Text';
-import CustomInput from '../../../helpers/CustomInput';
-import { Formik, Field } from 'formik'
-import * as yup from 'yup'
-import Color from '../../../constants/Colors'
+import * as yup from 'yup';
 import * as Api from '../../../api/Account';
+import CustomHeader from '../../../components/CustomHeader';
+import Color from '../../../constants/Colors';
+import CustomInput from '../../../helpers/CustomInput';
+import * as notification from '../../../helpers/Notification';
 
 const signUpValidationSchema = yup.object().shape({
     oldPassword: yup
         .string()
         //   .matches(/\w*[a-z]\w*/,  "Password must have a small letter")
         //   .matches(/\w*[A-Z]\w*/,  "Password must have a capital letter")
-          .matches(/\d/, "Password must have a number")
+        .matches(/\d/, "Password must have a number")
         //   .matches(/[!@#$%^&*()\-_"=+{}; :,<.>]/, "Password must have a special character")
         .min(6, ({ min }) => `Mã Pin ít nhất là ${min} ký tự`)
         .required('Mã Pin cũ không được trống'),
@@ -48,22 +47,17 @@ const ChangePinScreen = ({ navigation, route }) => {
         try {
             const res = await Api.ChangePin({ oldPassword: data.oldPassword, newPassword: data.newPassword })
             if (res.data.status === 400) {
-                Alert.alert('Thất bại!', res.data.message, [
-                    { text: 'Quay lại' }
-                ]);
+                notification.DangerNotification(res.data.message)
             }
             else {
-                Alert.alert('Thành công!', res.data.message, [
-                    { text: 'Xác nhận' }
-                ]);
-                navigation.replace('HomeApp')
+                notification.SuccessNotification(res.data.message)
+                setTimeout(() => {
+                    navigation.replace('HomeApp')
+                }, 1000);
             }
         } catch (error) {
-            Alert.alert('Thất bại!', error.data.message, [
-                { text: 'Quay lại' }
-            ]);
+            notification.DangerNotification(error.data.message)
         }
-        // console.log(data);
     }
 
 
@@ -103,6 +97,8 @@ const ChangePinScreen = ({ navigation, route }) => {
                                         placeholder="Nhập Mã Pin cũ"
                                         secureTextEntry
                                         onValueChange={(value) => setData({ ...data, oldPassword: value })}
+                                        keyboardType='numeric'
+                                        maxLength={6}
 
                                     />
                                 </View>
@@ -118,7 +114,8 @@ const ChangePinScreen = ({ navigation, route }) => {
                                         placeholder="Nhập Mã Pin mới"
                                         secureTextEntry
                                         onValueChange={(value) => setData({ ...data, newPassword: value })}
-
+                                        keyboardType='numeric'
+                                        maxLength={6}
                                     />
                                 </View>
 
@@ -139,7 +136,8 @@ const ChangePinScreen = ({ navigation, route }) => {
                                         placeholder="Xác nhận lại Mã Pin mới"
                                         secureTextEntry
                                         onValueChange={(value) => setData({ ...data, confirmPassword: value })}
-
+                                        keyboardType='numeric'
+                                        maxLength={6}
                                     />
                                 </View>
 

@@ -57,8 +57,6 @@ const styles = StyleSheet.create({
         textAlign: "center",
         fontSize: 14,
         color: '#000',
-        fontWeight: "bold",
-
     },
     columnRowTxtLight: {
         textAlign: "center",

@@ -1,6 +1,6 @@
 import { HubConnectionBuilder, LogLevel } from '@aspnet/signalr';
 import React, { useEffect, useState } from 'react';
-import { Dimensions, FlatList, Text, TouchableOpacity, View } from 'react-native';
+import { Dimensions, FlatList, Pressable, Text, TouchableOpacity, View } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import * as Api from '../../../api/LightningTable';
 import config from "../../../axios/config";
@@ -10,6 +10,8 @@ import * as Price from '../../../constants/Price';
 import Formatter from '../../../helpers/formatNumber';
 import { fetchLightningTable } from '../../../store/common/LightningTable';
 import { FetchChangeListStocks, fetchLightningTableFavored } from '../../../store/common/LightningTableFavored';
+import { MaterialCommunityIcons } from "@expo/vector-icons";
+import * as notification from '../../../helpers/Notification';
 
 function LightningTableFavoredScreen(props) {
     let { navigation } = props
@@ -23,10 +25,7 @@ function LightningTableFavoredScreen(props) {
     // const [filteredStocks, setFilteredStocks] = useState([]);
     useEffect(() => {
         const unsubscribe = navigation.addListener('focus', () => {
-            const fetchApiFavored = async () => {
-                const res = await Api.LightningTableFavored()
-                dispatch(fetchLightningTableFavored(res.data))
-            }
+
             const isPortrait = () => {
                 const dim = Dimensions.get('screen');
                 return dim.height >= dim.width;
@@ -44,7 +43,14 @@ function LightningTableFavoredScreen(props) {
         return unsubscribe;
     }, [navigation]);
 
-
+    const fetchApi = async () => {
+        const res = await Api.LightningTable()
+        dispatch(fetchLightningTable(res.data))
+    }
+    const fetchApiFavored = async () => {
+        const res = await Api.LightningTableFavored()
+        dispatch(fetchLightningTableFavored(res.data))
+    }
     let tempFavored = []
     if (LightningTable.length > 0 && LightningTableFavored.length > 0) {
         const result = LightningTable?.filter(o1 => LightningTableFavored?.some(o2 => o1.macp.trim() === o2.trim()));
@@ -120,6 +126,18 @@ function LightningTableFavoredScreen(props) {
             return Color.green
     }
 
+    const onHandleUnLike = async (macp) => {
+        const res = await Api.DeleteStockFavored(macp.trim())
+        if (res.status === 200) {
+            notification.SuccessNotification('Đâ bỏ thích cổ phiếu ', macp)
+            fetchApi()
+            fetchApiFavored()
+        }
+    }
+    const handleCheckFavored = (macp) => {
+        return LightningTableFavored.includes(macp)
+    }
+
     return (
         <View style={styles.container} >
             <FlatList
@@ -133,6 +151,14 @@ function LightningTableFavoredScreen(props) {
                         <View style={{ ...styles.tableRow, backgroundColor: index % 2 == 1 ? "#F0FBFC" : "white" }}>
                             {orientation === 'PORTRAIT' ?
                                 <>
+                                    <Pressable onPress={() => onHandleUnLike(item.macp)}>
+                                        <MaterialCommunityIcons
+                                            name={handleCheckFavored(item.macp) ? "heart" : "heart-outline"}
+                                            size={25}
+                                            color={handleCheckFavored(item.macp) ? "red" : "black"}
+                                        />
+                                    </Pressable>
+
                                     <Text
                                         style={{ ...styles.columnRowTxt, fontWeight: "bold", color: ClassNameRender(item.giaTran, item.giaSan, item.giaTC, item.gia) }}
                                     >

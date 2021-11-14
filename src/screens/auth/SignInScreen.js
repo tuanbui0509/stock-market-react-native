@@ -24,7 +24,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as ApiAuthentication from '../../api/Auth'
 import Color from '../../constants/Colors'
-
+import *as notification from '../../helpers/Notification'
 import { isAdmin } from '../../store/isAdmin';
 const SignInScreen = ({ navigation }) => {
     const dispatch = useDispatch()
@@ -130,24 +130,21 @@ const SignInScreen = ({ navigation }) => {
             if (res.data.status === 0) {
                 await AsyncStorage.setItem('Token', data.token)
                 await AsyncStorage.setItem('user', JSON.stringify(data.user))
-                dispatch(addToken())
-                dispatch(addUser(data.user))
-                Alert.alert('Thành công!', res.data.message, [
-                    { text: 'Xác nhận' }
-                ]);
+
+                notification.SuccessNotification(res.data.message)
+                setTimeout(function () {
+                    dispatch(addToken())
+                    dispatch(addUser(data.user))
+                }, 1000);
                 if (data.role === 'admin') {
                     dispatch(isAdmin());
                 }
-
             }
             else {
                 console.log(res.data.message);
             }
-
-        } catch (err) {
-            Alert.alert('Lỗi đăng nhập!', err.data.message, [
-                { text: 'Trở lại' }
-            ]);
+        } catch (error) {
+            notification.DangerNotification(error.data.message)
         }
     }
 
@@ -248,9 +245,9 @@ const SignInScreen = ({ navigation }) => {
                     }
 
 
-                    <TouchableOpacity>
+                    {/* <TouchableOpacity>
                         <Text style={{ color: Color.bg_color, marginTop: 15 }}>Quên mật khẩu?</Text>
-                    </TouchableOpacity>
+                    </TouchableOpacity> */}
                     <View style={styles.button}>
                         <TouchableOpacity
                             style={styles.signIn}

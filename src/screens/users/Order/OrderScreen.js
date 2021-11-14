@@ -1,13 +1,11 @@
 import { Picker } from '@react-native-picker/picker';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Formik } from 'formik';
-import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { Alert, SafeAreaView, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
-import { AutocompleteDropdown } from "react-native-autocomplete-dropdown";
+import React, { useEffect, useState } from 'react';
+import { SafeAreaView, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import Modal from "react-native-modal";
 import { RadioButton } from 'react-native-paper';
+import SearchableDropdown from 'react-native-searchable-dropdown';
 import { useDispatch, useSelector } from 'react-redux';
-import * as yup from 'yup';
 import * as ApiUser from '../../../api/Account';
 import * as ApiLT from '../../../api/LightningTable';
 import * as ApiOrder from '../../../api/Order';
@@ -16,14 +14,9 @@ import CustomHeader from '../../../components/CustomHeader';
 import Color from '../../../constants/Colors';
 import * as Price from '../../../constants/Price';
 import Formatter from '../../../helpers/formatNumber';
+import * as notification from '../../../helpers/Notification';
 import { fetchLightningTable } from '../../../store/common/LightningTable';
 import { fetchMyStock } from '../../../store/users/MyStock';
-const pinValidationSchema = yup.object().shape({
-    pin: yup
-        .string()
-        .min(6, ({ min }) => `Mã pin phải đủ ${min} chữ số`)
-        .required('Yêu cầu nhập mã Pin'),
-})
 
 function OrderScreen({ navigation, route }) {
     const LightningTable = useSelector(state => state.LightningTable)
@@ -62,7 +55,7 @@ function OrderScreen({ navigation, route }) {
         dispatch(fetchLightningTable(res.data))
         const suggestions = res.data.map((item) => ({
             id: item.macp.trim(),
-            title: item.macp.trim()
+            name: item.macp.trim()
         }))
         setStocks(suggestions)
     }
@@ -102,34 +95,16 @@ function OrderScreen({ navigation, route }) {
             <Picker.Item key={index} label={value} value={item.stk.trim()} />
         )
     })
-    const mapMyStockToLightningTable = () => {
-        const result = LightningTable.filter(o1 => MyStock?.some(o2 => o1.macp.trim() === o2.maCp.trim()));
-        const suggestions = result.map((item) => ({
-            id: item.macp,
-            title: item.macp.trim()
-        }))
-        setStocks(suggestions)
-    }
-    const handleSelectItem = (item) => {
-        if (item === null) {
-            SetErrorOrder({ ...errorOrder, ErrorMaCp: true })
-        } else {
-            SetErrorOrder({ ...errorOrder, ErrorMaCp: false })
-            setOrder({ ...order, maCp: item?.id })
-            setCurrentStock(item)
-            const res = findById(item?.id, LightningTable);
-            setTempStock(res)
-        }
 
-    }
     const handleChooseBuy = () => {
+        setCurrentStock({})
         setOrder({ ...order, loaiGiaoDich: true })
         fetchApiStocks()
     }
-    const handleChooseSell = async () => {
+    const handleChooseSell = () => {
         try {
-            setOrder({ ...order, loaiGiaoDich: false })
             setCurrentStock({})
+            setOrder({ ...order, loaiGiaoDich: false })
             mapMyStockToLightningTable()
         } catch (error) {
             console.log(error);
@@ -254,14 +229,13 @@ function OrderScreen({ navigation, route }) {
             return
         }
         const res = await ApiOrder.CheckOrder(order)
-        console.log('====================================');
-        console.log(res.data);
-        console.log('====================================');
         if (res.data.status === 0) {
             setModalFormVisible(!isModalFormVisible);
         }
         else {
-            Alert.alert("Giao dịch thất bại", res.data.message)
+            // Alert.alert("Giao dịch thất bại", res.data.message)
+            notification.DangerNotification(res.data.message)
+
         }
 
     };
@@ -278,20 +252,17 @@ function OrderScreen({ navigation, route }) {
                 loaiGiaoDich: true,// Trạng thái mua bán mua: true, bán: false
                 loaiLenh: 'LO'// Trạng thái Loai: ATO, ATC, LO
             })
-            Alert.alert("Giao dịch thành công", res.data.message)
+            notification.SuccessNotification(res.data.message)
             setModalFormVisible(!isModalFormVisible);
+            navigation.replace('HomeApp')
         }
         else {
             console.log(res);
-            Alert.alert("Giao dịch thất bại", res.data.message)
+            notification.DangerNotification(res.data.message)
+
             setModalFormVisible(!isModalFormVisible);
         }
     };
-
-    const onClearPress = useCallback(() => {
-        SetErrorOrder({ ...errorOrder, ErrorMaCp: true })
-    }, [])
-
 
     const handleChangeSoLuong = (value) => {
         if (value.trim().length >= 1) {
@@ -347,6 +318,26 @@ function OrderScreen({ navigation, route }) {
         }
     }
 
+    const mapMyStockToLightningTable = () => {
+        const result = LightningTable.filter(o1 => MyStock?.some(o2 => o1.macp.trim() === o2.maCp.trim()));
+        const suggestions = result.map((item) => ({
+            id: item.macp,
+            name: item.macp.trim()
+        }))
+        setStocks(suggestions)
+    }
+    const handleSelectItem = (item) => {
+        if (item === null) {
+            SetErrorOrder({ ...errorOrder, ErrorMaCp: true })
+        } else {
+            SetErrorOrder({ ...errorOrder, ErrorMaCp: false })
+            setOrder({ ...order, maCp: item?.id })
+            setCurrentStock(item)
+            const res = findById(item?.id, LightningTable);
+            setTempStock(res)
+        }
+
+    }
     return (
         <>
             <CustomHeader title="Đặt lệnh" isHome={true} navigation={navigation} />
@@ -363,25 +354,53 @@ function OrderScreen({ navigation, route }) {
                         </View>
                     </View>
                     <View style={styles.textSelect}>
-                        <AutocompleteDropdown
-                            onClear={onClearPress}
-                            closeOnSubmit={false}
-                            closeOnBlur={true}
-                            onSelectItem={handleSelectItem}
-                            dataSet={stocks}
-                            clearOnFocus={false}
-                            textInputProps={{
-                                placeholder: "Tìm kiếm mã CK",
-                                onchange: ((text) => {
-                                    if (text === '') SetErrorOrder({ ...errorOrder, ErrorMaCp: true })
-                                })
+                        <SearchableDropdown
+                            selectedItems={currentStock}
+                            onTextChange={(text) => setOrder({ ...order, maCp: text })}
+                            onItemSelect={handleSelectItem}
+                            containerStyle={{ padding: 5 }}
+                            resetValue={false}
+                            textInputStyle={{
+                                paddingVertical: 9,
+                                paddingHorizontal: 12,
+                                height: 42,
+                                width: '90%',
+                                marginLeft: 10,
+                                borderWidth: StyleSheet.hairlineWidth,
+                                borderRadius: 5,
+                                fontSize: 18,
+                                fontWeight: 'bold'
                             }}
+                            itemStyle={{
+                                paddingVertical: 9,
+                                paddingHorizontal: 12,
+                                height: 42,
+                                width: '90%',
+                                borderWidth: 1,
+                                borderColor: '#e5e5e5',
+                                marginLeft: 10,
+                                fontSize: 18,
+                                borderTopLeftRadius: 10,
+                                borderTopRightRadius: 10,
+
+                            }}
+                            itemTextStyle={{
+                                color: '#222',
+                            }}
+                            containerStyle={{
+                                borderColor: '#e5e5e5',
+                            }}
+                            itemsContainerStyle={{ maxHeight: 140 }}
+                            items={stocks}
+                            placeholder="Tìm mã cổ phiếu"
+                            resetValue={false}
+                            underlineColorAndroid="transparent"
+                            setSort={(item, searchedText) => item.name.toLowerCase().startsWith(searchedText.toLowerCase())}
+
                         />
-                        {errorOrder.ErrorMaCp ? <Text style={styles.errorMsg}>Mã CK được để trống!</Text> : null}
+                        {errorOrder.ErrorMaCp ? <Text style={styles.errorMsg}>Không được để trống!</Text> : null}
 
                     </View>
-                </View>
-                <ScrollView>
                     {stockInformation()}
                     <View style={styles.content_wp}>
                         <View style={styles.box}>
@@ -389,12 +408,16 @@ function OrderScreen({ navigation, route }) {
                             <Text style={{ ...styles.textTitle, fontWeight: 'bold', color: '#000' }}>{currentBank ? Formatter(currentBank?.soDu) : '0'}</Text>
                         </View>
                     </View>
+                </View>
+                <ScrollView>
+
                     <View style={styles.content_wp}>
                         <View style={{ ...styles.box, flexDirection: 'column', alignItems: 'flex-start' }}>
                             <Text style={styles.textTitle}>Khối lượng</Text>
                             <TextInput
                                 name="soLuong"
                                 placeholder="Khối lượng"
+                                keyboardType='numeric'
                                 style={styles.textInput}
                                 value={order.soLuong}
                                 onChangeText={handleChangeSoLuong}
@@ -407,6 +430,7 @@ function OrderScreen({ navigation, route }) {
                             <TextInput
                                 name="gia"
                                 placeholder="Giá"
+                                keyboardType='numeric'
                                 style={styles.textInput}
                                 value={order.gia}
                                 onChangeText={handleChangeGia}
@@ -418,7 +442,7 @@ function OrderScreen({ navigation, route }) {
 
                     <View style={styles.content_wp}>
                         <View style={{ ...styles.box, justifyContent: "center" }}>
-                            <Text style={styles.textLabel}>LO</Text>
+                            <Text style={{ ...styles.textLabel, color: '#000' }}>LO</Text>
                             <RadioButton
                                 value="LO"
                                 label="Carto Base MAp"
@@ -426,20 +450,23 @@ function OrderScreen({ navigation, route }) {
                                 onPress={() => { setOrder({ ...order, loaiLenh: 'LO' }); }}
                             />
                         </View>
-                        <View style={{ ...styles.box, justifyContent: "center" }}>
-                            <Text style={styles.textLabel}>ATC</Text>
-                            <RadioButton
-                                value="ATC"
-                                status={order.loaiLenh === 'ATC' ? 'checked' : 'unchecked'}
-                                onPress={() => { setOrder({ ...order, loaiLenh: 'ATC' }); }}
-                            />
-                        </View>
+
                         <View style={{ ...styles.box, justifyContent: "center" }}>
                             <Text style={styles.textLabel}>ATO</Text>
                             <RadioButton
                                 value="ATO"
                                 status={order.loaiLenh === 'ATO' ? 'checked' : 'unchecked'}
                                 onPress={() => { setOrder({ ...order, loaiLenh: 'ATO' }); }}
+                            />
+                        </View>
+
+                        <View style={{ ...styles.box, justifyContent: "center" }}>
+                            <Text style={styles.textLabel}>ATC</Text>
+                            <RadioButton
+                                disabled={true}
+                                value="ATC"
+                                status={order.loaiLenh === 'ATC' ? 'checked' : 'unchecked'}
+                                onPress={() => { setOrder({ ...order, loaiLenh: 'ATC' }); }}
                             />
                         </View>
                     </View>
@@ -487,6 +514,7 @@ function OrderScreen({ navigation, route }) {
                                 name="mkdatLenh"
                                 placeholder="******"
                                 style={styles.textInput}
+                                keyboardType='numeric'
                                 value={order.mkdatLenh}
                                 onChangeText={handleChangeMkdatLenh}
                                 onBlur={e => handleBlurMkdatLenh()}
@@ -539,7 +567,8 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: 'white',
         justifyContent: 'space-between',
-        alignItems: 'center'
+        alignItems: 'center',
+        padding: 10
     },
     titleText: {
         padding: 8,

@@ -1,8 +1,9 @@
+import DateTimePicker from '@react-native-community/datetimepicker'
 import { Picker } from '@react-native-picker/picker'
 import { LinearGradient } from 'expo-linear-gradient'
 import moment from 'moment'
 import React, { useEffect, useState } from 'react'
-import { Button, StyleSheet, Text, TextInput, TouchableOpacity, View, Alert } from 'react-native'
+import { StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
 import Modal from "react-native-modal"
 import { useDispatch, useSelector } from 'react-redux'
 import * as ApiUser from '../../../api/Account'
@@ -10,8 +11,8 @@ import styleModal from '../../../common/styleModal'
 import CustomHeader from '../../../components/CustomHeader'
 import Color from '../../../constants/Colors'
 import Formatter from '../../../helpers/formatNumber'
+import * as notification from '../../../helpers/Notification'
 import { fetchBankAccount } from '../../../store/users/BankAccount'
-import DateTimePicker from '@react-native-community/datetimepicker';
 
 function AdvanceMoneyScreen({ navigation }) {
     const ListBankAccount = useSelector(state => state.BankAccount)
@@ -25,14 +26,20 @@ function AdvanceMoneyScreen({ navigation }) {
         stk: '',
         soTien: '',
     })
+
+
     const fetchBank = async () => {
         const res = await ApiUser.MyBankAccount()
         dispatch(fetchBankAccount(res.data))
         setData({ ...data, stk: res.data[0]?.stk })
         let temp = data.ngayBan.format('MM-DD-YYYY')
-        const res1 = await ApiUser.KhaDung({ currentBank: res.data[0]?.stk, date: temp })
-        const res2 = await ApiUser.PhiUng(res1.data.data)
-        setKhaDung(Formatter(res1.data.data - res2.data.data))
+        try {
+            const res1 = await ApiUser.KhaDung({ currentBank: res.data[0]?.stk, date: temp })
+            const res2 = await ApiUser.PhiUng(res1.data.data)
+            setKhaDung(Formatter(res1.data.data - res2.data.data))
+        } catch (error) {
+            notification.DangerNotification(error.data.message)
+        }
     }
     const fetchKhaDung = async (date, stk) => {
         try {
@@ -41,8 +48,11 @@ function AdvanceMoneyScreen({ navigation }) {
             const res1 = await ApiUser.PhiUng(res.data.data)
             setKhaDung(Formatter(res.data.data - res1.data.data))
         } catch (error) {
-            Alert.alert('Thất bại!', error.data.message)
+            // Alert.alert('Thất bại!', error.data.message)
+            console.log(error.data);
             setData({ ...data, ngayBan: moment() })
+            notification.DangerNotification(res.data.message)
+
             fetchKhaDung(moment(), stk)
         }
     }
@@ -55,12 +65,13 @@ function AdvanceMoneyScreen({ navigation }) {
         try {
 
             const res = await ApiUser.LenhUng(data)
-            Alert.alert('Thành công', 'Bạn đã ứng tiền thành công')
+            notification.SuccessNotification("Bạn đã ứng tiền thành công")
             setModalVisible(!isModalVisible)
             fetchKhaDung(data.ngayBan, data.stk)
             setData({ ...data, soTien: '' })
         } catch (error) {
-            Alert.alert('Thất bại', error.data.message)
+            notification.DangerNotification(error.data.message)
+
         }
     }
     useEffect(() => {
@@ -167,6 +178,7 @@ function AdvanceMoneyScreen({ navigation }) {
                         style={styles.textInput}
                         onChangeText={handleChange}
                         placeholder="Số tiền"
+                        keyboardType='numeric'
                         value={data.soTien}
                     />
                 </View>

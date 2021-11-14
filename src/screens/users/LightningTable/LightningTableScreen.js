@@ -1,39 +1,31 @@
 import { HubConnectionBuilder, LogLevel } from '@aspnet/signalr';
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 import React, { useEffect, useState } from 'react';
-import { Dimensions, FlatList, Text, TouchableOpacity, View, Pressable, StyleSheet } from 'react-native';
+import { Dimensions, FlatList, LogBox, Pressable, Text, TouchableOpacity, View } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import * as Api from '../../../api/LightningTable';
 import config from "../../../axios/config";
 import styles from '../../../common/StyleTable';
-import CustomHeader from '../../../components/CustomHeader';
 import Color from '../../../constants/Colors';
 import * as Price from '../../../constants/Price';
 import Formatter from '../../../helpers/formatNumber';
 import { FetchChangeListStocks, fetchLightningTable } from '../../../store/common/LightningTable';
-import { MaterialCommunityIcons } from "@expo/vector-icons";
-import Animated, {
-    useSharedValue,
-    withSpring,
-    useAnimatedStyle,
-    Extrapolate,
-    interpolate,
-} from "react-native-reanimated";
+import { fetchLightningTableFavored } from '../../../store/common/LightningTableFavored';
+import * as notification from '../../../helpers/Notification';
+
 function LightningTableScreen(props) {
     let { navigation } = props
-    const columnPortrait = ['MaCK', 'TC', 'Trần', 'Sàn', 'Tổng KL']
+    const columnPortrait = [ 'MaCK', 'TC', 'Trần', 'Sàn', 'Tổng KL']
     const columnLandscape = ['MaCK', 'TC', 'Trần', 'Sàn', 'Giá mua 3', 'KL 3', 'Giá mua 2', 'KL 2', 'Giá mua 1', 'KL 1', 'Giá khớp', 'KL khớp', 'Giá bán 1', 'KL 1', 'Giá bán 2', 'KL 2', 'Giá bán 3', 'KL 3', 'Tổng KL']
     const [columns, setColumns] = useState([])
     const [orientation, setOrientation] = useState("PORTRAIT");
     const dispatch = useDispatch();
     const LightningTable = useSelector(state => state.LightningTable)
     const LightningTableFavored = useSelector(state => state.LightningTableFavored)
-    
+
     useEffect(() => {
         const unsubscribe = navigation.addListener('focus', () => {
-            const fetchApi = async () => {
-                const res = await Api.LightningTable()
-                dispatch(fetchLightningTable(res.data))
-            }
+
             const isPortrait = () => {
                 const dim = Dimensions.get('screen');
                 return dim.height >= dim.width;
@@ -49,7 +41,10 @@ function LightningTableScreen(props) {
         });
         return unsubscribe;
     }, [navigation]);
-
+    const fetchApi = async () => {
+        const res = await Api.LightningTable()
+        dispatch(fetchLightningTable(res.data))
+    }
     useEffect(() => {
         Dimensions.addEventListener('change', ({ window: { width, height } }) => {
             if (width < height) {
@@ -60,6 +55,8 @@ function LightningTableScreen(props) {
                 setOrientation("LANDSCAPE")
             }
         })
+
+        LogBox.ignoreLogs(['Animated: `useNativeDriver`']);
     }, []);
 
     useEffect(() => {
@@ -81,8 +78,8 @@ function LightningTableScreen(props) {
                         return (
                             <TouchableOpacity
                                 key={index}
-                                style={styles.columnHeader}>
-                                <Text style={styles.columnHeaderTxt}>{column}</Text>
+                                style={{ ...styles.columnHeader, width: "20%", }}>
+                                <Text style={{ ...styles.columnHeaderTxt, fontSize: 14 }}>{column}</Text>
                             </TouchableOpacity>
                         )
                     }
@@ -120,6 +117,26 @@ function LightningTableScreen(props) {
 
     }
 
+    const handleCheckFavored = (macp) => {
+        return LightningTableFavored.includes(macp)
+    }
+
+    const fetchApiFavored = async () => {
+        const res = await Api.LightningTableFavored()
+        dispatch(fetchLightningTableFavored(res.data))
+    }
+    const onHandleLike = async (macp) => {
+        const res = await Api.PostStockFavored({ maCP: macp.trim() })
+        if (res.status === 200) {
+            notification.SuccessNotification('Đã thích cổ phiếu ',macp)
+
+            fetchApi()
+            fetchApiFavored()
+        }
+    }
+
+
+
     return (
         <View style={styles.container} >
             <FlatList
@@ -133,16 +150,32 @@ function LightningTableScreen(props) {
                         <View style={{ ...styles.tableRow, backgroundColor: index % 2 == 1 ? "#F0FBFC" : "white" }}>
                             {orientation === 'PORTRAIT' ?
                                 <>
-                                   
+                                    {handleCheckFavored(item.macp) ?
+                                        <Pressable style={{ width: '10%' }}>
+                                            <MaterialCommunityIcons
+                                                name={handleCheckFavored(item.macp) ? "heart" : "heart-outline"}
+                                                size={25}
+                                                color={handleCheckFavored(item.macp) ? "red" : "black"}
+                                            />
+                                        </Pressable>
+                                        : <Pressable style={{ width: '10%' }} onPress={() => onHandleLike(item.macp)}>
+                                            <MaterialCommunityIcons
+                                                name={handleCheckFavored(item.macp) ? "heart" : "heart-outline"}
+                                                size={25}
+                                                color={handleCheckFavored(item.macp) ? "red" : "black"}
+                                            />
+                                        </Pressable>
+                                    }
+
                                     <Text
-                                        style={{ ...styles.columnRowTxt, fontWeight: "bold", color: ClassNameRender(item.giaTran, item.giaSan, item.giaTC, item.gia) }}
+                                        style={{ ...styles.columnRowTxt, width: '10%', fontWeight: "bold", color: ClassNameRender(item.giaTran, item.giaSan, item.giaTC, item.gia) }}
                                         onPress={() => handleChooseFavored()}
                                     >
                                         {item.macp?.trim()}</Text>
-                                    <Text style={styles.columnRowStandard}>{item.giaTC / Price.PRICE}</Text>
-                                    <Text style={styles.columnRowCeil}>{item.giaTran / Price.PRICE}</Text>
-                                    <Text style={styles.columnRowFloor}>{item.giaSan / Price.PRICE}</Text>
-                                    <Text style={styles.columnRowTxt}>{item.ktTong || '0'}</Text>
+                                    <Text style={{ ...styles.columnRowStandard, width: '20%' }}>{item.giaTC / Price.PRICE}</Text>
+                                    <Text style={{ ...styles.columnRowCeil, width: '20%' }}>{item.giaTran / Price.PRICE}</Text>
+                                    <Text style={{ ...styles.columnRowFloor, width: '20%' }}>{item.giaSan / Price.PRICE}</Text>
+                                    <Text style={{ ...styles.columnRowTxt, width: '20%' }}>{item.ktTong || '0'}</Text>
                                 </> :
                                 <>
                                     <Text

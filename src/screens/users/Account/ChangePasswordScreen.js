@@ -1,18 +1,16 @@
 import { LinearGradient } from 'expo-linear-gradient';
-import React, { useEffect, useState } from 'react';
+import { Field, Formik } from 'formik';
+import React, { useState } from 'react';
 import {
-    Alert,
-    Platform, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View
+    Platform, ScrollView, StyleSheet, Text, TouchableOpacity, View
 } from 'react-native';
 import * as Animatable from 'react-native-animatable';
-import Feather from 'react-native-vector-icons/Feather';
-import CustomHeader from '../../../components/CustomHeader';
-import * as TextInfo from '../../../constants/Text';
-import CustomInput from '../../../helpers/CustomInput';
-import { Formik, Field } from 'formik'
-import * as yup from 'yup'
-import Color from '../../../constants/Colors'
+import * as yup from 'yup';
 import * as Api from '../../../api/Account';
+import CustomHeader from '../../../components/CustomHeader';
+import Color from '../../../constants/Colors';
+import CustomInput from '../../../helpers/CustomInput';
+import * as notification from '../../../helpers/Notification';
 
 const signUpValidationSchema = yup.object().shape({
     oldPassword: yup
@@ -48,26 +46,20 @@ const ChangePasswordScreen = ({ navigation, route }) => {
     const changeHandle = async (values) => {
         try {
             const res = await Api.ChangePassword({ oldPassword: data.oldPassword, newPassword: data.newPassword })
-            console.log('====================================');
-            console.log(res.data);
-            console.log('====================================');
+
             if (res.data.status === 400) {
-                Alert.alert('Thất bại!', res.data.message, [
-                    { text: 'Quay lại' }
-                ]);
+                notification.DangerNotification(res.data.message)
+
             }
             else {
-                Alert.alert('Thành công!', res.data.message, [
-                    { text: 'Xác nhận' }
-                ]);
-                navigation.replace('HomeApp')
+                notification.SuccessNotification(res.data.message)
+                setTimeout(() => {
+                    navigation.replace('HomeApp')
+                }, 1000);
             }
         } catch (error) {
-            Alert.alert('Thất bại!', error.data.message, [
-                { text: 'Quay lại' }
-            ]);
+            notification.DangerNotification(error.data.message)
         }
-        // console.log(data);
     }
 
 
@@ -107,6 +99,7 @@ const ChangePasswordScreen = ({ navigation, route }) => {
                                         placeholder="Nhập mật khẩu cũ"
                                         secureTextEntry
                                         onValueChange={(value) => setData({ ...data, oldPassword: value })}
+                                        keyboardType='numeric'
 
                                     />
                                 </View>
@@ -122,6 +115,7 @@ const ChangePasswordScreen = ({ navigation, route }) => {
                                         placeholder="Nhập mật khẩu mới"
                                         secureTextEntry
                                         onValueChange={(value) => setData({ ...data, newPassword: value })}
+                                        keyboardType='numeric'
 
                                     />
                                 </View>
@@ -143,6 +137,7 @@ const ChangePasswordScreen = ({ navigation, route }) => {
                                         placeholder="Xác nhận lại mật khẩu mới"
                                         secureTextEntry
                                         onValueChange={(value) => setData({ ...data, confirmPassword: value })}
+                                        keyboardType='numeric'
 
                                     />
                                 </View>
