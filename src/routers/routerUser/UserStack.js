@@ -6,6 +6,8 @@ import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import CustomHeader from '../../components/CustomHeader';
 import MyBankAccountScreen from '../../screens/users/Account/MyBankAccountScreen';
 import MyStockScreen from '../../screens/users/Account/MyStockScreen';
+import { useIsFocused } from '@react-navigation/native';
+
 const Tab = createMaterialTopTabNavigator();
 const createTopTabs = (props) => {
   return <Tab.Navigator
@@ -61,16 +63,15 @@ const navOptionHandler = () => ({
 const Stack = createStackNavigator()
 
 function UserStack({ navigation, route }) {
-  const [loading, setLoading] = useState(false)
-  useEffect(() => {
+  const isFocused = useIsFocused();
 
-  }, [setLoading])
   return (
     <>
       <CustomHeader title="Thông tin khách hàng" isHome={true} navigation={navigation} />
-      <Stack.Navigator initialRouteName="TopTabs">
+      {isFocused ? <Stack.Navigator initialRouteName="TopTabs">
         <Stack.Screen name="TopTabs" children={createTopTabs} options={navOptionHandler} />
-      </Stack.Navigator>
+      </Stack.Navigator> : null}
+
     </>
   )
 }

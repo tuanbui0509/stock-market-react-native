@@ -1,15 +1,12 @@
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
+import { useIsFocused } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { StyleSheet } from 'react-native';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import CustomHeader from '../../components/CustomHeader';
-import LightningTableScreen from '../../screens/users/LightningTable/LightningTableScreen';
 import LightningTableFavoredScreen from '../../screens/users/LightningTable/LightningTableFavoredScreen';
-import * as Api from '../../api/LightningTable';
-import { fetchLightningTable } from '../../store/common/LightningTable';
-import { fetchLightningTableFavored } from '../../store/common/LightningTableFavored';
-import { useDispatch } from 'react-redux';
+import LightningTableScreen from '../../screens/users/LightningTable/LightningTableScreen';
 
 const Tab = createMaterialTopTabNavigator();
 const createTopTabs = (props) => {
@@ -67,20 +64,16 @@ const navOptionHandler = () => ({
 const Stack = createStackNavigator()
 
 function LightningTableStack({ navigation, route }) {
-  const dispatch = useDispatch();
-
-  useEffect(() => {
-    const unsubscribe = navigation.addListener('focus', () => {
-
-    });
-    return unsubscribe;
-  }, [navigation]);
+  const isFocused = useIsFocused();
   return (
     <>
       <CustomHeader title="Bảng điện thị trường" isHome={true} navigation={navigation} />
-      <Stack.Navigator initialRouteName="TopTabs">
-        <Stack.Screen name="TopTabs" children={createTopTabs} options={navOptionHandler} />
-      </Stack.Navigator>
+      {isFocused ?
+        <Stack.Navigator initialRouteName="TopTabs">
+          <Stack.Screen name="TopTabs" children={createTopTabs} options={navOptionHandler} />
+        </Stack.Navigator>
+        : null}
+
     </>
   )
 }

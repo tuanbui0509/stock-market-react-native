@@ -28,6 +28,14 @@ export default function PurchasedOneDayScreen({ navigation }) {
         });
         return unsubscribe;
     }, [navigation]);
+    useEffect(() => {
+        const fetchApi = async () => {
+            const res = await Api.PurchasedOneDay()
+            setTableData(res.data.list)
+            console.log(res.data.list);
+        }
+        fetchApi()
+    }, []);
 
     const tableHeader = () => (
         <View style={Styles.tableHeaderDetail}>

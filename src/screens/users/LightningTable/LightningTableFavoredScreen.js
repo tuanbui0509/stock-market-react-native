@@ -15,9 +15,8 @@ import * as notification from '../../../helpers/Notification';
 
 function LightningTableFavoredScreen(props) {
     let { navigation } = props
-    const columnPortrait = ['MaCK', 'TC', 'Trần', 'Sàn', 'Tổng KL']
     const columnLandscape = ['MaCK', 'TC', 'Trần', 'Sàn', 'Giá mua 3', 'KL 3', 'Giá mua 2', 'KL 2', 'Giá mua 1', 'KL 1', 'Giá khớp', 'KL khớp', 'Giá bán 1', 'KL 1', 'Giá bán 2', 'KL 2', 'Giá bán 3', 'KL 3', 'Tổng KL']
-    const [columns, setColumns] = useState([])
+    const [columns, setColumns] = useState(['MaCK', 'TC', 'Trần', 'Sàn', 'Tổng KL'])
     const [orientation, setOrientation] = useState("PORTRAIT");
     const LightningTable = useSelector(state => state.LightningTable)
     const LightningTableFavored = useSelector(state => state.LightningTableFavored)
@@ -31,7 +30,7 @@ function LightningTableFavoredScreen(props) {
                 return dim.height >= dim.width;
             };
             if (isPortrait()) {
-                setColumns(columnPortrait)
+                setColumns(columns)
                 setOrientation("PORTRAIT")
             } else {
                 setOrientation("LANDSCAPE")
@@ -59,16 +58,18 @@ function LightningTableFavoredScreen(props) {
 
 
     useEffect(() => {
-        Dimensions.addEventListener('change', ({ window: { width, height } }) => {
+        const subscription = Dimensions.addEventListener('change', ({ window: { width, height } }) => {
             if (width < height) {
-                setColumns(columnPortrait)
+                setColumns(columns)
                 setOrientation("PORTRAIT")
             } else {
                 setColumns(columnLandscape)
                 setOrientation("LANDSCAPE")
             }
         })
-    }, []);
+        return () => subscription?.remove();
+
+    });
 
     useEffect(() => {
         let hubConnection = new HubConnectionBuilder()

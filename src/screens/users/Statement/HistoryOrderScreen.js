@@ -216,7 +216,7 @@ export default function HistoryOrderScreen({ navigation }) {
             </TouchableOpacity>
             <FlatList
                 data={tableData}
-                style={{ width: "100%", marginTop: 10, height: 380 }}
+                style={{ width: "100%", marginTop: 10, height: 340 }}
                 keyExtractor={(item, index) => index + ""}
                 ListHeaderComponent={tableHeader}
                 stickyHeaderIndices={[0]}

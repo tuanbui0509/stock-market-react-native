@@ -8,34 +8,12 @@ import HistoryPurchasedScreen from '../../screens/users/Statement/HistoryPurchas
 import PurchasedOneDayScreen from '../../screens/users/Statement/PurchasedOneDayScreen';
 import HistoryOrderScreen from '../../screens/users/Statement/HistoryOrderScreen';
 import HistoryAdvanceMoneyScreen from '../../screens/users/Statement/HistoryAdvanceMoneyScreen';
+import { useIsFocused } from '@react-navigation/native';
+
 const Tab = createMaterialTopTabNavigator();
 const createTopTabs = (props) => {
   return <Tab.Navigator
     screenOptions={({ route }) => ({
-      // tabBarIcon: ({ focused, size, color }) => {
-      //   let iconName;
-      //   if (route.name === 'Lệnh trong ngày') {
-      //     iconName = 'receipt-outline';
-      //     size = focused ? 25 : 20;
-      //     color = focused ? '#007AFF' : '#555';
-      //   } else if (route.name === 'Lịch sử lệnh đặt') {
-      //     iconName = 'md-newspaper-outline';
-      //     size = focused ? 25 : 20;
-      //     color = focused ? '#007AFF' : '#555';
-      //   }
-      //   else if (route.name === 'Lịch sử khớp lệnh') {
-      //     iconName = 'md-documents-outline';
-      //     size = focused ? 25 : 20;
-      //     color = focused ? '#007AFF' : '#555';
-      //   }
-      //   return (
-      //     <Ionicons
-      //       name={iconName}
-      //       size={size}
-      //       color={color}
-      //     />
-      //   )
-      // },
       tabBarLabelStyle: { fontSize: 12, fontWeight: 'bold' },
       tabBarStyle: { backgroundColor: 'powderblue' },
       tabBarActiveTintColor: '#007AFF',
@@ -76,12 +54,15 @@ const navOptionHandler = () => ({
 const Stack = createStackNavigator()
 
 function StatementStack({ navigation, route }) {
+  const isFocused = useIsFocused();
+
   return (
     <>
       <CustomHeader title="Thông tin sao kê lệnh" isHome={true} navigation={navigation} />
-      <Stack.Navigator initialRouteName="TopTabsAssignment">
-        <Stack.Screen name="TopTabsAssignment" children={createTopTabs} options={navOptionHandler} />
-      </Stack.Navigator>
+      {isFocused ?
+        <Stack.Navigator initialRouteName="TopTabsAssignment">
+          <Stack.Screen name="TopTabsAssignment" children={createTopTabs} options={navOptionHandler} />
+        </Stack.Navigator> : null}
     </>
   )
 }

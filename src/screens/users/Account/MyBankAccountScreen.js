@@ -1,6 +1,6 @@
 import { Picker } from '@react-native-picker/picker';
 import React, { useEffect, useRef, useState } from 'react';
-import { Button, FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Button, Dimensions, FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import * as Api from '../../../api/Account';
 import styles from '../../../common/StyleTable';
@@ -10,35 +10,65 @@ import { fetchBankAccount } from '../../../store/users/BankAccount';
 import RBSheet from 'react-native-raw-bottom-sheet';
 import * as Price from '../../../constants/Price';
 import Modal from "react-native-modal";
-export default function MyBankAccountScreen() {
+export default function MyBankAccountScreen({ navigation }) {
     const BankAccount = useSelector(state => state.BankAccount)
     const dispatch = useDispatch()
     const [columns, setColumns] = useState(['STK', 'Số dư TK', 'Tổng số tiền'])
     const [detail, setDetail] = useState(['Số dư T0', 'Số dư T1', 'Số dư T2', 'Bán chờ thanh toán'])
+    const columnLandscape = ['STK', 'Số dư TK', 'Tổng số tiền', 'Bán chờ thanh toán', 'Số dư T0', 'Số dư T1', 'Số dư T2']
     const [tableData, setTableData] = useState([])
     const refRBSheet = useRef();
     const [currentSTK, setCurrentSTK] = useState([])
+    const [orientation, setOrientation] = useState();
+
+    const fetchApi = async () => {
+        const res = await Api.MyBankAccount()
+        res.data.forEach((e) => {
+            e.soDuT0 = Formatter(e.soDuT0) || 0;
+            e.soDuT1 = Formatter(e.soDuT1) || 0;
+            e.soDuT2 = Formatter(e.soDuT2) || 0;
+            e.soDu = Formatter(e.soDu) || 0;
+            e.choThanhToan = Formatter(e.choThanhToan) || 0;
+            e.tongSoTien = Formatter(e.tongSoTien) || 0;
+        })
+        dispatch(fetchBankAccount(res.data))
+        setTableData(res.data);
+    }
 
     useEffect(() => {
-        const fetchApi = async () => {
-            const res = await Api.MyBankAccount()
-            res.data.forEach((e) => {
-                e.soDuT0 = Formatter(e.soDuT0) || 0;
-                e.soDuT1 = Formatter(e.soDuT1) || 0;
-                e.soDuT2 = Formatter(e.soDuT2) || 0;
-                e.soDu = Formatter(e.soDu) || 0;
-                e.choThanhToan = Formatter(e.choThanhToan) || 0;
-                e.tongSoTien = Formatter(e.tongSoTien) || 0;
-            })
-            dispatch(fetchBankAccount(res.data))
-            setTableData(res.data);
-        }
+        const unsubscribe = navigation.addListener('focus', () => {
+            const isPortrait = () => {
+                const dim = Dimensions.get('screen');
+                return dim.height >= dim.width;
+            };
+            if (isPortrait()) {
+                setColumns(columns)
+                setOrientation("PORTRAIT")
+            } else {
+                setOrientation("LANDSCAPE")
+                setColumns(columnLandscape)
+            }
+            fetchApi()
+            console.log('bank');
+        });
+        return unsubscribe;
+    }, [navigation]);
+    useEffect(() => {
+        const subscription = Dimensions.addEventListener('change', ({ window: { width, height } }) => {
+            if (width < height) {
+                setColumns(columns)
+                setOrientation("PORTRAIT")
+            } else {
+                setColumns(columnLandscape)
+                setOrientation("LANDSCAPE")
+            }
+        })
+        return () => subscription?.remove();
+    });
 
-        fetchApi()
-    }, [])
     const tableHeader = () => (
         <View style={styles.tableHeader}>
-            {
+            {orientation === 'PORTRAIT' ?
                 columns.map((column, index) => {
                     {
                         return (
@@ -46,6 +76,17 @@ export default function MyBankAccountScreen() {
                                 key={index}
                                 style={{ ...styles.columnHeader, width: '33.33%' }}>
                                 <Text style={styles.columnHeaderTxt}>{column}</Text>
+                            </TouchableOpacity>
+                        )
+                    }
+                }) :
+                columns.map((column, index) => {
+                    {
+                        return (
+                            <TouchableOpacity
+                                key={index}
+                                style={{ ...styles.columnHeader, width: '14.2%' }}>
+                                <Text style={{ ...styles.columnHeaderTxt, fontSize: 14 }}>{column}</Text>
                             </TouchableOpacity>
                         )
                     }
@@ -99,7 +140,6 @@ export default function MyBankAccountScreen() {
                 <Button title="Đóng" onPress={() => setModalVisible(false)} />
             </View>
         </View>;
-
     return (
         <>
             <View style={styles.container}>
@@ -112,10 +152,24 @@ export default function MyBankAccountScreen() {
                     renderItem={({ item, index }) => {
                         return (
                             <View style={{ ...styles.tableRow, backgroundColor: index % 2 == 1 ? "#F0FBFC" : "white" }}>
-                                <Text style={{ ...styles.columnRowTxt, fontWeight: "bold", width: "40%" }} onPress={() => toggleModal(item)}>
-                                    {item.stk.trim()}</Text>
-                                <Text style={{ ...styles.columnRowTxt3, width: "30%", }}>{item.soDu}</Text>
-                                <Text style={{ ...styles.columnRowTxt3, width: "30%", }}>{item.tongSoTien}</Text>
+                                {orientation === 'PORTRAIT' ?
+                                    <>
+                                        <Text style={{ ...styles.columnRowTxt, fontWeight: "bold", width: "40%" }} onPress={() => toggleModal(item)}>
+                                            {item.stk.trim()}</Text>
+                                        <Text style={{ ...styles.columnRowTxt3, width: "30%", }}>{item.soDu}</Text>
+                                        <Text style={{ ...styles.columnRowTxt3, width: "30%", }}>{item.tongSoTien}</Text>
+                                    </> :
+                                    <>
+                                        <Text style={{ ...styles.columnRowTxt, fontWeight: "bold", width: "20%" }}>
+                                            {item.stk.trim()}</Text>
+                                        <Text style={{ ...styles.columnRowTxt3, fontSize: 13, width: "13.3%", }}>{item.soDu}</Text>
+                                        <Text style={{ ...styles.columnRowTxt3, fontSize: 13, width: "13.3%", }}>{item.tongSoTien}</Text>
+                                        <Text style={{ ...styles.columnRowTxt3, fontSize: 13, width: "13.3%", }}>{item.choThanhToan}</Text>
+                                        <Text style={{ ...styles.columnRowTxt3, fontSize: 13, width: "13.3%", }}>{item.soDuT0}</Text>
+                                        <Text style={{ ...styles.columnRowTxt3, fontSize: 13, width: "13.3%", }}>{item.soDuT1}</Text>
+                                        <Text style={{ ...styles.columnRowTxt3, fontSize: 13, width: "13.3%", }}>{item.soDuT2}</Text>
+                                    </>
+                                }
                             </View>
 
                         )

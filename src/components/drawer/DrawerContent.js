@@ -82,7 +82,7 @@ export function DrawerContent(props) {
                                     />
                                 )}
                                 label="Danh sách đơn đăng ký"
-                                onPress={() => { props.navigation.navigate('Users') }}
+                                onPress={() => { props.navigation.navigate('ManagementRegisterFormScreen') }}
                             />
                         </Drawer.Section> :
                         <Drawer.Section style={styles.drawerSection}>

@@ -154,10 +154,10 @@ export default function HistoryAdvanceMoneyScreen({ navigation }) {
                     return (
                         <ScrollView >
                             <View style={{ ...Styles.tableRow, backgroundColor: index % 2 == 1 ? "#F0FBFC" : "white" }}>
-                                <Text style={{ ...Styles.columnRowTxtLight, width: '30%' }}>{format(new Date(item.ngayYeuCau), 'dd/MM/yyyy kk:mm:ss')}</Text>
-                                <Text style={{ ...Styles.columnRowTxtLight, width: '30%' }}>{format(new Date(item.ngayBan), 'dd/MM/yyyy kk:mm:ss')}</Text>
-                                <Text style={{ ...Styles.columnRowTxtLight, width: '20%' }}>{Formatter(item.soTien)}</Text>
-                                <Text style={{ ...Styles.columnRowTxtLight, width: '20%' }}>{Formatter(item.phiUng)}</Text>
+                                <Text style={{ ...Styles.columnRowTxtLight, width: '25%' }}>{format(new Date(item.ngayYeuCau), 'dd/MM/yyyy kk:mm:ss')}</Text>
+                                <Text style={{ ...Styles.columnRowTxtLight, width: '25%' }}>{format(new Date(item.ngayBan), 'dd/MM/yyyy kk:mm:ss')}</Text>
+                                <Text style={{ ...Styles.columnRowTxtLight, width: '25%' }}>{Formatter(item.soTien)}</Text>
+                                <Text style={{ ...Styles.columnRowTxtLight, width: '25%' }}>{Formatter(item.phiUng)}</Text>
                             </View>
                         </ScrollView>
                     )

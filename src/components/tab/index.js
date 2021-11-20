@@ -1,17 +1,14 @@
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import React from 'react';
-import { Image, StyleSheet } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { useDispatch, useSelector } from 'react-redux';
-import ManagementAccountStack from '../../routers/routerAdmin/ManagementAccountStack';
 import ManagementRegisterFormStack from '../../routers/routerAdmin/ManagementRegisterFormStack';
-import ManagementStockStack from '../../routers/routerAdmin/ManagementStockStack';
-
 // import { IMAGE } from '../constants/Image';
 import LightningTableStack from '../../routers/routerUser/LightningTableStack';
 import OrderStack from '../../routers/routerUser/OrderStack';
 import StatementStack from '../../routers/routerUser/StatementStack';
 import UserStack from '../../routers/routerUser/UserStack';
+
 
 const navOptionHandler = () => ({
     headerShown: false

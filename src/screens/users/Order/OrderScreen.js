@@ -17,7 +17,7 @@ import Formatter from '../../../helpers/formatNumber';
 import * as notification from '../../../helpers/Notification';
 import { fetchLightningTable } from '../../../store/common/LightningTable';
 import { fetchMyStock } from '../../../store/users/MyStock';
-
+import { useIsFocused } from '@react-navigation/native';
 function OrderScreen({ navigation, route }) {
     const LightningTable = useSelector(state => state.LightningTable)
     const MyStock = useSelector(state => state.MyStock)
@@ -26,8 +26,9 @@ function OrderScreen({ navigation, route }) {
     const [stocks, setStocks] = useState(null);
     const [BankAccount, setBankAccount] = useState([])
     const [currentBank, setCurrentBank] = useState()
-    const [currentStock, setCurrentStock] = useState(null)
+    const [currentStock, setCurrentStock] = useState([])
     const [tempStock, setTempStock] = useState({})
+    const isFocused = useIsFocused();
     const [order, setOrder] = useState({
         stk: "",
         maCp: "",
@@ -74,7 +75,7 @@ function OrderScreen({ navigation, route }) {
                 loaiGiaoDich: true,// Trạng thái mua bán mua: true, bán: false
                 loaiLenh: 'LO'// Trạng thái Loai: ATO, ATC, LO
             })
-            setCurrentStock(null)
+            setCurrentStock([])
             fetchBankAccount()
             fetchApiStocks()
             fetchApiMyStock()
@@ -341,207 +342,214 @@ function OrderScreen({ navigation, route }) {
     return (
         <>
             <CustomHeader title="Đặt lệnh" isHome={true} navigation={navigation} />
-
-            <SafeAreaView style={styles.container}>
-                <View>
-                    <View style={styles.box_stk}>
-                        <View style={styles.textStyle}>
-                            <Picker
-                                selectedValue={order.stk}
-                                onValueChange={onChangeListBank}>
-                                {showStatusPicker}
-                            </Picker>
-                        </View>
-                    </View>
-                    <View style={styles.textSelect}>
-                        <SearchableDropdown
-                            selectedItems={currentStock}
-                            onTextChange={(text) => setOrder({ ...order, maCp: text })}
-                            onItemSelect={handleSelectItem}
-                            containerStyle={{ padding: 5 }}
-                            resetValue={false}
-                            textInputStyle={{
-                                paddingVertical: 9,
-                                paddingHorizontal: 12,
-                                height: 42,
-                                width: '90%',
-                                marginLeft: 10,
-                                borderWidth: StyleSheet.hairlineWidth,
-                                borderRadius: 5,
-                                fontSize: 18,
-                                fontWeight: 'bold'
-                            }}
-                            itemStyle={{
-                                paddingVertical: 9,
-                                paddingHorizontal: 12,
-                                height: 42,
-                                width: '90%',
-                                borderWidth: 1,
-                                borderColor: '#e5e5e5',
-                                marginLeft: 10,
-                                fontSize: 18,
-                                borderTopLeftRadius: 10,
-                                borderTopRightRadius: 10,
-
-                            }}
-                            itemTextStyle={{
-                                color: '#222',
-                            }}
-                            containerStyle={{
-                                borderColor: '#e5e5e5',
-                            }}
-                            itemsContainerStyle={{ maxHeight: 140 }}
-                            items={stocks}
-                            placeholder="Tìm mã cổ phiếu"
-                            resetValue={false}
-                            underlineColorAndroid="transparent"
-                            setSort={(item, searchedText) => item.name.toLowerCase().startsWith(searchedText.toLowerCase())}
-
-                        />
-                        {errorOrder.ErrorMaCp ? <Text style={styles.errorMsg}>Không được để trống!</Text> : null}
-
-                    </View>
-                    {stockInformation()}
-                    <View style={styles.content_wp}>
-                        <View style={styles.box}>
-                            <Text style={styles.textTitle}>Số dư tài khoản</Text>
-                            <Text style={{ ...styles.textTitle, fontWeight: 'bold', color: '#000' }}>{currentBank ? Formatter(currentBank?.soDu) : '0'}</Text>
-                        </View>
-                    </View>
-                </View>
-                <ScrollView>
-
-                    <View style={styles.content_wp}>
-                        <View style={{ ...styles.box, flexDirection: 'column', alignItems: 'flex-start' }}>
-                            <Text style={styles.textTitle}>Khối lượng</Text>
-                            <TextInput
-                                name="soLuong"
-                                placeholder="Khối lượng"
-                                keyboardType='numeric'
-                                style={styles.textInput}
-                                value={order.soLuong}
-                                onChangeText={handleChangeSoLuong}
-                                onBlur={e => handleBlurSoluong()}
-                            />
-                            {errorOrder.ErrorSoLuong ? <Text style={styles.errorMsg}>Không được để trống!</Text> : null}
-                        </View>
-                        <View style={{ ...styles.box, flexDirection: 'column', alignItems: 'flex-start' }}>
-                            <Text style={styles.textTitle}>Giá đặt</Text>
-                            <TextInput
-                                name="gia"
-                                placeholder="Giá"
-                                keyboardType='numeric'
-                                style={styles.textInput}
-                                value={order.gia}
-                                onChangeText={handleChangeGia}
-                                onBlur={e => handleBlurGia()}
-                            />
-                            {errorOrder.ErrorGia ? <Text style={styles.errorMsg}>Không được để trống!</Text> : null}
-                        </View>
-                    </View>
-
-                    <View style={styles.content_wp}>
-                        <View style={{ ...styles.box, justifyContent: "center" }}>
-                            <Text style={{ ...styles.textLabel, color: '#000' }}>LO</Text>
-                            <RadioButton
-                                value="LO"
-                                label="Carto Base MAp"
-                                status={order.loaiLenh === 'LO' ? 'checked' : 'unchecked'}
-                                onPress={() => { setOrder({ ...order, loaiLenh: 'LO' }); }}
-                            />
+            {isFocused ?
+                <SafeAreaView style={styles.container}>
+                    <View>
+                        <View style={styles.box_stk}>
+                            <View style={styles.textStyle}>
+                                <Picker
+                                    selectedValue={order.stk}
+                                    onValueChange={onChangeListBank}>
+                                    {showStatusPicker}
+                                </Picker>
+                            </View>
                         </View>
 
-                        <View style={{ ...styles.box, justifyContent: "center" }}>
-                            <Text style={styles.textLabel}>ATO</Text>
-                            <RadioButton
-                                value="ATO"
-                                status={order.loaiLenh === 'ATO' ? 'checked' : 'unchecked'}
-                                onPress={() => { setOrder({ ...order, loaiLenh: 'ATO' }); }}
-                            />
-                        </View>
+                        <View style={styles.textSelect}>
+                            <SearchableDropdown
+                                selectedItems={currentStock}
+                                // onTextChange={(text) => setOrder({ ...order, maCp: text })}
+                                onItemSelect={handleSelectItem}
+                                containerStyle={{ padding: 5 }}
+                                resetValue={false}
+                                textInputStyle={{
+                                    paddingVertical: 9,
+                                    paddingHorizontal: 12,
+                                    width: '100%',
+                                    marginLeft: 10,
+                                    borderWidth: StyleSheet.hairlineWidth,
+                                    borderRadius: 5,
+                                    fontSize: 18,
+                                    fontWeight: 'bold'
+                                }}
+                                itemStyle={{
+                                    paddingVertical: 9,
+                                    paddingHorizontal: 12,
+                                    height: 42,
+                                    width: '100%',
+                                    borderWidth: StyleSheet.hairlineWidth,
+                                    borderColor: '#e5e5e5',
+                                    marginLeft: 10,
+                                }}
+                                itemTextStyle={{
+                                    color: '#222',
+                                    fontWeight: 'bold',
+                                    fontSize: 16,
+                                }}
+                                containerStyle={{
+                                    borderColor: '#e5e5e5',
+                                }}
+                                itemsContainerStyle={{ maxHeight: 130 }}
+                                multi={false}
+                                items={stocks}
 
-                        <View style={{ ...styles.box, justifyContent: "center" }}>
-                            <Text style={styles.textLabel}>ATC</Text>
-                            <RadioButton
-                                disabled={true}
-                                value="ATC"
-                                status={order.loaiLenh === 'ATC' ? 'checked' : 'unchecked'}
-                                onPress={() => { setOrder({ ...order, loaiLenh: 'ATC' }); }}
-                            />
-                        </View>
-                    </View>
-                    <View style={styles.content_wp}>
-                        <View style={styles.box}>
-                            <TouchableOpacity onPress={handleChooseBuy}>
-                                {order.loaiGiaoDich ? <LinearGradient
-                                    colors={['#1BCC77', Color.green]}
-                                    style={styles.appButtonContainer}
-                                >
-                                    <Text style={styles.appButtonText}>Mua</Text>
-                                </LinearGradient> :
-                                    <LinearGradient
-                                        colors={['#fff', '#fff']}
-                                        style={styles.appButtonContainer}
-                                    >
-                                        <Text style={{ ...styles.appButtonText, color: '#333' }}>Mua</Text>
-                                    </LinearGradient>}
-                            </TouchableOpacity>
-                        </View>
-
-                        <View style={styles.box}>
-                            <TouchableOpacity onPress={handleChooseSell}>
-                                {!order.loaiGiaoDich ? <LinearGradient
-                                    colors={['#F8495A', Color.red]}
-                                    style={styles.appButtonContainer}
-                                >
-                                    <Text style={styles.appButtonText}>Bán</Text>
-                                </LinearGradient> :
-                                    <LinearGradient
-                                        colors={['#fff', '#fff']}
-                                        style={styles.appButtonContainer}
-                                    >
-                                        <Text style={{ ...styles.appButtonText, color: '#333' }}>Bán</Text>
-                                    </LinearGradient>
+                                textInputProps={
+                                    {
+                                        placeholder: 'Tìm mã cổ phiếu',
+                                        underlineColorAndroid: "transparent",
+                                    }
                                 }
-                            </TouchableOpacity>
-                        </View>
-                    </View>
+                                underlineColorAndroid="transparent"
+                                setSort={(item, searchedText) => item.name.toLowerCase().startsWith(searchedText.toLowerCase())}
 
-                    <View style={styles.content_wp}>
-                        <View style={{ ...styles.box, flexDirection: 'column', alignItems: 'flex-start' }}>
-                            <Text style={styles.textTitle}>Mật khẩu đặt lệnh</Text>
-                            <TextInput
-                                name="mkdatLenh"
-                                placeholder="******"
-                                style={styles.textInput}
-                                keyboardType='numeric'
-                                value={order.mkdatLenh}
-                                onChangeText={handleChangeMkdatLenh}
-                                onBlur={e => handleBlurMkdatLenh()}
-                                maxLength={6}
-                                secureTextEntry
                             />
-                            {errorOrder.ErrorMkdatLenh ? <Text style={styles.errorMsg}>Không được để trống!</Text> : null}
-                        </View>
-                        <View style={{ ...styles.box, flexDirection: 'column', alignItems: 'flex-start' }}>
-                        </View>
-                    </View>
+                            {errorOrder.ErrorMaCp ? <Text style={styles.errorMsg}>Không được để trống!</Text> : null}
 
-                    <View style={{ ...styles.content_wp, justifyContent: 'center', flexDirection: "column" }}>
-                        {/* <View style={styles.box}> */}
-                        <TouchableOpacity onPress={handleSubmitForm}>
-                            <LinearGradient
-                                colors={[Color.btn_color, Color.bg_color]}
-                                style={{ ...styles.appButtonContainer, width: 220 }}
-                            >
-                                <Text style={styles.appButtonText}>Xác nhận</Text>
-                            </LinearGradient>
-                        </TouchableOpacity>
-                        {/* </View> */}
+                        </View>
+
+                        {stockInformation()}
+                        <View style={styles.content_wp}>
+                            <View style={styles.box}>
+                                <Text style={styles.textTitle}>Số dư tài khoản</Text>
+                                <Text style={{ ...styles.textTitle, fontWeight: 'bold', color: '#000' }}>{currentBank ? Formatter(currentBank?.soDu) : '0'}</Text>
+                            </View>
+                        </View>
                     </View>
-                    <Text style={{ fontSize: 11, textAlign: 'center' }}>Giá x 1000 VNĐ. Bản quyền thuộc về Công ty Cổ phần chứng khoán NTNT. © 2021</Text>
-                </ScrollView>
-            </SafeAreaView>
+                    <ScrollView>
+
+                        <View style={styles.content_wp}>
+                            <View style={{ ...styles.box, flexDirection: 'column', alignItems: 'flex-start' }}>
+                                <Text style={styles.textTitle}>Khối lượng</Text>
+                                <TextInput
+                                    name="soLuong"
+                                    placeholder="Khối lượng"
+                                    keyboardType='numeric'
+                                    style={styles.textInput}
+                                    value={order.soLuong}
+                                    onChangeText={handleChangeSoLuong}
+                                    onBlur={e => handleBlurSoluong()}
+                                />
+                                {errorOrder.ErrorSoLuong ? <Text style={styles.errorMsg}>Không được để trống!</Text> : null}
+                            </View>
+                            <View style={{ ...styles.box, flexDirection: 'column', alignItems: 'flex-start' }}>
+                                <Text style={styles.textTitle}>Giá đặt</Text>
+                                <TextInput
+                                    name="gia"
+                                    placeholder="Giá"
+                                    keyboardType='numeric'
+                                    style={styles.textInput}
+                                    value={order.gia}
+                                    onChangeText={handleChangeGia}
+                                    onBlur={e => handleBlurGia()}
+                                />
+                                {errorOrder.ErrorGia ? <Text style={styles.errorMsg}>Không được để trống!</Text> : null}
+                            </View>
+                        </View>
+
+                        <View style={styles.content_wp}>
+                            <View style={{ ...styles.box, justifyContent: "center" }}>
+                                <Text style={{ ...styles.textLabel, color: '#000' }}>LO</Text>
+                                <RadioButton
+                                    value="LO"
+                                    label="Carto Base MAp"
+                                    status={order.loaiLenh === 'LO' ? 'checked' : 'unchecked'}
+                                    onPress={() => { setOrder({ ...order, loaiLenh: 'LO' }); }}
+                                />
+                            </View>
+
+                            <View style={{ ...styles.box, justifyContent: "center" }}>
+                                <Text style={styles.textLabel}>ATO</Text>
+                                <RadioButton
+                                    value="ATO"
+                                    status={order.loaiLenh === 'ATO' ? 'checked' : 'unchecked'}
+                                    onPress={() => { setOrder({ ...order, loaiLenh: 'ATO' }); }}
+                                />
+                            </View>
+
+                            <View style={{ ...styles.box, justifyContent: "center" }}>
+                                <Text style={styles.textLabel}>ATC</Text>
+                                <RadioButton
+                                    disabled={true}
+                                    value="ATC"
+                                    status={order.loaiLenh === 'ATC' ? 'checked' : 'unchecked'}
+                                    onPress={() => { setOrder({ ...order, loaiLenh: 'ATC' }); }}
+                                />
+                            </View>
+                        </View>
+                        <View style={styles.content_wp}>
+                            <View style={styles.box}>
+                                <TouchableOpacity onPress={handleChooseBuy}>
+                                    {order.loaiGiaoDich ? <LinearGradient
+                                        colors={['#1BCC77', Color.green]}
+                                        style={styles.appButtonContainer}
+                                    >
+                                        <Text style={styles.appButtonText}>Mua</Text>
+                                    </LinearGradient> :
+                                        <LinearGradient
+                                            colors={['#fff', '#fff']}
+                                            style={styles.appButtonContainer}
+                                        >
+                                            <Text style={{ ...styles.appButtonText, color: '#333' }}>Mua</Text>
+                                        </LinearGradient>}
+                                </TouchableOpacity>
+                            </View>
+
+                            <View style={styles.box}>
+                                <TouchableOpacity onPress={handleChooseSell}>
+                                    {!order.loaiGiaoDich ? <LinearGradient
+                                        colors={['#F8495A', Color.red]}
+                                        style={styles.appButtonContainer}
+                                    >
+                                        <Text style={styles.appButtonText}>Bán</Text>
+                                    </LinearGradient> :
+                                        <LinearGradient
+                                            colors={['#fff', '#fff']}
+                                            style={styles.appButtonContainer}
+                                        >
+                                            <Text style={{ ...styles.appButtonText, color: '#333' }}>Bán</Text>
+                                        </LinearGradient>
+                                    }
+                                </TouchableOpacity>
+                            </View>
+                        </View>
+
+                        <View style={styles.content_wp}>
+                            <View style={{ ...styles.box, flexDirection: 'column', alignItems: 'flex-start' }}>
+                                <Text style={styles.textTitle}>Mật khẩu đặt lệnh</Text>
+                                <TextInput
+                                    name="mkdatLenh"
+                                    placeholder="******"
+                                    style={styles.textInput}
+                                    keyboardType='numeric'
+                                    value={order.mkdatLenh}
+                                    onChangeText={handleChangeMkdatLenh}
+                                    onBlur={e => handleBlurMkdatLenh()}
+                                    maxLength={6}
+                                    secureTextEntry
+                                />
+                                {errorOrder.ErrorMkdatLenh ? <Text style={styles.errorMsg}>Không được để trống!</Text> : null}
+                            </View>
+                            <View style={{ ...styles.box, flexDirection: 'column', alignItems: 'flex-start' }}>
+                            </View>
+                        </View>
+
+                        <View style={{ ...styles.content_wp, justifyContent: 'center', flexDirection: "column" }}>
+                            {/* <View style={styles.box}> */}
+                            <TouchableOpacity onPress={handleSubmitForm}>
+                                <LinearGradient
+                                    colors={[Color.btn_color, Color.bg_color]}
+                                    style={{ ...styles.appButtonContainer, width: 220 }}
+                                >
+                                    <Text style={styles.appButtonText}>Xác nhận</Text>
+                                </LinearGradient>
+                            </TouchableOpacity>
+                            {/* </View> */}
+                        </View>
+                        <Text style={{ fontSize: 11, textAlign: 'center' }}>Giá x 1000 VNĐ. Bản quyền thuộc về Công ty Cổ phần chứng khoán NTNT. © 2021</Text>
+                    </ScrollView>
+                </SafeAreaView>
+                : null}
+
 
             <Modal
                 isVisible={isModalFormVisible}
@@ -611,7 +619,7 @@ const styles = StyleSheet.create({
     textStyle: {
         paddingVertical: 10,
         height: 40,
-        width: '80%',
+        width: '90%',
         marginLeft: 10,
         borderWidth: StyleSheet.hairlineWidth,
         borderRadius: 5,
@@ -624,10 +632,6 @@ const styles = StyleSheet.create({
     },
     textSelect: {
         marginTop: 5,
-        // width: '100%',
-        paddingLeft: 30,
-        // height: 150
-        maxHeight: 150
     },
     box_cp: {
         marginBottom: 5

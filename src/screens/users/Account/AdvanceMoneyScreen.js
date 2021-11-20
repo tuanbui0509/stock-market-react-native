@@ -20,13 +20,35 @@ function AdvanceMoneyScreen({ navigation }) {
     const [showDate, setShowDate] = useState(false)
     const [khaDung, setKhaDung] = useState(0)
     const [PhiUng, setPhiUng] = useState(0)
-
     const [data, setData] = useState({
         ngayBan: moment(),
         stk: '',
         soTien: '',
     })
 
+    const [error, setError] = useState(false)
+    const [orientation, setOrientation] = useState()
+
+    useEffect(() => {
+        const unsubscribe = navigation.addListener('focus', () => {
+
+            // const isPortrait = () => {
+            //     const dim = Dimensions.get('screen');
+            //     return dim.height >= dim.width;
+            // };
+            // if (isPortrait()) {
+            //     setColumns(columnPortrait)
+            //     setOrientation("PORTRAIT")
+            // } else {
+            //     setOrientation("LANDSCAPE")
+            //     setColumns(columnLandscape)
+            // }
+            fetchApi()
+        });
+        return unsubscribe;
+    }, [navigation]);
+
+    console.log(orientation);
 
     const fetchBank = async () => {
         const res = await ApiUser.MyBankAccount()
@@ -35,8 +57,7 @@ function AdvanceMoneyScreen({ navigation }) {
         let temp = data.ngayBan.format('MM-DD-YYYY')
         try {
             const res1 = await ApiUser.KhaDung({ currentBank: res.data[0]?.stk, date: temp })
-            const res2 = await ApiUser.PhiUng(res1.data.data)
-            setKhaDung(Formatter(res1.data.data - res2.data.data))
+            setKhaDung(Formatter(res1.data.data))
         } catch (error) {
             notification.DangerNotification(error.data.message)
         }
@@ -45,15 +66,17 @@ function AdvanceMoneyScreen({ navigation }) {
         try {
             let temp = date.format('MM-DD-YYYY')
             const res = await ApiUser.KhaDung({ currentBank: stk, date: temp })
-            const res1 = await ApiUser.PhiUng(res.data.data)
-            setKhaDung(Formatter(res.data.data - res1.data.data))
+            if (res.data.data !== 0) {
+                setKhaDung(Formatter(res.data.data))
+            } else {
+                setKhaDung(Formatter(0))
+            }
+            console.log(date);
+            setData({ ...data, ngayBan: date })
         } catch (error) {
-            // Alert.alert('Thất bại!', error.data.message)
             console.log(error.data);
-            setData({ ...data, ngayBan: moment() })
-            notification.DangerNotification(res.data.message)
-
-            fetchKhaDung(moment(), stk)
+            notification.DangerNotification(error.data.message)
+            fetchKhaDung(data.ngayBan, stk)
         }
     }
     const fetchPhiUng = async () => {
@@ -63,8 +86,7 @@ function AdvanceMoneyScreen({ navigation }) {
 
     const fetchLenhUng = async () => {
         try {
-
-            const res = await ApiUser.LenhUng(data)
+            await ApiUser.LenhUng(data)
             notification.SuccessNotification("Bạn đã ứng tiền thành công")
             setModalVisible(!isModalVisible)
             fetchKhaDung(data.ngayBan, data.stk)
@@ -81,7 +103,11 @@ function AdvanceMoneyScreen({ navigation }) {
     const [isModalVisible, setModalVisible] = useState(false)
 
     const handleSubmit = () => {
-        fetchPhiUng()
+        if (data.soTien.length === 0) {
+            setError(true)
+            return
+        }
+        // fetchPhiUng()
         setModalVisible(!isModalVisible)
     }
 
@@ -93,8 +119,8 @@ function AdvanceMoneyScreen({ navigation }) {
     const YourOwnComponent = () =>
         <View style={styleModal.centeredView}>
             <View style={styleModal.modalView}>
-                <Text style={{ ...styles.textTitleRBSheet, fontSize: 18, fontWeight: 'bold', marginBottom: 10, textAlign: 'center' }}>{`Số tiền bạn muốn ứng là: ${data.soTien}`}</Text>
-                <Text style={{ ...styles.textTitleRBSheet, fontSize: 16, marginBottom: 20 }}>{`Phí ứng: ${PhiUng}`}</Text>
+                <Text style={{ ...styles.textTitleRBSheet, fontSize: 18, fontWeight: 'bold', marginBottom: 10, textAlign: 'center' }}>{`Số tiền ứng tối đa là: ${data.soTien}`}</Text>
+                {/* <Text style={{ ...styles.textTitleRBSheet, fontSize: 16, marginBottom: 20 }}>{`Phí ứng: ${PhiUng}`}</Text> */}
                 <View style={styles.wrapperLabel}>
                     <TouchableOpacity onPress={handleSubmitLend}>
                         <LinearGradient
@@ -130,14 +156,13 @@ function AdvanceMoneyScreen({ navigation }) {
     const onDateChange = (e, selectedDate) => {
         const current = selectedDate || data.ngayBan
         setShowDate(false)
-        setData({ ...data, ngayBan: moment(current) })
         fetchKhaDung(moment(current), data.stk)
     }
     const handleChange = (value) => {
-        const str = (Number(value)).toLocaleString()
-        console.log(str)
-        setData({ ...data, soTien: str })
-
+        setData({ ...data, soTien: value })
+        if (value.length === 0) {
+            setError(true)
+        } else setError(false)
     };
     return (
         <View style={styles.container}>
@@ -182,6 +207,7 @@ function AdvanceMoneyScreen({ navigation }) {
                         value={data.soTien}
                     />
                 </View>
+                {error ? <Text style={styles.error}>Không được để trống!</Text> : null}
                 <TouchableOpacity onPress={handleSubmit}>
                     <LinearGradient
                         colors={[Color.btn_color, Color.bg_color]}
@@ -242,9 +268,10 @@ const styles = StyleSheet.create({
     },
     error: {
         color: '#ff0000',
-        fontSize: 9,
+        fontSize: 14,
         marginBottom: 8,
         marginLeft: 6,
+        textAlign: 'center'
     },
     text_title: {
         fontSize: 18,

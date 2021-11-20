@@ -4,6 +4,7 @@ import TabNavigator from '../../components/tab';
 import AdvanceMoneyScreen from '../../screens/users/Account/AdvanceMoneyScreen';
 import ChangePasswordScreen from '../../screens/users/Account/ChangePasswordScreen';
 import ChangePinScreen from '../../screens/users/Account/ChangePinScreen';
+import DetailRegisterFormScreen from '../../screens/admin/DetailRegisterForm/DetailRegisterFormScreen';
 import { DrawerContent } from './DrawerContent';
 import InformationScreen from './InformationScreen';
 import RegisterScreen from './RegisterScreen';

@@ -15,23 +15,21 @@ import * as notification from '../../../helpers/Notification';
 
 function LightningTableScreen(props) {
     let { navigation } = props
-    const columnPortrait = [ 'MaCK', 'TC', 'Trần', 'Sàn', 'Tổng KL']
+    const [columns, setColumns] = useState(['MaCK', 'TC', 'Trần', 'Sàn', 'Tổng KL'])
     const columnLandscape = ['MaCK', 'TC', 'Trần', 'Sàn', 'Giá mua 3', 'KL 3', 'Giá mua 2', 'KL 2', 'Giá mua 1', 'KL 1', 'Giá khớp', 'KL khớp', 'Giá bán 1', 'KL 1', 'Giá bán 2', 'KL 2', 'Giá bán 3', 'KL 3', 'Tổng KL']
-    const [columns, setColumns] = useState([])
-    const [orientation, setOrientation] = useState("PORTRAIT");
+    const [orientation, setOrientation] = useState()
     const dispatch = useDispatch();
     const LightningTable = useSelector(state => state.LightningTable)
     const LightningTableFavored = useSelector(state => state.LightningTableFavored)
 
+    const isPortrait = () => {
+        const dim = Dimensions.get('screen');
+        return dim.height >= dim.width;
+    };
     useEffect(() => {
         const unsubscribe = navigation.addListener('focus', () => {
-
-            const isPortrait = () => {
-                const dim = Dimensions.get('screen');
-                return dim.height >= dim.width;
-            };
             if (isPortrait()) {
-                setColumns(columnPortrait)
+                setColumns(columns)
                 setOrientation("PORTRAIT")
             } else {
                 setOrientation("LANDSCAPE")
@@ -46,18 +44,18 @@ function LightningTableScreen(props) {
         dispatch(fetchLightningTable(res.data))
     }
     useEffect(() => {
-        Dimensions.addEventListener('change', ({ window: { width, height } }) => {
+        const subscription = Dimensions.addEventListener('change', ({ window: { width, height } }) => {
             if (width < height) {
-                setColumns(columnPortrait)
+                setColumns(columns)
                 setOrientation("PORTRAIT")
+                console.log("PORTRAIT");
             } else {
                 setColumns(columnLandscape)
                 setOrientation("LANDSCAPE")
             }
         })
-
-        LogBox.ignoreLogs(['Animated: `useNativeDriver`']);
-    }, []);
+        return () => subscription?.remove();
+    });
 
     useEffect(() => {
         let hubConnection = new HubConnectionBuilder()
@@ -70,6 +68,17 @@ function LightningTableScreen(props) {
         });
         hubConnection.start()
     }, []);
+
+    useEffect(() => {
+        if (isPortrait()) {
+            setColumns(columns)
+            setOrientation("PORTRAIT")
+        } else {
+            setOrientation("LANDSCAPE")
+            setColumns(columnLandscape)
+        }
+        fetchApi()
+    }, [])
     const tableHeader = () => (
         <View style={styles.tableHeader}>
             {orientation === 'PORTRAIT' ?
@@ -128,7 +137,7 @@ function LightningTableScreen(props) {
     const onHandleLike = async (macp) => {
         const res = await Api.PostStockFavored({ maCP: macp.trim() })
         if (res.status === 200) {
-            notification.SuccessNotification('Đã thích cổ phiếu ',macp)
+            notification.SuccessNotification('Đã thích cổ phiếu ', macp)
 
             fetchApi()
             fetchApiFavored()

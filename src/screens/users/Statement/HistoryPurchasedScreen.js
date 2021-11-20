@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Button, FlatList, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { Button, Dimensions, FlatList, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import * as Api from '../../../api/Statement';
 import Formatter from '../../../helpers/formatNumber';
 import queryString from 'query-string';
@@ -215,7 +215,7 @@ export default function HistoryPurchasedScreen({ navigation }) {
             </TouchableOpacity>
             <FlatList
                 data={tableData}
-                style={{ width: "100%", marginTop: 10, height: 380 }}
+                style={{ width: "100%", marginTop: 10, height: Dimensions.get('window').height - 340 }}
                 keyExtractor={(item, index) => index + ""}
                 ListHeaderComponent={tableHeader}
                 stickyHeaderIndices={[0]}

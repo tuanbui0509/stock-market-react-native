@@ -9,7 +9,7 @@ export const ConfirmRegisterForm = (id) => {
     return AxiosClient.put(`DonDangKy/${id}`)
 }
 
-export const CancelRegisterForm = (id) => {
+export const DeleteRegisterForm = (id) => {
     return AxiosClient.delete(`DonDangKy/${id}`)
 }
 // users
