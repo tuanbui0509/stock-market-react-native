@@ -1,7 +1,7 @@
 import { HubConnectionBuilder, LogLevel } from '@aspnet/signalr';
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import React, { useEffect, useState } from 'react';
-import { Dimensions, FlatList, LogBox, Pressable, Text, TouchableOpacity, View } from 'react-native';
+import { Dimensions, FlatList, Pressable, Text, TouchableOpacity, View } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import * as Api from '../../../api/LightningTable';
 import config from "../../../axios/config";
@@ -9,54 +9,37 @@ import styles from '../../../common/StyleTable';
 import Color from '../../../constants/Colors';
 import * as Price from '../../../constants/Price';
 import Formatter from '../../../helpers/formatNumber';
+import * as notification from '../../../helpers/Notification';
+import { useOrientation } from '../../../helpers/useOrientation';
 import { FetchChangeListStocks, fetchLightningTable } from '../../../store/common/LightningTable';
 import { fetchLightningTableFavored } from '../../../store/common/LightningTableFavored';
-import * as notification from '../../../helpers/Notification';
 
 function LightningTableScreen(props) {
     let { navigation } = props
     const [columns, setColumns] = useState(['MaCK', 'TC', 'Trần', 'Sàn', 'Tổng KL'])
     const columnLandscape = ['MaCK', 'TC', 'Trần', 'Sàn', 'Giá mua 3', 'KL 3', 'Giá mua 2', 'KL 2', 'Giá mua 1', 'KL 1', 'Giá khớp', 'KL khớp', 'Giá bán 1', 'KL 1', 'Giá bán 2', 'KL 2', 'Giá bán 3', 'KL 3', 'Tổng KL']
-    const [orientation, setOrientation] = useState()
+    const columnPortrait = ['MaCK', 'TC', 'Trần', 'Sàn', 'Tổng KL']
+    const orientation = useOrientation()
     const dispatch = useDispatch();
     const LightningTable = useSelector(state => state.LightningTable)
     const LightningTableFavored = useSelector(state => state.LightningTableFavored)
 
-    const isPortrait = () => {
-        const dim = Dimensions.get('screen');
-        return dim.height >= dim.width;
-    };
+
     useEffect(() => {
         const unsubscribe = navigation.addListener('focus', () => {
-            if (isPortrait()) {
-                setColumns(columns)
-                setOrientation("PORTRAIT")
-            } else {
-                setOrientation("LANDSCAPE")
+            if (orientation === 'PORTRAIT') {
+                setColumns(columnPortrait)
+            } else if (orientation === 'LANDSCAPE') {
                 setColumns(columnLandscape)
             }
             fetchApi()
         });
-        return unsubscribe;
+        return unsubscribe
     }, [navigation]);
     const fetchApi = async () => {
         const res = await Api.LightningTable()
         dispatch(fetchLightningTable(res.data))
     }
-    useEffect(() => {
-        const subscription = Dimensions.addEventListener('change', ({ window: { width, height } }) => {
-            if (width < height) {
-                setColumns(columns)
-                setOrientation("PORTRAIT")
-                console.log("PORTRAIT");
-            } else {
-                setColumns(columnLandscape)
-                setOrientation("LANDSCAPE")
-            }
-        })
-        return () => subscription?.remove();
-    });
-
     useEffect(() => {
         let hubConnection = new HubConnectionBuilder()
             .withUrl(config.BASE_URL + "/signalr")
@@ -67,18 +50,27 @@ function LightningTableScreen(props) {
             dispatch(FetchChangeListStocks(json));
         });
         hubConnection.start()
+        // return () => {
+        //     hubConnection.stop()
+        // }
     }, []);
-
     useEffect(() => {
-        if (isPortrait()) {
-            setColumns(columns)
-            setOrientation("PORTRAIT")
-        } else {
-            setOrientation("LANDSCAPE")
+        if (orientation === 'LANDSCAPE') {
             setColumns(columnLandscape)
+        } else if (orientation === 'PORTRAIT') {
+            setColumns(columnPortrait)
         }
-        fetchApi()
-    }, [])
+    }, [orientation])
+    useEffect(() => {
+        const subscription = Dimensions.addEventListener('change', ({ window: { width, height } }) => {
+            if (width < height) {
+                setColumns(columnPortrait)
+            } else {
+                setColumns(columnLandscape)
+            }
+        })
+        return () => subscription?.remove();
+    });
     const tableHeader = () => (
         <View style={styles.tableHeader}>
             {orientation === 'PORTRAIT' ?

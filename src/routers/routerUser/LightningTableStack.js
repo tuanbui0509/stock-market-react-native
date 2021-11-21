@@ -57,6 +57,11 @@ const createTopTabs = (props) => {
 
 }
 
+const isPortrait = () => {
+  const dim = Dimensions.get('screen');
+  return dim.height >= dim.width;
+};
+
 const navOptionHandler = () => ({
   headerShown: false
 })

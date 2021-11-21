@@ -1,7 +1,7 @@
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
 import React, { useEffect, useState } from 'react';
-import { StyleSheet } from 'react-native';
+import { Dimensions, StyleSheet } from 'react-native';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import CustomHeader from '../../components/CustomHeader';
 import MyBankAccountScreen from '../../screens/users/Account/MyBankAccountScreen';
@@ -32,16 +32,12 @@ const createTopTabs = (props) => {
         )
       },
       tabBarLabelStyle: { fontSize: 12 },
-      tabBarStyle: { backgroundColor: 'powderblue' },
+      tabBarStyle: { backgroundColor: 'powderblue', display: 'flex', justifyContent: 'space-between' },
       tabBarActiveTintColor: '#007AFF',
       tabBarInactiveTintColor: '#555',
       tabBarActiveBackgroundColor: '#fff',
-      tabBarInactiveBackgroundColor: '#999',
       showLabel: true,
     })}
-    activeColor='#f0edf6'
-    inactiveColor='#3e2465'
-    barStyle={{ backgroundColor: '#694fad' }}
   >
     <Tab.Screen
       name="Cổ phiếu hiện có"
@@ -55,6 +51,11 @@ const createTopTabs = (props) => {
 
 
 }
+
+const isPortrait = () => {
+  const dim = Dimensions.get('screen');
+  return dim.height >= dim.width;
+};
 
 const navOptionHandler = () => ({
   headerShown: false

@@ -8,6 +8,7 @@ import FlashMessage from "react-native-flash-message";
 export default function App() {
   LogBox.ignoreLogs(['Remote debugger']);
   LogBox.ignoreLogs(['Reanimated 2']);
+  LogBox.ignoreLogs(['Warning:'])
   return (
     <Provider store={index.store} >
       <PersistGate loading={null} persistor={index.persistor}>

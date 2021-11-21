@@ -13,6 +13,7 @@ import Modal from "react-native-modal";
 export default function MyBankAccountScreen({ navigation }) {
     const BankAccount = useSelector(state => state.BankAccount)
     const dispatch = useDispatch()
+    const columnPortrait = ['STK', 'Số dư TK', 'Tổng số tiền']
     const [columns, setColumns] = useState(['STK', 'Số dư TK', 'Tổng số tiền'])
     const [detail, setDetail] = useState(['Số dư T0', 'Số dư T1', 'Số dư T2', 'Bán chờ thanh toán'])
     const columnLandscape = ['STK', 'Số dư TK', 'Tổng số tiền', 'Bán chờ thanh toán', 'Số dư T0', 'Số dư T1', 'Số dư T2']
@@ -42,7 +43,7 @@ export default function MyBankAccountScreen({ navigation }) {
                 return dim.height >= dim.width;
             };
             if (isPortrait()) {
-                setColumns(columns)
+                setColumns(columnPortrait)
                 setOrientation("PORTRAIT")
             } else {
                 setOrientation("LANDSCAPE")
@@ -56,7 +57,7 @@ export default function MyBankAccountScreen({ navigation }) {
     useEffect(() => {
         const subscription = Dimensions.addEventListener('change', ({ window: { width, height } }) => {
             if (width < height) {
-                setColumns(columns)
+                setColumns(columnPortrait)
                 setOrientation("PORTRAIT")
             } else {
                 setColumns(columnLandscape)

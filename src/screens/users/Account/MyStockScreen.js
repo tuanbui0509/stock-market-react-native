@@ -5,9 +5,11 @@ import styles from '../../../common/StyleTable';
 import Formatter from '../../../helpers/formatNumber';
 import Modal from "react-native-modal";
 import styleModal from '../../../common/styleModal';
+import *as variable from '../../../constants/variable';
 
 
 export default function MyStockScreen({ navigation }) {
+    const columnPortrait = ['MaCP', 'Tổng', 'Khả dụng', 'Giá TT', 'Giá trị TT']
     const [columns, setColumns] = useState(['MaCP', 'Tổng', 'Khả dụng', 'Giá TT', 'Giá trị TT'])
     const columnLandscape = ['MaCP', 'Tổng', 'Khả dụng', 'T0', 'T1', 'T2', 'Giá TT', 'Giá trị TT']
 
@@ -52,7 +54,7 @@ export default function MyStockScreen({ navigation }) {
 
     useEffect(() => {
         if (isPortrait()) {
-            setColumns(columns)
+            setColumns(columnPortrait)
             setOrientation("PORTRAIT")
         } else {
             setOrientation("LANDSCAPE")
@@ -63,7 +65,7 @@ export default function MyStockScreen({ navigation }) {
     useEffect(() => {
         const subscription = Dimensions.addEventListener('change', ({ window: { width, height } }) => {
             if (width < height) {
-                setColumns(columns)
+                setColumns(columnPortrait)
                 setOrientation("PORTRAIT")
             } else {
                 setColumns(columnLandscape)
@@ -164,7 +166,7 @@ export default function MyStockScreen({ navigation }) {
         <View style={styles.container}>
             <FlatList
                 data={tableData}
-                style={{ width: "98%", paddingTop: 20 }}
+                style={{ width: "98%", paddingTop: 5 }}
                 keyExtractor={(item, index) => index + ""}
                 ListHeaderComponent={tableHeader}
                 stickyHeaderIndices={[0]}

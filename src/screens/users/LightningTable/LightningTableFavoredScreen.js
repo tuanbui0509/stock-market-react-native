@@ -12,31 +12,26 @@ import { fetchLightningTable } from '../../../store/common/LightningTable';
 import { FetchChangeListStocks, fetchLightningTableFavored } from '../../../store/common/LightningTableFavored';
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import * as notification from '../../../helpers/Notification';
+import { useOrientation } from '../../../helpers/useOrientation';
 
 function LightningTableFavoredScreen(props) {
     let { navigation } = props
     const columnLandscape = ['MaCK', 'TC', 'Trần', 'Sàn', 'Giá mua 3', 'KL 3', 'Giá mua 2', 'KL 2', 'Giá mua 1', 'KL 1', 'Giá khớp', 'KL khớp', 'Giá bán 1', 'KL 1', 'Giá bán 2', 'KL 2', 'Giá bán 3', 'KL 3', 'Tổng KL']
+    const columnPortrait = ['MaCK', 'TC', 'Trần', 'Sàn', 'Tổng KL']
     const [columns, setColumns] = useState(['MaCK', 'TC', 'Trần', 'Sàn', 'Tổng KL'])
-    const [orientation, setOrientation] = useState("PORTRAIT");
+    const orientation = useOrientation()
     const LightningTable = useSelector(state => state.LightningTable)
     const LightningTableFavored = useSelector(state => state.LightningTableFavored)
     const dispatch = useDispatch();
     // const [filteredStocks, setFilteredStocks] = useState([]);
     useEffect(() => {
         const unsubscribe = navigation.addListener('focus', () => {
-
-            const isPortrait = () => {
-                const dim = Dimensions.get('screen');
-                return dim.height >= dim.width;
-            };
-            if (isPortrait()) {
-                setColumns(columns)
-                setOrientation("PORTRAIT")
-            } else {
-                setOrientation("LANDSCAPE")
+            if (orientation === 'PORTRAIT') {
+                setColumns(columnPortrait)
+                console.log(columnPortrait);
+            } else if (orientation === 'LANDSCAPE') {
                 setColumns(columnLandscape)
             }
-
             fetchApiFavored()
         });
         return unsubscribe;
@@ -56,21 +51,6 @@ function LightningTableFavoredScreen(props) {
         tempFavored = result
     }
 
-
-    useEffect(() => {
-        const subscription = Dimensions.addEventListener('change', ({ window: { width, height } }) => {
-            if (width < height) {
-                setColumns(columns)
-                setOrientation("PORTRAIT")
-            } else {
-                setColumns(columnLandscape)
-                setOrientation("LANDSCAPE")
-            }
-        })
-        return () => subscription?.remove();
-
-    });
-
     useEffect(() => {
         let hubConnection = new HubConnectionBuilder()
             .withUrl(config.BASE_URL + "/signalr")
@@ -81,8 +61,26 @@ function LightningTableFavoredScreen(props) {
             dispatch(FetchChangeListStocks(json));
         });
         hubConnection.start()
+        // return () => {
+        //     hubConnection.stop()
+        // }
     }, []);
+    useEffect(() => {
+        const subscription = Dimensions.addEventListener('change', ({ window: { width, height } }) => {
+            if (width < height) {
+                setColumns(columnPortrait)
+            } else {
+                setColumns(columnLandscape)
+            }
+        })
+        return () => subscription?.remove();
+    });
 
+    useEffect(() => {
+        if (orientation === 'LANDSCAPE') {
+            setColumns(columnLandscape)
+        }
+    }, [orientation])
 
     const tableHeader = () => (
         <View style={styles.tableHeader}>
