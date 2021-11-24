@@ -1,11 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { Button, Dimensions, FlatList, Text, TouchableOpacity, View } from 'react-native';
+import { Overlay } from 'react-native-elements';
 import * as Api from '../../../api/Account';
+import styleModal from '../../../common/styleModal';
 import styles from '../../../common/StyleTable';
 import Formatter from '../../../helpers/formatNumber';
-import Modal from "react-native-modal";
-import styleModal from '../../../common/styleModal';
-import *as variable from '../../../constants/variable';
 
 
 export default function MyStockScreen({ navigation }) {
@@ -46,7 +45,6 @@ export default function MyStockScreen({ navigation }) {
                 setOrientation("LANDSCAPE")
                 setColumns(columnLandscape)
             }
-            console.log('stock');
             fetchApi()
         });
         return unsubscribe;
@@ -124,14 +122,17 @@ export default function MyStockScreen({ navigation }) {
         </View>
     )
 
-
-
-    const [isModalVisible, setModalVisible] = useState(false);
-
     const toggleModal = (item) => {
         setCurrentSTK(item)
-        setModalVisible(!isModalVisible);
+        setVisible(!visible);
     };
+
+    const [visible, setVisible] = useState(false);
+
+    const toggleOverlay = () => {
+        setVisible(!visible);
+    };
+
 
     // responsive
     useEffect(() => {
@@ -159,7 +160,7 @@ export default function MyStockScreen({ navigation }) {
                     <Text style={{ ...styles.textBodyRBSheet, width: '25%', fontSize: 13 }}>{Formatter(currentSTK.soLuongT1) || '0'}</Text>
                     <Text style={{ ...styles.textBodyRBSheet, width: '25%', fontSize: 13 }}>{Formatter(currentSTK.soLuongT2) || '0'}</Text>
                 </View>
-                <Button title="Đóng" onPress={() => setModalVisible(false)} />
+                <Button title="Đóng" onPress={() => setVisible(false)} />
             </View>
         </View>;
     return (
@@ -201,20 +202,13 @@ export default function MyStockScreen({ navigation }) {
                     )
                 }}
             />
-            <Modal
-                isVisible={isModalVisible}
-                onBackdropPress={() => setModalVisible(false)}
-                testID={'modal'}
-                backdropOpacity={0.8}
-                animationIn="zoomInDown"
-                animationOut="zoomOutUp"
-                animationInTiming={600}
-                animationOutTiming={600}
-                backdropTransitionInTiming={600}
-                backdropTransitionOutTiming={600}
+            <Overlay
+                isVisible={visible}
+                onBackdropPress={toggleOverlay}
+                overlayStyle={{ backgroundColor: 'transparent' }}
             >
                 <YourOwnComponent />
-            </Modal>
+            </Overlay>
         </View>
     )
 }

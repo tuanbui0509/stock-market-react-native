@@ -1,15 +1,13 @@
-import { Picker } from '@react-native-picker/picker';
-import React, { useEffect, useRef, useState } from 'react';
-import { Button, Dimensions, FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { Button, Dimensions, FlatList, Text, TouchableOpacity, View } from 'react-native';
+import { Overlay } from 'react-native-elements';
 import { useDispatch, useSelector } from 'react-redux';
 import * as Api from '../../../api/Account';
-import styles from '../../../common/StyleTable';
 import styleModal from '../../../common/styleModal';
+import styles from '../../../common/StyleTable';
 import Formatter from '../../../helpers/formatNumber';
 import { fetchBankAccount } from '../../../store/users/BankAccount';
-import RBSheet from 'react-native-raw-bottom-sheet';
-import * as Price from '../../../constants/Price';
-import Modal from "react-native-modal";
+
 export default function MyBankAccountScreen({ navigation }) {
     const BankAccount = useSelector(state => state.BankAccount)
     const dispatch = useDispatch()
@@ -18,7 +16,6 @@ export default function MyBankAccountScreen({ navigation }) {
     const [detail, setDetail] = useState(['Số dư T0', 'Số dư T1', 'Số dư T2', 'Bán chờ thanh toán'])
     const columnLandscape = ['STK', 'Số dư TK', 'Tổng số tiền', 'Bán chờ thanh toán', 'Số dư T0', 'Số dư T1', 'Số dư T2']
     const [tableData, setTableData] = useState([])
-    const refRBSheet = useRef();
     const [currentSTK, setCurrentSTK] = useState([])
     const [orientation, setOrientation] = useState();
 
@@ -50,7 +47,6 @@ export default function MyBankAccountScreen({ navigation }) {
                 setColumns(columnLandscape)
             }
             fetchApi()
-            console.log('bank');
         });
         return unsubscribe;
     }, [navigation]);
@@ -118,11 +114,14 @@ export default function MyBankAccountScreen({ navigation }) {
 
 
 
-    const [isModalVisible, setModalVisible] = useState(false);
+    const [visible, setVisible] = useState(false);
+    const toggleOverlay = () => {
+        setVisible(!visible);
+    };
 
     const toggleModal = (item) => {
         setCurrentSTK(item)
-        setModalVisible(!isModalVisible);
+        setVisible(!visible);
     };
     const YourOwnComponent = () =>
         <View style={styleModal.centeredView}>
@@ -138,7 +137,7 @@ export default function MyBankAccountScreen({ navigation }) {
                     <Text style={{ ...styles.textBodyRBSheet, width: '25%', fontSize: 13 }}>{Formatter(currentSTK.soDuT2) || '0'}</Text>
                     <Text style={{ ...styles.textBodyRBSheet, width: '25%', fontSize: 13 }}>{Formatter(currentSTK.choThanhToan) || '0'}</Text>
                 </View>
-                <Button title="Đóng" onPress={() => setModalVisible(false)} />
+                <Button title="Đóng" onPress={() => setVisible(false)} />
             </View>
         </View>;
     return (
@@ -178,20 +177,13 @@ export default function MyBankAccountScreen({ navigation }) {
                 />
 
             </View>
-            <Modal
-                isVisible={isModalVisible}
-                onBackdropPress={() => setModalVisible(false)}
-                testID={'modal'}
-                backdropOpacity={0.8}
-                animationIn="zoomInDown"
-                animationOut="zoomOutUp"
-                animationInTiming={600}
-                animationOutTiming={600}
-                backdropTransitionInTiming={600}
-                backdropTransitionOutTiming={600}
+            <Overlay
+                isVisible={visible}
+                onBackdropPress={toggleOverlay}
+                overlayStyle={{ backgroundColor: 'transparent' }}
             >
                 <YourOwnComponent />
-            </Modal>
+            </Overlay>
 
         </>
     )

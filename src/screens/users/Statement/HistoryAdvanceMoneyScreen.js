@@ -7,12 +7,12 @@ import queryString from 'query-string';
 import React, { useEffect, useState } from 'react';
 import { Dimensions, FlatList, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import * as ApiUser from '../../../api/Account';
-import Formatter from '../../../helpers/formatNumber'
 import * as Api from '../../../api/Statement';
 import Styles from '../../../common/StyleTable';
 import Color from '../../../constants/Colors';
+import * as variable from '../../../constants/variable';
+import Formatter from '../../../helpers/formatNumber';
 import { useOrientation } from '../../../helpers/useOrientation';
-import *as variable from '../../../constants/variable';
 export default function HistoryAdvanceMoneyScreen({ navigation }) {
     const [columns, setColumns] = useState(['Ngày Ứng', 'Ngày Bán', 'Số tiền', 'Phí Ứng'])
     const [tableData, setTableData] = useState([])
@@ -97,7 +97,6 @@ export default function HistoryAdvanceMoneyScreen({ navigation }) {
         setTableData(res.data.list)
     }
     // responsive
-    console.log(orientation);
 
     return (
         <>

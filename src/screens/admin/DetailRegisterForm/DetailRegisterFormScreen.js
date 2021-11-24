@@ -5,7 +5,6 @@ import { LinearGradient } from 'expo-linear-gradient';
 import React, { useEffect, useState } from 'react';
 import { SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import * as Animatable from 'react-native-animatable';
-import Modal from "react-native-modal";
 import { useTheme } from 'react-native-paper';
 import * as Api from '../../../api/Admin';
 import styleModal from '../../../common/styleModal';
@@ -13,13 +12,19 @@ import CustomHeader from '../../../components/CustomHeader';
 import Color from '../../../constants/Colors';
 import * as notification from '../../../helpers/Notification';
 import { useFocusEffect } from '@react-navigation/core';
+import { Overlay } from 'react-native-elements';
 
 
 function DetailRegisterFormScreen(props) {
     const { colors } = useTheme();
     const { navigation, route } = props
     const user = route.params
-    const [isModalVisible, setModalVisible] = useState(false)
+    const [visible, setVisible] = useState(false);
+
+    const toggleOverlay = () => {
+        setVisible(!visible);
+    };
+
     const [flag, setFlag] = useState(false)
 
     let value1 = new Date(user.ngaySinh)
@@ -55,7 +60,7 @@ function DetailRegisterFormScreen(props) {
                     notification.DangerNotification(res.data.message)
                 }
             }
-            setModalVisible(false)
+            setVisible(false)
         } catch (error) {
             notification.DangerNotification(error.data.message)
         }
@@ -77,7 +82,7 @@ function DetailRegisterFormScreen(props) {
                             <Text style={styles.appButtonText}>Xác nhận</Text>
                         </LinearGradient>
                     </TouchableOpacity>
-                    <TouchableOpacity onPress={() => setModalVisible(false)}>
+                    <TouchableOpacity onPress={() => setVisible(false)}>
                         <LinearGradient
                             colors={['#fff', '#fff']}
                             style={{ ...styles.appButtonContainer, width: 120 }}
@@ -193,7 +198,7 @@ function DetailRegisterFormScreen(props) {
                         </View>
                         <View style={styles.content_wp}>
                             <View style={styles.box}>
-                                <TouchableOpacity onPress={() => { setModalVisible(true); setFlag(true) }}>
+                                <TouchableOpacity onPress={() => { setVisible(true); setFlag(true) }}>
                                     <LinearGradient
                                         colors={['#1BCC77', Color.green]}
                                         style={styles.appButtonContainer}>
@@ -203,7 +208,7 @@ function DetailRegisterFormScreen(props) {
                             </View>
 
                             <View style={styles.box}>
-                                <TouchableOpacity onPress={() => { setModalVisible(true); setFlag(false) }}>
+                                <TouchableOpacity onPress={() => { setVisible(true); setFlag(false) }}>
                                     <LinearGradient
                                         colors={['#F8495A', Color.red]}
                                         style={styles.appButtonContainer}
@@ -216,20 +221,13 @@ function DetailRegisterFormScreen(props) {
                     </ScrollView>
                 </Animatable.View>
             </View>
-            <Modal
-                isVisible={isModalVisible}
-                onBackdropPress={() => setModalVisible(false)}
-                testID={'modal'}
-                backdropOpacity={0.8}
-                animationIn="zoomInDown"
-                animationOut="zoomOutUp"
-                animationInTiming={600}
-                animationOutTiming={600}
-                backdropTransitionInTiming={600}
-                backdropTransitionOutTiming={600}
+            <Overlay
+                isVisible={visible}
+                onBackdropPress={toggleOverlay}
+                overlayStyle={{ backgroundColor: 'transparent' }}
             >
                 <YourOwnComponent />
-            </Modal>
+            </Overlay>
         </SafeAreaView>
     )
 

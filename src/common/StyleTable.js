@@ -120,6 +120,12 @@ const styles = StyleSheet.create({
         textAlign: "center",
         fontSize: 16,
         fontWeight: "bold"
+    },
+    textTitle: {
+        textAlign: "center",
+        fontSize: 16,
+        fontWeight: "bold",
+        color: 'red'
     }
 });
 

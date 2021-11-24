@@ -1,17 +1,15 @@
-import React, { useEffect, useState } from 'react';
-import { Alert, Button, FlatList, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import * as Api from '../../../api/Statement';
-import Styles from '../../../common/StyleTable';
-import Formatter from '../../../helpers/formatNumber';
-import queryString from 'query-string';
-import Color from '../../../constants/Colors';
-import Icon from 'react-native-vector-icons/FontAwesome';
-
-import Colors from '../../../constants/Colors';
-import Modal from "react-native-modal";
-import styleModal from '../../../common/styleModal';
 import { format } from 'date-fns';
 import { LinearGradient } from 'expo-linear-gradient';
+import React, { useEffect, useState } from 'react';
+import { Alert, Button, FlatList, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Overlay } from 'react-native-elements';
+import Icon from 'react-native-vector-icons/FontAwesome';
+import * as Api from '../../../api/Statement';
+import styleModal from '../../../common/styleModal';
+import Styles from '../../../common/StyleTable';
+import Color from '../../../constants/Colors';
+import Formatter from '../../../helpers/formatNumber';
+
 
 export default function PurchasedOneDayScreen({ navigation }) {
     const [columns, setColumns] = useState(['MaCK', 'Mua/Bán', 'KLượng Khớp/Tổng KLượng', 'Trạng thái', 'Giá khớp'])
@@ -32,7 +30,6 @@ export default function PurchasedOneDayScreen({ navigation }) {
         const fetchApi = async () => {
             const res = await Api.PurchasedOneDay()
             setTableData(res.data.list)
-            console.log(res.data.list);
         }
         fetchApi()
     }, []);
@@ -82,12 +79,16 @@ export default function PurchasedOneDayScreen({ navigation }) {
         </View>
     )
 
-    const [isModalVisible, setModalVisible] = useState(false);
+    const [visible, setVisible] = useState(false);
+    const toggleOverlay = () => {
+        setVisible(!visible);
+    };
+
     const [isCancelVisible, setCancelVisible] = useState(false);
 
     const toggleModal = (item) => {
         setCurrentMaCK(item)
-        setModalVisible(!isModalVisible);
+        setVisible(!visible);
     };
     const toggleModalCancel = (item) => {
         setCurrentMaCK(item)
@@ -115,39 +116,36 @@ export default function PurchasedOneDayScreen({ navigation }) {
                         /> : null}
                     </Text>
                 </View>
-                <Button title="Đóng" onPress={() => setModalVisible(false)} />
+                <Button title="Đóng" onPress={() => setVisible(false)} />
             </View>
         </View>;
 
 
     const YourCancelComponent = () =>
-        <View style={styleModal.centeredView}>
-            <View style={styleModal.modalView}>
-                <Text style={{ ...styles.textTitle, fontWeight: 'bold', fontSize: 18, color: '#000' }}>Bạn có muốn hủy lệnh này không?</Text>
-                <View style={styles.wrapperLabel}>
-                    <TouchableOpacity onPress={handleOkDelete}>
-                        <LinearGradient
-                            colors={['#F8495A', Color.red]}
-                            style={{ ...styles.appButtonContainer, width: 120, marginRight: 20 }}
-                        >
-                            <Text style={styles.appButtonText}>Xác nhận</Text>
-                        </LinearGradient>
-                    </TouchableOpacity>
-                    <TouchableOpacity onPress={() => setCancelVisible(false)}>
-                        <LinearGradient
-                            colors={['#fff', '#fff']}
-                            style={{ ...styles.appButtonContainer, width: 120 }}
-                        >
-                            <Text style={{ ...styles.appButtonText, color: '#333' }}>Hủy bỏ</Text>
-                        </LinearGradient>
-                    </TouchableOpacity>
-                </View>
+        <View style={{ ...styleModal.modalView, margin: 0, padding: 15 }}>
+            <Text style={{ ...styles.textTitle, fontWeight: 'bold', fontSize: 18, color: '#000' }}>Bạn có muốn hủy lệnh này không?</Text>
+            <View style={styles.wrapperLabel}>
+                <TouchableOpacity onPress={handleOkDelete}>
+                    <LinearGradient
+                        colors={['#F8495A', Color.red]}
+                        style={{ ...styles.appButtonContainer, width: 120, marginRight: 20 }}
+                    >
+                        <Text style={styles.appButtonText}>Xác nhận</Text>
+                    </LinearGradient>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => setCancelVisible(false)}>
+                    <LinearGradient
+                        colors={['#fff', '#fff']}
+                        style={{ ...styles.appButtonContainer, width: 120 }}
+                    >
+                        <Text style={{ ...styles.appButtonText, color: '#333' }}>Hủy bỏ</Text>
+                    </LinearGradient>
+                </TouchableOpacity>
             </View>
-        </View>;
+        </View>
 
     const handleOkDelete = async () => {
         const res = await Api.CancelStock(currentMaCK.maLD)
-        console.log(res);
         if (res.data.status === 0) {
             Alert.alert('Thành công', res.data.message)
         }
@@ -155,6 +153,7 @@ export default function PurchasedOneDayScreen({ navigation }) {
             Alert.alert('Thất bại', res.data.message)
         }
         setCancelVisible(false);
+        setVisible(false)
     }
 
     return (
@@ -184,35 +183,21 @@ export default function PurchasedOneDayScreen({ navigation }) {
                     )
                 }}
             />
-            <Modal
-                isVisible={isModalVisible}
-                onBackdropPress={() => setModalVisible(false)}
-                testID={'modal'}
-                backdropOpacity={0.8}
-                animationIn="zoomInDown"
-                animationOut="zoomOutUp"
-                animationInTiming={600}
-                animationOutTiming={600}
-                backdropTransitionInTiming={600}
-                backdropTransitionOutTiming={600}
+            <Overlay
+                isVisible={visible}
+                onBackdropPress={toggleOverlay}
+                overlayStyle={{ backgroundColor: 'transparent' }}
             >
                 <YourOwnComponent />
-            </Modal>
+            </Overlay>
 
-            <Modal
+            <Overlay
                 isVisible={isCancelVisible}
                 onBackdropPress={() => setCancelVisible(false)}
-                testID={'modal'}
-                backdropOpacity={0.8}
-                animationIn="zoomInDown"
-                animationOut="zoomOutUp"
-                animationInTiming={600}
-                animationOutTiming={600}
-                backdropTransitionInTiming={600}
-                backdropTransitionOutTiming={600}
+                overlayStyle={{ backgroundColor: 'transparent' }}
             >
                 <YourCancelComponent />
-            </Modal>
+            </Overlay>
         </View>
     )
 }

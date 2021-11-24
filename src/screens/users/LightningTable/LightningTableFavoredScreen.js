@@ -1,6 +1,9 @@
 import { HubConnectionBuilder, LogLevel } from '@aspnet/signalr';
+import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { useIsFocused } from '@react-navigation/native';
 import React, { useEffect, useState } from 'react';
-import { Dimensions, FlatList, Pressable, Text, TouchableOpacity, View } from 'react-native';
+import { Dimensions, FlatList, Text, TouchableOpacity, View } from 'react-native';
+import { Tooltip } from 'react-native-elements';
 import { useDispatch, useSelector } from 'react-redux';
 import * as Api from '../../../api/LightningTable';
 import config from "../../../axios/config";
@@ -8,11 +11,10 @@ import styles from '../../../common/StyleTable';
 import Color from '../../../constants/Colors';
 import * as Price from '../../../constants/Price';
 import Formatter from '../../../helpers/formatNumber';
-import { fetchLightningTable } from '../../../store/common/LightningTable';
-import { FetchChangeListStocks, fetchLightningTableFavored } from '../../../store/common/LightningTableFavored';
-import { MaterialCommunityIcons } from "@expo/vector-icons";
 import * as notification from '../../../helpers/Notification';
 import { useOrientation } from '../../../helpers/useOrientation';
+import { fetchLightningTable } from '../../../store/common/LightningTable';
+import { FetchChangeListStocks, fetchLightningTableFavored } from '../../../store/common/LightningTableFavored';
 
 function LightningTableFavoredScreen(props) {
     let { navigation } = props
@@ -23,12 +25,12 @@ function LightningTableFavoredScreen(props) {
     const LightningTable = useSelector(state => state.LightningTable)
     const LightningTableFavored = useSelector(state => state.LightningTableFavored)
     const dispatch = useDispatch();
+    const isFocused = useIsFocused();
     // const [filteredStocks, setFilteredStocks] = useState([]);
     useEffect(() => {
         const unsubscribe = navigation.addListener('focus', () => {
             if (orientation === 'PORTRAIT') {
                 setColumns(columnPortrait)
-                console.log(columnPortrait);
             } else if (orientation === 'LANDSCAPE') {
                 setColumns(columnLandscape)
             }
@@ -133,72 +135,80 @@ function LightningTableFavoredScreen(props) {
             fetchApiFavored()
         }
     }
-    const handleCheckFavored = (macp) => {
-        return LightningTableFavored.includes(macp)
-    }
-
     return (
         <View style={styles.container} >
-            <FlatList
-                data={tempFavored}
-                style={{ width: "99%", paddingTop: 10 }}
-                keyExtractor={(item, index) => index + ""}
-                ListHeaderComponent={tableHeader}
-                stickyHeaderIndices={[0]}
-                renderItem={({ item, index }) => {
-                    return (
-                        <View style={{ ...styles.tableRow, backgroundColor: index % 2 == 1 ? "#F0FBFC" : "white" }}>
-                            {orientation === 'PORTRAIT' ?
-                                <>
-                                    <Pressable onPress={() => onHandleUnLike(item.macp)}>
-                                        <MaterialCommunityIcons
-                                            name={handleCheckFavored(item.macp) ? "heart" : "heart-outline"}
-                                            size={25}
-                                            color={handleCheckFavored(item.macp) ? "red" : "black"}
-                                        />
-                                    </Pressable>
+            {isFocused ?
+                <FlatList
+                    data={tempFavored}
+                    style={{ width: "99%", paddingTop: 10 }}
+                    keyExtractor={(item, index) => index + ""}
+                    ListHeaderComponent={tableHeader}
+                    stickyHeaderIndices={[0]}
+                    renderItem={({ item, index }) => {
+                        return (
+                            <View style={{ ...styles.tableRow, backgroundColor: index % 2 == 1 ? "#F0FBFC" : "white" }}>
+                                {orientation === 'PORTRAIT' ?
+                                    <>
+                                        <Tooltip
+                                            backgroundColor='#08d4c4'
+                                            withOverlay={false}
+                                            skipAndroidStatusBar={true}
+                                            popover={
+                                                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                                                    <Text style={styles.textTitle}>Đã thích: </Text>
+                                                    <MaterialCommunityIcons
+                                                        onPress={() => onHandleUnLike(item.macp)}
+                                                        name="heart"
+                                                        size={20}
+                                                        color="red"
+                                                    />
+                                                </View>
+                                            }>
+                                            <Text
+                                                style={{
+                                                    fontWeight: "bold", marginRight: 20, marginLeft: 20,
+                                                    color: ClassNameRender(item.giaTran, item.giaSan, item.giaTC, item.gia)
+                                                }}
+                                            > {item.macp?.trim()}</Text>
+                                        </Tooltip>
+                                        <Text style={styles.columnRowStandard}>{item.giaTC / Price.PRICE}</Text>
+                                        <Text style={styles.columnRowCeil}>{item.giaTran / Price.PRICE}</Text>
+                                        <Text style={styles.columnRowFloor}>{item.giaSan / Price.PRICE}</Text>
+                                        <Text style={styles.columnRowTxt}>{item.ktTong || '0'}</Text>
+                                    </> :
+                                    <>
+                                        <Text
+                                            style={{ ...styles.columnRowTxt, fontSize: 12, fontWeight: "bold", width: "5.263157894736842%", color: ClassNameRender(item.giaTran, item.giaSan, item.giaTC, item.gia) }}
+                                        >
+                                            {item?.macp?.trim()}</Text>
+                                        <Text style={{ ...styles.columnRowStandard, fontSize: 12, width: "5.263157894736842%" }}>{item.giaTC / Price.PRICE}</Text>
+                                        <Text style={{ ...styles.columnRowCeil, fontSize: 12, width: "5.263157894736842%" }}>{item.giaTran / Price.PRICE}</Text>
+                                        <Text style={{ ...styles.columnRowFloor, fontSize: 12, width: "5.263157894736842%" }}>{item.giaSan / Price.PRICE}</Text>
+                                        <Text style={{ ...styles.columnRowTxtLandscape, color: ClassNameRender(item.giaTran, item.giaSan, item.giaTC, item.giaMua3) }}>{item.giaMua3 / Price.PRICE || '0'}</Text>
+                                        <Text style={{ ...styles.columnRowTxtLandscape, color: ClassNameRender(item.giaTran, item.giaSan, item.giaTC, item.giaMua3) }}>{Formatter(item.klMua3) || '0'}</Text>
+                                        <Text style={{ ...styles.columnRowTxtLandscape, color: ClassNameRender(item.giaTran, item.giaSan, item.giaTC, item.giaMua2) }}>{item.giaMua2 / Price.PRICE || '0'}</Text>
+                                        <Text style={{ ...styles.columnRowTxtLandscape, color: ClassNameRender(item.giaTran, item.giaSan, item.giaTC, item.giaMua2) }}>{Formatter(item.klMua2) || '0'}</Text>
+                                        <Text style={{ ...styles.columnRowTxtLandscape, color: ClassNameRender(item.giaTran, item.giaSan, item.giaTC, item.giaMua1) }}>{item.giaMua1 / Price.PRICE || '0'}</Text>
+                                        <Text style={{ ...styles.columnRowTxtLandscape, color: ClassNameRender(item.giaTran, item.giaSan, item.giaTC, item.giaMua1) }}>{Formatter(item.klMua1) || '0'}</Text>
+                                        <Text style={{ ...styles.columnRowTxtLandscape, color: ClassNameRender(item.giaTran, item.giaSan, item.giaTC, item.gia) }}>{item.gia / Price.PRICE || '0'}</Text>
+                                        <Text style={{ ...styles.columnRowTxtLandscape, color: ClassNameRender(item.giaTran, item.giaSan, item.giaTC, item.gia) }}>{Formatter(item.kl) || '0'}</Text>
+                                        <Text style={{ ...styles.columnRowTxtLandscape, color: ClassNameRender(item.giaTran, item.giaSan, item.giaTC, item.giaBan1) }}>{item.giaBan1 / Price.PRICE || '0'}</Text>
+                                        <Text style={{ ...styles.columnRowTxtLandscape, color: ClassNameRender(item.giaTran, item.giaSan, item.giaTC, item.giaBan1) }}>{Formatter(item.klBan1) || '0'}</Text>
+                                        <Text style={{ ...styles.columnRowTxtLandscape, color: ClassNameRender(item.giaTran, item.giaSan, item.giaTC, item.giaBan2) }}>{item.giaBan2 / Price.PRICE || '0'}</Text>
+                                        <Text style={{ ...styles.columnRowTxtLandscape, color: ClassNameRender(item.giaTran, item.giaSan, item.giaTC, item.giaBan2) }}>{Formatter(item.klBan2) || '0'}</Text>
+                                        <Text style={{ ...styles.columnRowTxtLandscape, color: ClassNameRender(item.giaTran, item.giaSan, item.giaTC, item.giaBan3) }}>{item.giaBan3 / Price.PRICE || '0'}</Text>
+                                        <Text style={{ ...styles.columnRowTxtLandscape, color: ClassNameRender(item.giaTran, item.giaSan, item.giaTC, item.giaBan3) }}>{Formatter(item.klBan3) || '0'}</Text>
+                                        <Text style={styles.columnRowTxtLandscape}>{item.ktTong || '0'}</Text>
+                                    </>
+                                }
 
-                                    <Text
-                                        style={{ ...styles.columnRowTxt, fontWeight: "bold", color: ClassNameRender(item.giaTran, item.giaSan, item.giaTC, item.gia) }}
-                                    >
-                                        {item?.macp?.trim()}</Text>
-                                    <Text style={styles.columnRowStandard}>{item.giaTC / Price.PRICE}</Text>
-                                    <Text style={styles.columnRowCeil}>{item.giaTran / Price.PRICE}</Text>
-                                    <Text style={styles.columnRowFloor}>{item.giaSan / Price.PRICE}</Text>
-                                    <Text style={styles.columnRowTxt}>{item.ktTong || '0'}</Text>
-                                </> :
-                                <>
-                                    <Text
-                                        style={{ ...styles.columnRowTxt, fontSize: 12, fontWeight: "bold", width: "5.263157894736842%", color: ClassNameRender(item.giaTran, item.giaSan, item.giaTC, item.gia) }}
-                                    >
-                                        {item?.macp?.trim()}</Text>
-                                    <Text style={{ ...styles.columnRowStandard, fontSize: 12, width: "5.263157894736842%" }}>{item.giaTC / Price.PRICE}</Text>
-                                    <Text style={{ ...styles.columnRowCeil, fontSize: 12, width: "5.263157894736842%" }}>{item.giaTran / Price.PRICE}</Text>
-                                    <Text style={{ ...styles.columnRowFloor, fontSize: 12, width: "5.263157894736842%" }}>{item.giaSan / Price.PRICE}</Text>
-                                    <Text style={{ ...styles.columnRowTxtLandscape, color: ClassNameRender(item.giaTran, item.giaSan, item.giaTC, item.giaMua3) }}>{item.giaMua3 / Price.PRICE || '0'}</Text>
-                                    <Text style={{ ...styles.columnRowTxtLandscape, color: ClassNameRender(item.giaTran, item.giaSan, item.giaTC, item.giaMua3) }}>{Formatter(item.klMua3) || '0'}</Text>
-                                    <Text style={{ ...styles.columnRowTxtLandscape, color: ClassNameRender(item.giaTran, item.giaSan, item.giaTC, item.giaMua2) }}>{item.giaMua2 / Price.PRICE || '0'}</Text>
-                                    <Text style={{ ...styles.columnRowTxtLandscape, color: ClassNameRender(item.giaTran, item.giaSan, item.giaTC, item.giaMua2) }}>{Formatter(item.klMua2) || '0'}</Text>
-                                    <Text style={{ ...styles.columnRowTxtLandscape, color: ClassNameRender(item.giaTran, item.giaSan, item.giaTC, item.giaMua1) }}>{item.giaMua1 / Price.PRICE || '0'}</Text>
-                                    <Text style={{ ...styles.columnRowTxtLandscape, color: ClassNameRender(item.giaTran, item.giaSan, item.giaTC, item.giaMua1) }}>{Formatter(item.klMua1) || '0'}</Text>
-                                    <Text style={{ ...styles.columnRowTxtLandscape, color: ClassNameRender(item.giaTran, item.giaSan, item.giaTC, item.gia) }}>{item.gia / Price.PRICE || '0'}</Text>
-                                    <Text style={{ ...styles.columnRowTxtLandscape, color: ClassNameRender(item.giaTran, item.giaSan, item.giaTC, item.gia) }}>{Formatter(item.kl) || '0'}</Text>
-                                    <Text style={{ ...styles.columnRowTxtLandscape, color: ClassNameRender(item.giaTran, item.giaSan, item.giaTC, item.giaBan1) }}>{item.giaBan1 / Price.PRICE || '0'}</Text>
-                                    <Text style={{ ...styles.columnRowTxtLandscape, color: ClassNameRender(item.giaTran, item.giaSan, item.giaTC, item.giaBan1) }}>{Formatter(item.klBan1) || '0'}</Text>
-                                    <Text style={{ ...styles.columnRowTxtLandscape, color: ClassNameRender(item.giaTran, item.giaSan, item.giaTC, item.giaBan2) }}>{item.giaBan2 / Price.PRICE || '0'}</Text>
-                                    <Text style={{ ...styles.columnRowTxtLandscape, color: ClassNameRender(item.giaTran, item.giaSan, item.giaTC, item.giaBan2) }}>{Formatter(item.klBan2) || '0'}</Text>
-                                    <Text style={{ ...styles.columnRowTxtLandscape, color: ClassNameRender(item.giaTran, item.giaSan, item.giaTC, item.giaBan3) }}>{item.giaBan3 / Price.PRICE || '0'}</Text>
-                                    <Text style={{ ...styles.columnRowTxtLandscape, color: ClassNameRender(item.giaTran, item.giaSan, item.giaTC, item.giaBan3) }}>{Formatter(item.klBan3) || '0'}</Text>
-                                    <Text style={styles.columnRowTxtLandscape}>{item.ktTong || '0'}</Text>
-                                </>
-                            }
 
+                            </View>
 
-                        </View>
-
-                    )
-                }}
-            />
+                        )
+                    }}
+                />
+                : null}
         </View>
 
     )

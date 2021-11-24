@@ -1,7 +1,8 @@
 import { HubConnectionBuilder, LogLevel } from '@aspnet/signalr';
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import React, { useEffect, useState } from 'react';
-import { Dimensions, FlatList, Pressable, Text, TouchableOpacity, View } from 'react-native';
+import { Dimensions, FlatList, TouchableOpacity, View } from 'react-native';
+import { Text, Tooltip, SearchBar } from 'react-native-elements';
 import { useDispatch, useSelector } from 'react-redux';
 import * as Api from '../../../api/LightningTable';
 import config from "../../../axios/config";
@@ -13,7 +14,6 @@ import * as notification from '../../../helpers/Notification';
 import { useOrientation } from '../../../helpers/useOrientation';
 import { FetchChangeListStocks, fetchLightningTable } from '../../../store/common/LightningTable';
 import { fetchLightningTableFavored } from '../../../store/common/LightningTableFavored';
-
 function LightningTableScreen(props) {
     let { navigation } = props
     const [columns, setColumns] = useState(['MaCK', 'TC', 'Trần', 'Sàn', 'Tổng KL'])
@@ -23,8 +23,6 @@ function LightningTableScreen(props) {
     const dispatch = useDispatch();
     const LightningTable = useSelector(state => state.LightningTable)
     const LightningTableFavored = useSelector(state => state.LightningTableFavored)
-
-
     useEffect(() => {
         const unsubscribe = navigation.addListener('focus', () => {
             if (orientation === 'PORTRAIT') {
@@ -114,10 +112,6 @@ function LightningTableScreen(props) {
             return Color.green
     }
 
-    const handleChooseFavored = () => {
-
-    }
-
     const handleCheckFavored = (macp) => {
         return LightningTableFavored.includes(macp)
     }
@@ -135,11 +129,9 @@ function LightningTableScreen(props) {
             fetchApiFavored()
         }
     }
-
-
-
     return (
         <View style={styles.container} >
+
             <FlatList
                 data={LightningTable}
                 style={{ width: "99%", paddingTop: 10 }}
@@ -151,28 +143,38 @@ function LightningTableScreen(props) {
                         <View style={{ ...styles.tableRow, backgroundColor: index % 2 == 1 ? "#F0FBFC" : "white" }}>
                             {orientation === 'PORTRAIT' ?
                                 <>
-                                    {handleCheckFavored(item.macp) ?
-                                        <Pressable style={{ width: '10%' }}>
-                                            <MaterialCommunityIcons
-                                                name={handleCheckFavored(item.macp) ? "heart" : "heart-outline"}
-                                                size={25}
-                                                color={handleCheckFavored(item.macp) ? "red" : "black"}
-                                            />
-                                        </Pressable>
-                                        : <Pressable style={{ width: '10%' }} onPress={() => onHandleLike(item.macp)}>
-                                            <MaterialCommunityIcons
-                                                name={handleCheckFavored(item.macp) ? "heart" : "heart-outline"}
-                                                size={25}
-                                                color={handleCheckFavored(item.macp) ? "red" : "black"}
-                                            />
-                                        </Pressable>
-                                    }
+                                    <Tooltip
+                                        backgroundColor='#08d4c4'
+                                        withOverlay={false}
+                                        skipAndroidStatusBar={true}
+                                        containerStyle={{ padding: 5 }}
+                                        popover={handleCheckFavored(item.macp) ?
+                                            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                                                <Text style={styles.textTitle}>Đã thích: </Text>
+                                                <MaterialCommunityIcons
+                                                    name="heart"
+                                                    size={20}
+                                                    color="red"
+                                                />
+                                            </View>
+                                            : <View style={{ flexDirection: 'row', alignItems: 'center' }} >
+                                                <Text style={styles.textTitle}>Yêu thích: </Text>
+                                                <MaterialCommunityIcons
+                                                    onPress={() => onHandleLike(item.macp)}
+                                                    name="heart-outline"
+                                                    size={20}
+                                                    color="red"
+                                                />
+                                            </View>
+                                        }>
+                                        <Text
+                                            style={{
+                                                fontWeight: "bold", marginRight: 20, marginLeft: 20,
+                                                color: ClassNameRender(item.giaTran, item.giaSan, item.giaTC, item.gia)
+                                            }}
+                                        > {item.macp?.trim()}</Text>
+                                    </Tooltip>
 
-                                    <Text
-                                        style={{ ...styles.columnRowTxt, width: '10%', fontWeight: "bold", color: ClassNameRender(item.giaTran, item.giaSan, item.giaTC, item.gia) }}
-                                        onPress={() => handleChooseFavored()}
-                                    >
-                                        {item.macp?.trim()}</Text>
                                     <Text style={{ ...styles.columnRowStandard, width: '20%' }}>{item.giaTC / Price.PRICE}</Text>
                                     <Text style={{ ...styles.columnRowCeil, width: '20%' }}>{item.giaTran / Price.PRICE}</Text>
                                     <Text style={{ ...styles.columnRowFloor, width: '20%' }}>{item.giaSan / Price.PRICE}</Text>
@@ -210,7 +212,7 @@ function LightningTableScreen(props) {
                     )
                 }}
             />
-        </View>
+        </View >
 
     )
 }

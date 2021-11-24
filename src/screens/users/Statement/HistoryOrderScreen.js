@@ -1,30 +1,25 @@
+import DateTimePicker from '@react-native-community/datetimepicker';
+import { Picker } from '@react-native-picker/picker';
+import { format } from 'date-fns';
+import { LinearGradient } from 'expo-linear-gradient';
+import moment from 'moment';
+import queryString from 'query-string';
 import React, { useEffect, useState } from 'react';
 import { Button, Dimensions, FlatList, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { Overlay } from 'react-native-elements';
 import * as Api from '../../../api/Statement';
-import Formatter from '../../../helpers/formatNumber';
-import queryString from 'query-string';
-import { useForm, Controller } from "react-hook-form";
-import Constants from 'expo-constants';
-import { Picker } from '@react-native-picker/picker';
-import { yupResolver } from '@hookform/resolvers/yup'; // install @hookform/resolvers (not @hookform/resolvers/yup)
-import * as yup from 'yup';
-import DateTimePicker from '@react-native-community/datetimepicker';
-import moment from 'moment';
-import Color from '../../../constants/Colors';
-import { Col } from 'react-native-table-component';
-import { LinearGradient } from 'expo-linear-gradient';
-import Modal from "react-native-modal";
 import styleModal from '../../../common/styleModal';
 import Styles from '../../../common/StyleTable';
-import { format } from 'date-fns';
-import *as variable from '../../../constants/variable';
+import Color from '../../../constants/Colors';
+import * as variable from '../../../constants/variable';
+import Formatter from '../../../helpers/formatNumber';
 import { useOrientation } from '../../../helpers/useOrientation';
 
 export default function HistoryOrderScreen({ navigation }) {
-    const [columns, setColumns] = useState(['MaCK', 'Mua/Bán', 'KLượng Khớp/Tổng KLượng', 'Giá khớp', 'Trạng thái'])
-    const [detail, setDetail] = useState(['Mã LD', 'Giá', 'SL Khớp', 'Giá trị khớp'])
-    const columnPortrait = ['MaCK', 'Mua/Bán', 'KLượng Khớp/Tổng KLượng', 'Giá khớp', 'Trạng thái']
-    const columnLandscape = ['MaCK', 'Mua/Bán', 'KLượng Khớp/Tổng KLượng', 'Ngày', 'Từ tài khoản', 'Giá', 'Giá khớp', 'Trạng thái']
+    const [columns, setColumns] = useState(['Mã CK', 'Mua/Bán', 'KLượng Khớp/Tổng KLượng', 'Giá khớp', 'Trạng thái'])
+    const [detail, setDetail] = useState(['Mã CK', 'Giá', 'SL Khớp', 'Giá trị khớp'])
+    const columnPortrait = ['Mã CK', 'Mua/Bán', 'KLượng Khớp/Tổng KLượng', 'Giá khớp', 'Trạng thái']
+    const columnLandscape = ['Mã CK', 'Mua/Bán', 'KLượng Khớp/Tổng KLượng', 'Ngày', 'Từ tài khoản', 'Giá', 'Giá khớp', 'Trạng thái']
     const [tableData, setTableData] = useState([])
     const [status, setStatus] = useState([])
     const [currentMaCK, setCurrentMaCK] = useState([])
@@ -47,7 +42,6 @@ export default function HistoryOrderScreen({ navigation }) {
             const fetchApi = async () => {
                 const temp = { ...data, from: data.from.format('MM/DD/YYYY'), to: data.to.format('MM/DD/YYYY') }
                 const paramsString = queryString.stringify(temp);
-                // console.log(paramsString);
                 const res = await Api.HistoryOrder(paramsString)
                 setTableData(res.data.list)
             }
@@ -147,11 +141,14 @@ export default function HistoryOrderScreen({ navigation }) {
 
 
 
-    const [isModalVisible, setModalVisible] = useState(false);
+    const [visible, setVisible] = useState(false);
+    const toggleOverlay = () => {
+        setVisible(!visible);
+    };
 
     const toggleModal = (item) => {
         setCurrentMaCK(item)
-        setModalVisible(!isModalVisible);
+        setVisible(!visible);
     };
     const YourOwnComponent = () =>
         <View style={styleModal.centeredView}>
@@ -164,12 +161,12 @@ export default function HistoryOrderScreen({ navigation }) {
                     ListHeaderComponent={tableHeaderDetail()}
                 />
                 <View style={{ ...Styles.tableRow, backgroundColor: "#F0FBFC", paddingBottom: 20 }}>
-                    <Text style={{ ...Styles.textBodyRBSheet, width: '25%', fontSize: 13 }}>{Formatter(currentMaCK.maLD) || '0'}</Text>
+                    <Text style={{ ...Styles.textBodyRBSheet, width: '25%', fontSize: 13 }}>{Formatter(currentMaCK.maCP.trim())}</Text>
                     <Text style={{ ...Styles.textBodyRBSheet, width: '25%', fontSize: 13 }}>{Formatter(currentMaCK.giaKhop) || '0'}</Text>
                     <Text style={{ ...Styles.textBodyRBSheet, width: '25%', fontSize: 13 }}>{Formatter(currentMaCK.slKhop) || '0'}</Text>
                     <Text style={{ ...Styles.textBodyRBSheet, width: '25%', fontSize: 13 }}>{Formatter(currentMaCK.giaTriKhop) || '0'}</Text>
                 </View>
-                <Button title="Đóng" onPress={() => setModalVisible(false)} />
+                <Button title="Đóng" onPress={() => setVisible(false)} />
             </View>
         </View>;
 
@@ -262,20 +259,7 @@ export default function HistoryOrderScreen({ navigation }) {
                             )
                         }}
                     />
-                    <Modal
-                        isVisible={isModalVisible}
-                        onBackdropPress={() => setModalVisible(false)}
-                        testID={'modal'}
-                        backdropOpacity={0.8}
-                        animationIn="zoomInDown"
-                        animationOut="zoomOutUp"
-                        animationInTiming={600}
-                        animationOutTiming={600}
-                        backdropTransitionInTiming={600}
-                        backdropTransitionOutTiming={600}
-                    >
-                        <YourOwnComponent />
-                    </Modal>
+
                 </View>
                 : <View style={styles.container}>
                     <View style={styles.content_wp}>
@@ -361,6 +345,13 @@ export default function HistoryOrderScreen({ navigation }) {
                         }}
                     />
                 </View>}
+            <Overlay
+                isVisible={visible}
+                onBackdropPress={toggleOverlay}
+                overlayStyle={{ backgroundColor: 'transparent' }}
+            >
+                <YourOwnComponent />
+            </Overlay>
         </>
     )
 }

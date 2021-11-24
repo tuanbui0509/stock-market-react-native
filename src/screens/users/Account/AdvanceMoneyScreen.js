@@ -4,7 +4,6 @@ import { LinearGradient } from 'expo-linear-gradient'
 import moment from 'moment'
 import React, { useEffect, useState } from 'react'
 import { StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
-import Modal from "react-native-modal"
 import { useDispatch, useSelector } from 'react-redux'
 import * as ApiUser from '../../../api/Account'
 import styleModal from '../../../common/styleModal'
@@ -13,6 +12,7 @@ import Color from '../../../constants/Colors'
 import Formatter from '../../../helpers/formatNumber'
 import * as notification from '../../../helpers/Notification'
 import { fetchBankAccount } from '../../../store/users/BankAccount'
+import { Overlay } from 'react-native-elements';
 
 function AdvanceMoneyScreen({ navigation }) {
     const ListBankAccount = useSelector(state => state.BankAccount)
@@ -43,7 +43,7 @@ function AdvanceMoneyScreen({ navigation }) {
             //     setOrientation("LANDSCAPE")
             //     setColumns(columnLandscape)
             // }
-            fetchApi()
+            // fetchApi()
         });
         return unsubscribe;
     }, [navigation]);
@@ -88,7 +88,7 @@ function AdvanceMoneyScreen({ navigation }) {
         try {
             await ApiUser.LenhUng(data)
             notification.SuccessNotification("Bạn đã ứng tiền thành công")
-            setModalVisible(!isModalVisible)
+            setVisible(!visible)
             fetchKhaDung(data.ngayBan, data.stk)
             setData({ ...data, soTien: '' })
         } catch (error) {
@@ -100,15 +100,17 @@ function AdvanceMoneyScreen({ navigation }) {
         fetchBank()
     }, []);
 
-    const [isModalVisible, setModalVisible] = useState(false)
-
+    const [visible, setVisible] = useState(false)
+    const toggleOverlay = () => {
+        setVisible(!visible);
+    };
     const handleSubmit = () => {
         if (data.soTien.length === 0) {
             setError(true)
             return
         }
         // fetchPhiUng()
-        setModalVisible(!isModalVisible)
+        setVisible(!visible)
     }
 
     const handleSubmitLend = () => {
@@ -130,7 +132,7 @@ function AdvanceMoneyScreen({ navigation }) {
                             <Text style={styles.appButtonText}>Xác nhận</Text>
                         </LinearGradient>
                     </TouchableOpacity>
-                    <TouchableOpacity onPress={() => setModalVisible(false)}>
+                    <TouchableOpacity onPress={() => setVisible(false)}>
                         <LinearGradient
                             colors={['#fff', '#fff']}
                             style={{ ...styles.appButtonContainer, width: 120 }}
@@ -217,20 +219,13 @@ function AdvanceMoneyScreen({ navigation }) {
                     </LinearGradient>
                 </TouchableOpacity>
             </View>
-            <Modal
-                isVisible={isModalVisible}
-                onBackdropPress={() => setModalVisible(false)}
-                testID={'modal'}
-                backdropOpacity={0.8}
-                animationIn="zoomInDown"
-                animationOut="zoomOutUp"
-                animationInTiming={600}
-                animationOutTiming={600}
-                backdropTransitionInTiming={600}
-                backdropTransitionOutTiming={600}
+            <Overlay
+                isVisible={visible}
+                onBackdropPress={toggleOverlay}
+                overlayStyle={{ backgroundColor: 'transparent' }}
             >
                 <YourOwnComponent />
-            </Modal>
+            </Overlay>
 
         </View>
     )
