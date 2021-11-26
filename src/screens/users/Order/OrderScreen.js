@@ -40,7 +40,9 @@ function OrderScreen({ navigation, route }) {
         loaiGiaoDich: true,// Trạng thái mua bán mua: true, bán: false
         loaiLenh: 'LO'// Trạng thái Loai: ATO, ATC, LO
     });
-
+    console.log('================data================');
+    console.log(MyStock);
+    console.log('====================================');
     const [errorOrder, SetErrorOrder] = useState({
         ErrorMaCp: false,
         ErrorGia: false,
@@ -48,7 +50,7 @@ function OrderScreen({ navigation, route }) {
         ErrorMkdatLenh: false,
     });
     const fetchBankAccount = async () => {
-        const res = await ApiUser.MyBankAccount()
+        const res = await ApiUser.MyBankAccountExits()
         setBankAccount(res.data)
         setCurrentBank(res.data[0])
         setOrder({ ...order, stk: res.data[0].stk })
@@ -63,8 +65,8 @@ function OrderScreen({ navigation, route }) {
         setStocks(suggestions)
     }
     const fetchApiMyStock = async () => {
-        const res = await ApiUser.MyStocks()
-        dispatch(fetchMyStock(res.data.list))
+        const res = await ApiUser.MyStocksExits()
+        dispatch(fetchMyStock(res.data))
     }
     useEffect(() => {
         const unsubscribe = navigation.addListener('focus', () => {
@@ -554,7 +556,7 @@ function OrderScreen({ navigation, route }) {
                                 </TouchableOpacity>
                                 {/* </View> */}
                             </View>
-                            <Text style={{ fontSize: 11, textAlign: 'center' }}>Giá x 1000 VNĐ. Bản quyền thuộc về Công ty Cổ phần chứng khoán NTNT. © 2021</Text>
+                            <Text style={{ fontSize: 13, textAlign: 'center' }}>Giá x 1000 VNĐ. Bản quyền thuộc về Công ty Cổ phần chứng khoán NTNT. © 2021</Text>
                         </ScrollView>
                     </SafeAreaView> :
                         <SafeAreaView style={{ padding: 10, maxHeight: 250 }}>

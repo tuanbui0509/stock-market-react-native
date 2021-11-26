@@ -3,7 +3,7 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useIsFocused } from '@react-navigation/native';
 import React, { useEffect, useState } from 'react';
 import { Dimensions, FlatList, Text, TouchableOpacity, View } from 'react-native';
-import { Tooltip } from 'react-native-elements';
+import { SearchBar, Tooltip } from 'react-native-elements';
 import { useDispatch, useSelector } from 'react-redux';
 import * as Api from '../../../api/LightningTable';
 import config from "../../../axios/config";
@@ -26,7 +26,11 @@ function LightningTableFavoredScreen(props) {
     const LightningTableFavored = useSelector(state => state.LightningTableFavored)
     const dispatch = useDispatch();
     const isFocused = useIsFocused();
-    // const [filteredStocks, setFilteredStocks] = useState([]);
+    const [search, setSearch] = useState('')
+    // dynamic data
+    const [filteredDataSource, setFilteredDataSource] = useState([]);
+    //static data
+    const [tempFavored, setTempFavored] = useState([]);
     useEffect(() => {
         const unsubscribe = navigation.addListener('focus', () => {
             if (orientation === 'PORTRAIT') {
@@ -34,24 +38,11 @@ function LightningTableFavoredScreen(props) {
             } else if (orientation === 'LANDSCAPE') {
                 setColumns(columnLandscape)
             }
+            setSearch('')
             fetchApiFavored()
         });
         return unsubscribe;
     }, [navigation]);
-
-    const fetchApi = async () => {
-        const res = await Api.LightningTable()
-        dispatch(fetchLightningTable(res.data))
-    }
-    const fetchApiFavored = async () => {
-        const res = await Api.LightningTableFavored()
-        dispatch(fetchLightningTableFavored(res.data))
-    }
-    let tempFavored = []
-    if (LightningTable.length > 0 && LightningTableFavored.length > 0) {
-        const result = LightningTable?.filter(o1 => LightningTableFavored?.some(o2 => o1.macp.trim() === o2.trim()));
-        tempFavored = result
-    }
 
     useEffect(() => {
         let hubConnection = new HubConnectionBuilder()
@@ -63,9 +54,7 @@ function LightningTableFavoredScreen(props) {
             dispatch(FetchChangeListStocks(json));
         });
         hubConnection.start()
-        // return () => {
-        //     hubConnection.stop()
-        // }
+        fetchApiFavored()
     }, []);
     useEffect(() => {
         const subscription = Dimensions.addEventListener('change', ({ window: { width, height } }) => {
@@ -127,20 +116,62 @@ function LightningTableFavoredScreen(props) {
             return Color.green
     }
 
+    const fetchApiFavored = async () => {
+        const res = await Api.LightningTableFavored()
+        dispatch(fetchLightningTableFavored(res.data))
+
+        if (LightningTable.length > 0 && res.data.length > 0) {
+            const result = LightningTable?.filter(o1 => res.data?.some(o2 => o1.macp.trim() === o2.trim()));
+            setFilteredDataSource(result)
+            setTempFavored(result)
+        }
+    }
+
     const onHandleUnLike = async (macp) => {
         const res = await Api.DeleteStockFavored(macp.trim())
         if (res.status === 200) {
             notification.SuccessNotification('Đâ bỏ thích cổ phiếu ', macp)
-            fetchApi()
             fetchApiFavored()
+            setSearch('')
         }
     }
+    const searchFilterFunction = (text) => {
+        // Check if searched text is not blank
+        if (text) {
+            const newData = tempFavored.filter(function (item) {
+                const itemData = item.macp?.trim()
+                    ? item.macp?.trim().toUpperCase()
+                    : ''.toUpperCase();
+                const textData = text.toUpperCase();
+                return itemData.indexOf(textData) > -1;
+            });
+            setFilteredDataSource(newData);
+            setSearch(text);
+        } else {
+            // Inserted text is blank
+            setFilteredDataSource(tempFavored);
+            setSearch(text);
+        }
+    };
     return (
-        <View style={styles.container} >
+        <View >
+            <SearchBar
+                round
+                searchIcon={{ size: 20 }}
+                onChangeText={(text) => searchFilterFunction(text)}
+                onClear={(text) => searchFilterFunction('')}
+                showCancel={false}
+                placeholder="Tìm mã cổ phiếu ..."
+                platform='Android'
+                lightTheme
+                containerStyle={{ padding: 0, backgroundColor: '#fff' }}
+                inputContainerStyle={orientation === 'PORTRAIT' ? { backgroundColor: '#f3f3f3', margin: 5 } : { width: '30%', backgroundColor: '#f3f3f3', padding: 0, margin: 0, fontSize: 13 }}
+                value={search}
+            />
             {isFocused ?
                 <FlatList
-                    data={tempFavored}
-                    style={{ width: "99%", paddingTop: 10 }}
+                    data={filteredDataSource}
+                    style={{ width: "99%" }}
                     keyExtractor={(item, index) => index + ""}
                     ListHeaderComponent={tableHeader}
                     stickyHeaderIndices={[0]}
@@ -155,7 +186,7 @@ function LightningTableFavoredScreen(props) {
                                             skipAndroidStatusBar={true}
                                             popover={
                                                 <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                                                    <Text style={styles.textTitle}>Đã thích: </Text>
+                                                    <Text style={styles.textTitle}>Bỏ thích: </Text>
                                                     <MaterialCommunityIcons
                                                         onPress={() => onHandleUnLike(item.macp)}
                                                         name="heart"
@@ -177,10 +208,28 @@ function LightningTableFavoredScreen(props) {
                                         <Text style={styles.columnRowTxt}>{item.ktTong || '0'}</Text>
                                     </> :
                                     <>
-                                        <Text
-                                            style={{ ...styles.columnRowTxt, fontSize: 12, fontWeight: "bold", width: "5.263157894736842%", color: ClassNameRender(item.giaTran, item.giaSan, item.giaTC, item.gia) }}
-                                        >
-                                            {item?.macp?.trim()}</Text>
+                                        <Tooltip
+                                            backgroundColor='#08d4c4'
+                                            withOverlay={false}
+                                            skipAndroidStatusBar={true}
+                                            popover={
+                                                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                                                    <Text style={styles.textTitle}>Bỏ thích: </Text>
+                                                    <MaterialCommunityIcons
+                                                        onPress={() => onHandleUnLike(item.macp)}
+                                                        name="heart"
+                                                        size={20}
+                                                        color="red"
+                                                    />
+                                                </View>
+                                            }>
+                                            <Text
+                                                style={{
+                                                    fontWeight: "bold", marginRight: 5, marginLeft: 5,
+                                                    color: ClassNameRender(item.giaTran, item.giaSan, item.giaTC, item.gia)
+                                                }}
+                                            > {item.macp?.trim()}</Text>
+                                        </Tooltip>
                                         <Text style={{ ...styles.columnRowStandard, fontSize: 12, width: "5.263157894736842%" }}>{item.giaTC / Price.PRICE}</Text>
                                         <Text style={{ ...styles.columnRowCeil, fontSize: 12, width: "5.263157894736842%" }}>{item.giaTran / Price.PRICE}</Text>
                                         <Text style={{ ...styles.columnRowFloor, fontSize: 12, width: "5.263157894736842%" }}>{item.giaSan / Price.PRICE}</Text>

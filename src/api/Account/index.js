@@ -4,8 +4,15 @@ import AxiosClient from '../../axios/axiosClient';
 export const MyStocks = () => {
     return AxiosClient.get("ChungKhoanHienCo?current=1&pageSize=10000")
 }
+export const MyStocksExits = () => {
+    return AxiosClient.get("ChungKhoanHienCo/KhaDung")
+}
 export const MyBankAccount = () => {
     return AxiosClient.get("TaiKhoanNganHang")
+}
+
+export const MyBankAccountExits = () => {
+    return AxiosClient.get("TaiKhoanNganHang/KhaDung")
 }
 
 export const ChangePassword = (body) => {

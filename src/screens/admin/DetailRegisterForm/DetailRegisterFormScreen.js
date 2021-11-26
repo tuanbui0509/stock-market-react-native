@@ -53,7 +53,7 @@ function DetailRegisterFormScreen(props) {
             } else {
                 const res = await Api.DeleteRegisterForm(user.maDon)
                 if (res.data.status === 0) {
-                    notification.SuccessNotification(res.data.message)
+                    notification.SuccessNotification("Hủy đơn thành công!")
                     navigation.goBack()
                 }
                 else {
@@ -69,8 +69,8 @@ function DetailRegisterFormScreen(props) {
 
 
     const YourOwnComponent = () =>
-        <View style={styleModal.centeredView}>
-            <View style={styleModal.modalView}>
+        <View>
+            <View style={{ ...styleModal.modalView, margin: 0, padding: 10 }}>
                 <Text style={{ ...styles.textTitleRBSheet, fontSize: 18, fontWeight: 'bold', marginBottom: 10, textAlign: 'center' }}>
                     {flag ? 'Bạn có muốn xác nhận đơn không?' : 'Bạn có muốn hủy đơn không?'}</Text>
                 <View style={styles.wrapperLabel}>

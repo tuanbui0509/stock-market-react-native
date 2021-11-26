@@ -65,7 +65,6 @@ const SignInScreen = ({ navigation }) => {
             setAcc({
                 ...acc,
                 password: val,
-                check_textInputChange: true,
                 isValidPassword: true
             });
         } else {
@@ -263,7 +262,7 @@ const SignInScreen = ({ navigation }) => {
                             </LinearGradient>
                         </TouchableOpacity>
 
-                        <TouchableOpacity
+                        {/* <TouchableOpacity
                             onPress={() => navigation.navigate('SignUpScreen')}
                             style={[styles.signIn, {
                                 borderColor: Color.bg_color,
@@ -274,7 +273,7 @@ const SignInScreen = ({ navigation }) => {
                             <Text style={[styles.textSign, {
                                 color: Color.bg_color
                             }]}>Đăng ký</Text>
-                        </TouchableOpacity>
+                        </TouchableOpacity> */}
                     </View>
                 </ScrollView>
             </Animatable.View>
