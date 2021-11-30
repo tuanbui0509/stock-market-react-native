@@ -1,44 +1,45 @@
-import React, { useEffect, useState } from 'react';
-import { Button, Dimensions, FlatList, Text, TouchableOpacity, View } from 'react-native';
-import { Overlay } from 'react-native-elements';
-import { useDispatch, useSelector } from 'react-redux';
-import * as Api from '../../../api/Account';
-import styleModal from '../../../common/styleModal';
-import styles from '../../../common/StyleTable';
-import Formatter from '../../../helpers/formatNumber';
-import { fetchBankAccount } from '../../../store/users/BankAccount';
+import React, { useEffect, useState } from 'react'
+import { Button, Dimensions, FlatList, Text, TouchableOpacity, View } from 'react-native'
+import { Overlay } from 'react-native-elements'
+import { useDispatch, useSelector } from 'react-redux'
+import * as Api from '../../../api/Account'
+import styleModal from '../../../common/styleModal'
+import styles from '../../../common/StyleTable'
+import Formatter from '../../../helpers/formatNumber'
+import { fetchBankAccount } from '../../../store/users/BankAccount'
 
 export default function MyBankAccountScreen({ navigation }) {
     const BankAccount = useSelector(state => state.BankAccount)
     const dispatch = useDispatch()
-    const columnPortrait = ['STK', 'Số dư TK', 'Tổng số tiền']
+    const columnPortrait = ['STK', 'Số dư TK', 'Số dư khả dụng', 'Tổng số tiền']
     const [columns, setColumns] = useState(['STK', 'Số dư TK', 'Tổng số tiền'])
     const [detail, setDetail] = useState(['Số dư T0', 'Số dư T1', 'Số dư T2', 'Bán chờ thanh toán'])
     const columnLandscape = ['STK', 'Số dư TK', 'Tổng số tiền', 'Bán chờ thanh toán', 'Số dư T0', 'Số dư T1', 'Số dư T2']
     const [tableData, setTableData] = useState([])
     const [currentSTK, setCurrentSTK] = useState([])
-    const [orientation, setOrientation] = useState();
+    const [orientation, setOrientation] = useState()
 
     const fetchApi = async () => {
         const res = await Api.MyBankAccount()
         res.data.forEach((e) => {
-            e.soDuT0 = Formatter(e.soDuT0) || 0;
-            e.soDuT1 = Formatter(e.soDuT1) || 0;
-            e.soDuT2 = Formatter(e.soDuT2) || 0;
-            e.soDu = Formatter(e.soDu) || 0;
-            e.choThanhToan = Formatter(e.choThanhToan) || 0;
-            e.tongSoTien = Formatter(e.tongSoTien) || 0;
+            e.soDuT0 = Formatter(e.soDuT0) || 0
+            e.soDuT1 = Formatter(e.soDuT1) || 0
+            e.soDuT2 = Formatter(e.soDuT2) || 0
+            e.soDu = Formatter(e.soDu) || 0
+            e.khaDung = Formatter(e.khaDung) || 0
+            e.choThanhToan = Formatter(e.choThanhToan) || 0
+            e.tongSoTien = Formatter(e.tongSoTien) || 0
         })
         dispatch(fetchBankAccount(res.data))
-        setTableData(res.data);
+        setTableData(res.data)
     }
 
     useEffect(() => {
         const unsubscribe = navigation.addListener('focus', () => {
             const isPortrait = () => {
-                const dim = Dimensions.get('screen');
-                return dim.height >= dim.width;
-            };
+                const dim = Dimensions.get('screen')
+                return dim.height >= dim.width
+            }
             if (isPortrait()) {
                 setColumns(columnPortrait)
                 setOrientation("PORTRAIT")
@@ -47,9 +48,9 @@ export default function MyBankAccountScreen({ navigation }) {
                 setColumns(columnLandscape)
             }
             fetchApi()
-        });
-        return unsubscribe;
-    }, [navigation]);
+        })
+        return unsubscribe
+    }, [navigation])
     useEffect(() => {
         const subscription = Dimensions.addEventListener('change', ({ window: { width, height } }) => {
             if (width < height) {
@@ -60,8 +61,8 @@ export default function MyBankAccountScreen({ navigation }) {
                 setOrientation("LANDSCAPE")
             }
         })
-        return () => subscription?.remove();
-    });
+        return () => subscription?.remove()
+    })
 
     const tableHeader = () => (
         <View style={styles.tableHeader}>
@@ -71,8 +72,8 @@ export default function MyBankAccountScreen({ navigation }) {
                         return (
                             <TouchableOpacity
                                 key={index}
-                                style={{ ...styles.columnHeader, width: '33.33%' }}>
-                                <Text style={styles.columnHeaderTxt}>{column}</Text>
+                                style={{ ...styles.columnHeader, width: '25%', padding: 0 }}>
+                                <Text style={{ ...styles.columnHeaderTxt, fontSize: 14 }}>{column}</Text>
                             </TouchableOpacity>
                         )
                     }
@@ -114,15 +115,15 @@ export default function MyBankAccountScreen({ navigation }) {
 
 
 
-    const [visible, setVisible] = useState(false);
+    const [visible, setVisible] = useState(false)
     const toggleOverlay = () => {
-        setVisible(!visible);
-    };
+        setVisible(!visible)
+    }
 
     const toggleModal = (item) => {
         setCurrentSTK(item)
-        setVisible(!visible);
-    };
+        setVisible(!visible)
+    }
     const YourOwnComponent = () =>
         <View style={styleModal.centeredView}>
             <View style={styleModal.modalView}>
@@ -139,13 +140,13 @@ export default function MyBankAccountScreen({ navigation }) {
                 </View>
                 <Button title="Đóng" onPress={() => setVisible(false)} />
             </View>
-        </View>;
+        </View>
     return (
         <>
             <View style={styles.container}>
                 <FlatList
                     data={tableData}
-                    style={{ width: "98%", paddingTop: 20 }}
+                    style={{ width: "98%", paddingTop: 10 }}
                     keyExtractor={(item, index) => index + ""}
                     ListHeaderComponent={tableHeader}
                     stickyHeaderIndices={[0]}
@@ -154,10 +155,11 @@ export default function MyBankAccountScreen({ navigation }) {
                             <View style={{ ...styles.tableRow, backgroundColor: index % 2 == 1 ? "#F0FBFC" : "white" }}>
                                 {orientation === 'PORTRAIT' ?
                                     <>
-                                        <Text style={{ ...styles.columnRowTxt, fontWeight: "bold", width: "40%" }} onPress={() => toggleModal(item)}>
+                                        <Text style={{ ...styles.columnRowTxt, fontWeight: "bold", width: "30%", fontSize: 13 }} onPress={() => toggleModal(item)}>
                                             {item.stk.trim()}</Text>
-                                        <Text style={{ ...styles.columnRowTxt3, width: "30%", }}>{item.soDu}</Text>
-                                        <Text style={{ ...styles.columnRowTxt3, width: "30%", }}>{item.tongSoTien}</Text>
+                                        <Text style={{ ...styles.columnRowTxt3, fontSize: 14, width: "20%", }}>{item.soDu}</Text>
+                                        <Text style={{ ...styles.columnRowTxt3, fontSize: 14, width: "25%", }}>{item.khaDung}</Text>
+                                        <Text style={{ ...styles.columnRowTxt3, fontSize: 14, width: "25%", }}>{item.tongSoTien}</Text>
                                     </> :
                                     <>
                                         <Text style={{ ...styles.columnRowTxt, fontWeight: "bold", width: "20%" }}>

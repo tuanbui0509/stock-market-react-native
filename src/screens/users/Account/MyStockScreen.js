@@ -167,7 +167,7 @@ export default function MyStockScreen({ navigation }) {
         <View style={styles.container}>
             <FlatList
                 data={tableData}
-                style={{ width: "98%", paddingTop: 5 }}
+                style={{ width: "98%", paddingTop: 10 }}
                 keyExtractor={(item, index) => index + ""}
                 ListHeaderComponent={tableHeader}
                 stickyHeaderIndices={[0]}

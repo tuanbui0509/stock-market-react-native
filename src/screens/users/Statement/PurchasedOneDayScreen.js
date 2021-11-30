@@ -10,7 +10,6 @@ import Styles from '../../../common/StyleTable';
 import Color from '../../../constants/Colors';
 import Formatter from '../../../helpers/formatNumber';
 
-
 export default function PurchasedOneDayScreen({ navigation }) {
     const [columns, setColumns] = useState(['MaCK', 'Mua/Bán', 'KLượng Khớp/Tổng KLượng', 'Trạng thái', 'Giá khớp'])
     const [detail, setDetail] = useState(['Giá', 'Tổng KL', 'SL Khớp', 'Hủy lệnh'])
@@ -177,7 +176,7 @@ export default function PurchasedOneDayScreen({ navigation }) {
                                 <Text style={{ ...Styles.columnRowTxt, width: '20%', color: item.loaiGiaoDich ? Color.green : Color.red }}>{item.loaiGiaoDich ? 'Mua' : 'Bán'}</Text>
                                 <Text style={{ ...Styles.columnRowTxtLight, width: '20%' }}>{Formatter(item.slKhop) || '0'}/{Formatter(item.soLuong)}</Text>
                                 <Text style={{ ...Styles.columnRowTxt, width: '20%', color: ClassNameRender(item.maTT.trim()) }}>{item.tenTrangThai}</Text>
-                                <Text style={{ ...Styles.columnRowTxt, width: '20%', color: ClassNameRender(item.maTT.trim()) }}>{item.gia}</Text>
+                                <Text style={{ ...Styles.columnRowTxt, width: '20%', color: ClassNameRender(item.maTT.trim()) }}>{Formatter(item.gia)}</Text>
                             </View>
                         </ScrollView>
                     )

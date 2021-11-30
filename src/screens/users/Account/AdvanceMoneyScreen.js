@@ -27,28 +27,6 @@ function AdvanceMoneyScreen({ navigation }) {
     })
 
     const [error, setError] = useState(false)
-    const [orientation, setOrientation] = useState()
-
-    useEffect(() => {
-        const unsubscribe = navigation.addListener('focus', () => {
-
-            // const isPortrait = () => {
-            //     const dim = Dimensions.get('screen');
-            //     return dim.height >= dim.width;
-            // };
-            // if (isPortrait()) {
-            //     setColumns(columnPortrait)
-            //     setOrientation("PORTRAIT")
-            // } else {
-            //     setOrientation("LANDSCAPE")
-            //     setColumns(columnLandscape)
-            // }
-            // fetchApi()
-        });
-        return unsubscribe;
-    }, [navigation]);
-
-    console.log(orientation);
 
     const fetchBank = async () => {
         const res = await ApiUser.MyBankAccount()
@@ -119,9 +97,9 @@ function AdvanceMoneyScreen({ navigation }) {
 
 
     const YourOwnComponent = () =>
-        <View style={styleModal.centeredView}>
-            <View style={styleModal.modalView}>
-                <Text style={{ ...styles.textTitleRBSheet, fontSize: 18, fontWeight: 'bold', marginBottom: 10, textAlign: 'center' }}>{`Số tiền ứng tối đa là: ${data.soTien}`}</Text>
+        <View>
+            <View style={{ ...styleModal.modalView, padding: 10, margin: 0 }}>
+                <Text style={{ ...styles.textTitleRBSheet, fontSize: 18, fontWeight: 'bold', marginBottom: 10, textAlign: 'center' }}>{`Số tiền ứng của bạn là: ${Formatter(data.soTien)} VND`}</Text>
                 {/* <Text style={{ ...styles.textTitleRBSheet, fontSize: 16, marginBottom: 20 }}>{`Phí ứng: ${PhiUng}`}</Text> */}
                 <View style={styles.wrapperLabel}>
                     <TouchableOpacity onPress={handleSubmitLend}>
@@ -150,10 +128,24 @@ function AdvanceMoneyScreen({ navigation }) {
             <Picker.Item key={index} label={value} value={item.stk.trim()} />
         )
     })
-    let onChangeListBank = (stk) => {
+    let onChangeListBank = async (stk) => {
         setData({ ...data, stk: stk })
-        fetchKhaDung(data.ngayBan, stk)
-
+        // fetchKhaDung(data.ngayBan, stk)
+        try {
+            let temp = data.ngayBan.format('MM-DD-YYYY')
+            const res = await ApiUser.KhaDung({ currentBank: stk, date: temp })
+            if (res.data.data !== 0) {
+                setKhaDung(Formatter(res.data.data))
+            } else {
+                setKhaDung(Formatter(0))
+            }
+            console.log(date);
+            setData({ ...data, ngayBan: date })
+        } catch (error) {
+            console.log(error.data);
+            notification.DangerNotification(error.data.message)
+            // fetchKhaDung(data.ngayBan, stk)
+        }
     }
     const onDateChange = (e, selectedDate) => {
         const current = selectedDate || data.ngayBan

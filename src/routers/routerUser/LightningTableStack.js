@@ -1,10 +1,11 @@
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
 import { useIsFocused } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
-import React from 'react';
-import { StyleSheet } from 'react-native';
+import React, { useEffect } from 'react';
+import { Dimensions, StyleSheet } from 'react-native';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import CustomHeader from '../../components/CustomHeader';
+import { useOrientation } from '../../helpers/useOrientation';
 import LightningTableFavoredScreen from '../../screens/users/LightningTable/LightningTableFavoredScreen';
 import LightningTableScreen from '../../screens/users/LightningTable/LightningTableScreen';
 
@@ -53,8 +54,33 @@ const createTopTabs = (props) => {
       component={LightningTableFavoredScreen}
     />
   </Tab.Navigator>
+}
 
+const TopTabsLandscape = (props) => {
+  return <Tab.Navigator
+    screenOptions={({ route }) => ({
+      tabBarLabelStyle: { fontSize: 12 },
+      tabBarStyle: { backgroundColor: 'powderblue' },
+      tabBarActiveTintColor: '#007AFF',
+      tabBarInactiveTintColor: '#555',
+      tabBarActiveBackgroundColor: '#fff',
+      tabBarInactiveBackgroundColor: '#999',
+      showLabel: true,
+    })}
+    activeColor='#f0edf6'
+    inactiveColor='#3e2465'
+    barStyle={{ backgroundColor: '#694fad' }}
+  >
 
+    <Tab.Screen
+      name="Sàn giao dịch"
+      component={LightningTableScreen}
+    />
+    <Tab.Screen
+      name="Danh mục đầu tư"
+      component={LightningTableFavoredScreen}
+    />
+  </Tab.Navigator>
 }
 
 const isPortrait = () => {
@@ -66,16 +92,21 @@ const navOptionHandler = () => ({
   headerShown: false
 })
 
+
 const Stack = createStackNavigator()
 
 function LightningTableStack({ navigation, route }) {
+  const orientation = useOrientation()
   const isFocused = useIsFocused();
   return (
     <>
       <CustomHeader title="Bảng điện thị trường" isHome={true} navigation={navigation} />
       {isFocused ?
         <Stack.Navigator initialRouteName="TopTabs">
-          <Stack.Screen name="TopTabs" children={createTopTabs} options={navOptionHandler} />
+          <Stack.Screen
+            name="TopTabs"
+            children={isPortrait() ? createTopTabs : TopTabsLandscape}
+            options={navOptionHandler} />
         </Stack.Navigator>
         : null}
 

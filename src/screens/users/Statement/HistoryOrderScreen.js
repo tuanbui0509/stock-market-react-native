@@ -189,6 +189,7 @@ export default function HistoryOrderScreen({ navigation }) {
                             <Text style={styles.text_title}>MaTT</Text>
                             <View style={styles.textStyle}>
                                 <Picker
+                                    style={{ width: 150 }}
                                     selectedValue={data.MaTT}
                                     onValueChange={(itemValue) => setData({ ...data, MaTT: itemValue })} >
                                     {showStatusPicker}
@@ -237,7 +238,7 @@ export default function HistoryOrderScreen({ navigation }) {
                     </TouchableOpacity>
                     <FlatList
                         data={tableData}
-                        style={{ width: "100%", marginTop: 10, height: Dimensions.get('window').height - 340 }}
+                        style={{ width: "100%", marginTop: 10, height: Dimensions.get('window').height - 360 }}
                         keyExtractor={(item, index) => index + ""}
                         ListHeaderComponent={tableHeader}
                         stickyHeaderIndices={[0]}
@@ -398,6 +399,7 @@ const styles = StyleSheet.create({
     textStyle: {
         paddingVertical: 10,
         height: 40,
+        fontSize: 11,
         width: '80%',
         marginLeft: 10,
         borderWidth: StyleSheet.hairlineWidth,

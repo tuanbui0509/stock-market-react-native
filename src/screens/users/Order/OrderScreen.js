@@ -40,9 +40,6 @@ function OrderScreen({ navigation, route }) {
         loaiGiaoDich: true,// Trạng thái mua bán mua: true, bán: false
         loaiLenh: 'LO'// Trạng thái Loai: ATO, ATC, LO
     });
-    console.log('================data================');
-    console.log(MyStock);
-    console.log('====================================');
     const [errorOrder, SetErrorOrder] = useState({
         ErrorMaCp: false,
         ErrorGia: false,
@@ -189,7 +186,7 @@ function OrderScreen({ navigation, route }) {
                 <View style={styles.wrapperLabel}>
                     <View style={styles.contentLabel}>
                         <Text style={{ ...styles.textTitle, fontSize: 16, marginRight: 20 }}>Giá trị:</Text>
-                        <Text style={{ ...styles.textTitle, fontWeight: 'bold', fontSize: 16, color: '#000' }}>{Formatter(order.gia * order.soLuong)}</Text>
+                        <Text style={{ ...styles.textTitle, fontWeight: 'bold', fontSize: 16, color: '#000' }}>{Formatter((order.gia * 1000) * order.soLuong)}</Text>
                     </View>
                     <View style={styles.contentLabel}>
                     </View>
@@ -264,9 +261,11 @@ function OrderScreen({ navigation, route }) {
                 loaiGiaoDich: true,// Trạng thái mua bán mua: true, bán: false
                 loaiLenh: 'LO'// Trạng thái Loai: ATO, ATC, LO
             })
-            notification.SuccessNotification(res.data.message)
             setVisible(!visible);
-            navigation.replace('HomeApp')
+            notification.SuccessNotification(res.data.message)
+            setTimeout(() => {
+                navigation.replace('HomeApp')
+            }, 1500);
         }
         else {
             console.log(res);
