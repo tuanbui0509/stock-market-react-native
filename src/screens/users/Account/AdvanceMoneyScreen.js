@@ -2,8 +2,8 @@ import DateTimePicker from '@react-native-community/datetimepicker'
 import { Picker } from '@react-native-picker/picker'
 import { LinearGradient } from 'expo-linear-gradient'
 import moment from 'moment'
-import React, { useEffect, useState } from 'react'
-import { StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
+import React, { useEffect, useState, useRef } from 'react'
+import { Alert, BackHandler, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
 import { useDispatch, useSelector } from 'react-redux'
 import * as ApiUser from '../../../api/Account'
 import styleModal from '../../../common/styleModal'
@@ -13,6 +13,7 @@ import Formatter from '../../../helpers/formatNumber'
 import * as notification from '../../../helpers/Notification'
 import { fetchBankAccount } from '../../../store/users/BankAccount'
 import { Overlay } from 'react-native-elements';
+import Loading from '../../../helpers/Loading';
 
 function AdvanceMoneyScreen({ navigation }) {
     const ListBankAccount = useSelector(state => state.BankAccount)
@@ -20,6 +21,7 @@ function AdvanceMoneyScreen({ navigation }) {
     const [showDate, setShowDate] = useState(false)
     const [khaDung, setKhaDung] = useState(0)
     const [PhiUng, setPhiUng] = useState(0)
+    const [loading, setLoading] = useState(false)
     const [data, setData] = useState({
         ngayBan: moment(),
         stk: '',
@@ -37,7 +39,9 @@ function AdvanceMoneyScreen({ navigation }) {
             const res1 = await ApiUser.KhaDung({ currentBank: res.data[0]?.stk, date: temp })
             setKhaDung(Formatter(res1.data.data))
         } catch (error) {
-            notification.DangerNotification(error.data.message)
+            if (error) {
+                notification.DangerNotification(error.data.message)
+            }
         }
     }
     const fetchKhaDung = async (date, stk) => {
@@ -49,12 +53,13 @@ function AdvanceMoneyScreen({ navigation }) {
             } else {
                 setKhaDung(Formatter(0))
             }
-            console.log(date);
             setData({ ...data, ngayBan: date })
         } catch (error) {
-            console.log(error.data);
-            notification.DangerNotification(error.data.message)
-            fetchKhaDung(data.ngayBan, stk)
+            if (error) {
+                console.log(error.data);
+                notification.DangerNotification(error.data.message)
+                fetchKhaDung(data.ngayBan, stk)
+            }
         }
     }
     const fetchPhiUng = async () => {
@@ -65,19 +70,42 @@ function AdvanceMoneyScreen({ navigation }) {
     const fetchLenhUng = async () => {
         try {
             await ApiUser.LenhUng(data)
-            notification.SuccessNotification("Bạn đã ứng tiền thành công")
             setVisible(!visible)
-            fetchKhaDung(data.ngayBan, data.stk)
-            setData({ ...data, soTien: '' })
+            setLoading(true)
+            setTimeout(() => {
+                setLoading(false)
+                notification.SuccessNotification("Bạn đã ứng tiền thành công")
+                fetchKhaDung(data.ngayBan, data.stk)
+            }, 3000);
         } catch (error) {
-            notification.DangerNotification(error.data.message)
-
+            if (error) {
+                notification.DangerNotification(error.data.message)
+            }
         }
     }
     useEffect(() => {
         fetchBank()
     }, []);
+    // useEffect(() => {
+    //     const backAction = () => {
+    //         Alert.alert("Thoát chức năng!", "Are you sure you want to go back?", [
+    //             {
+    //                 text: "Cancel",
+    //                 onPress: () => null,
+    //                 style: "cancel"
+    //             },
+    //             { text: "YES", onPress: () => BackHandler.exitApp() }
+    //         ]);
+    //         return true;
+    //     };
 
+    //     const backHandler = BackHandler.addEventListener(
+    //         "hardwareBackPress",
+    //         backAction
+    //     );
+
+    //     return () => backHandler.remove();
+    // }, []);
     const [visible, setVisible] = useState(false)
     const toggleOverlay = () => {
         setVisible(!visible);
@@ -87,7 +115,7 @@ function AdvanceMoneyScreen({ navigation }) {
             setError(true)
             return
         }
-        // fetchPhiUng()
+        fetchPhiUng()
         setVisible(!visible)
     }
 
@@ -99,8 +127,8 @@ function AdvanceMoneyScreen({ navigation }) {
     const YourOwnComponent = () =>
         <View>
             <View style={{ ...styleModal.modalView, padding: 10, margin: 0 }}>
-                <Text style={{ ...styles.textTitleRBSheet, fontSize: 18, fontWeight: 'bold', marginBottom: 10, textAlign: 'center' }}>{`Số tiền ứng của bạn là: ${Formatter(data.soTien)} VND`}</Text>
-                {/* <Text style={{ ...styles.textTitleRBSheet, fontSize: 16, marginBottom: 20 }}>{`Phí ứng: ${PhiUng}`}</Text> */}
+                <Text style={{ ...styles.textTitleRBSheet, fontSize: 18, fontWeight: 'bold', marginBottom: 5, textAlign: 'center' }}>{`Số tiền ứng của bạn là: ${Formatter(data.soTien)} VND`}</Text>
+                <Text style={{ ...styles.textTitleRBSheet, fontSize: 14, marginBottom: 20, fontStyle: 'italic' }}>{`(Phí ứng: ${Formatter(PhiUng)})`}</Text>
                 <View style={styles.wrapperLabel}>
                     <TouchableOpacity onPress={handleSubmitLend}>
                         <LinearGradient
@@ -139,12 +167,12 @@ function AdvanceMoneyScreen({ navigation }) {
             } else {
                 setKhaDung(Formatter(0))
             }
-            console.log(date);
             setData({ ...data, ngayBan: date })
         } catch (error) {
-            console.log(error.data);
-            notification.DangerNotification(error.data.message)
-            // fetchKhaDung(data.ngayBan, stk)
+            // if (error) {
+            //     console.log(error.data.message);
+            //     notification.DangerNotification(error.data.message)
+            // }
         }
     }
     const onDateChange = (e, selectedDate) => {
@@ -158,9 +186,30 @@ function AdvanceMoneyScreen({ navigation }) {
             setError(true)
         } else setError(false)
     };
+
+    useEffect(() => {
+        const backAction = () => {
+            Alert.alert("Thoát chức năng!", `Bạn có muốn thoát không?`, [
+                {
+                    text: "Hủy",
+                    onPress: () => null,
+                    style: "cancel"
+                },
+                { text: "Thoát", onPress: () => navigation.replace('HomeApp') }
+            ]);
+            return true;
+        };
+
+        const backHandler = BackHandler.addEventListener(
+            "hardwareBackPress",
+            backAction
+        );
+
+        return () => backHandler.remove();
+    }, []);
     return (
         <View style={styles.container}>
-            <CustomHeader title="" navigation={navigation} />
+            <CustomHeader title="Ứng tiền bán" navigation={navigation} />
             <View style={styles.content}>
                 <View style={styles.content_wp}>
                     <View style={styles.textStyle}>
@@ -218,6 +267,7 @@ function AdvanceMoneyScreen({ navigation }) {
             >
                 <YourOwnComponent />
             </Overlay>
+            <Loading loading={loading} />
 
         </View>
     )

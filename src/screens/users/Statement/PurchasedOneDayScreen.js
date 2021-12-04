@@ -1,7 +1,7 @@
 import { format } from 'date-fns';
 import { LinearGradient } from 'expo-linear-gradient';
 import React, { useEffect, useState } from 'react';
-import { Alert, Button, FlatList, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Button, FlatList, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { Overlay } from 'react-native-elements';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import * as Api from '../../../api/Statement';
@@ -9,27 +9,25 @@ import styleModal from '../../../common/styleModal';
 import Styles from '../../../common/StyleTable';
 import Color from '../../../constants/Colors';
 import Formatter from '../../../helpers/formatNumber';
-
+import Loading from '../../../helpers/Loading';
+import * as notification from '../../../helpers/Notification';
 export default function PurchasedOneDayScreen({ navigation }) {
     const [columns, setColumns] = useState(['MaCK', 'Mua/Bán', 'KLượng Khớp/Tổng KLượng', 'Trạng thái', 'Giá khớp'])
     const [detail, setDetail] = useState(['Giá', 'Tổng KL', 'SL Khớp', 'Hủy lệnh'])
     const [currentMaCK, setCurrentMaCK] = useState([])
     const [tableData, setTableData] = useState([])
+    const [loading, setLoading] = useState(false)
     useEffect(() => {
         const unsubscribe = navigation.addListener('focus', () => {
-            const fetchApi = async () => {
-                const res = await Api.PurchasedOneDay()
-                setTableData(res.data.list)
-            }
             fetchApi()
         });
         return unsubscribe;
     }, [navigation]);
+    const fetchApi = async () => {
+        const res = await Api.PurchasedOneDay()
+        setTableData(res.data.list)
+    }
     useEffect(() => {
-        const fetchApi = async () => {
-            const res = await Api.PurchasedOneDay()
-            setTableData(res.data.list)
-        }
         fetchApi()
     }, []);
 
@@ -146,10 +144,15 @@ export default function PurchasedOneDayScreen({ navigation }) {
     const handleOkDelete = async () => {
         const res = await Api.CancelStock(currentMaCK.maLD)
         if (res.data.status === 0) {
-            Alert.alert('Thành công', res.data.message)
+            setLoading(true)
+            setTimeout(() => {
+                setLoading(false)
+                notification.SuccessNotification(res.data.message)
+            }, 3000);
+            fetchApi()
         }
         else {
-            Alert.alert('Thất bại', res.data.message)
+            notification.DangerNotification(res.data.message)
         }
         setCancelVisible(false);
         setVisible(false)
@@ -171,7 +174,6 @@ export default function PurchasedOneDayScreen({ navigation }) {
                                     style={{ ...Styles.columnRowTxt, fontWeight: "bold", width: '20%', }}
                                     onPress={() => toggleModal(item)}
                                 >
-
                                     {item.maCP.trim()}</Text>
                                 <Text style={{ ...Styles.columnRowTxt, width: '20%', color: item.loaiGiaoDich ? Color.green : Color.red }}>{item.loaiGiaoDich ? 'Mua' : 'Bán'}</Text>
                                 <Text style={{ ...Styles.columnRowTxtLight, width: '20%' }}>{Formatter(item.slKhop) || '0'}/{Formatter(item.soLuong)}</Text>
@@ -197,6 +199,8 @@ export default function PurchasedOneDayScreen({ navigation }) {
             >
                 <YourCancelComponent />
             </Overlay>
+
+            <Loading loading={loading} />
         </View>
     )
 }

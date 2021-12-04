@@ -3,7 +3,7 @@ import { Text, TouchableOpacity, View } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 function CustomHeader(props) {
     let { isHome, title, navigation, route } = props
-
+   
     return (
         <View style={{ flexDirection: 'row', height: 50, paddingTop: 0, backgroundColor: '#37C2D0' }}>
             <View style={{ flex: 1, justifyContent: 'center' }}>

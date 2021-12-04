@@ -97,17 +97,7 @@ export function DrawerContent(props) {
                                 label="Thông tin khách hàng"
                                 onPress={() => { props.navigation.navigate('InformationScreen') }}
                             />
-                            {/* <DrawerItem
-                                icon={({ color, size }) => (
-                                    <Icon
-                                        name="ios-card-outline"
-                                        color={color}
-                                        size={size}
-                                    />
-                                )}
-                                label="Danh sách tài khoản"
-                                onPress={() => { props.navigation.navigate('Users') }}
-                            /> */}
+                           
                             <DrawerItem
                                 icon={({ color, size }) => (
                                     <Icon

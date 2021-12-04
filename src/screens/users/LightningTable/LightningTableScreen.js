@@ -45,6 +45,10 @@ function LightningTableScreen(props) {
         dispatch(fetchLightningTable(res.data))
     }
     useEffect(() => {
+        fetchApi()
+        searchFilterFunction(search)
+    }, []);
+    useEffect(() => {
         let hubConnection = new HubConnectionBuilder()
             .withUrl(config.BASE_URL + "/signalr")
             .configureLogging(LogLevel.Information)
@@ -54,9 +58,12 @@ function LightningTableScreen(props) {
             dispatch(FetchChangeListStocks(json));
         });
         hubConnection.start()
-        fetchApi()
-        searchFilterFunction(search)
     }, []);
+
+    useEffect(() => {
+        setFilteredDataSource(LightningTable);
+    }, [LightningTable])
+    
     useEffect(() => {
         if (orientation === 'LANDSCAPE') {
             setColumns(columnLandscape)
@@ -104,6 +111,9 @@ function LightningTableScreen(props) {
         </View>
     )
 
+    console.log('ready');
+
+
     const ClassNameRender = (giaTran, giaSan, giaTC, val) => {
         if (val === giaTran)
             return Color.ceil
@@ -139,9 +149,6 @@ function LightningTableScreen(props) {
     const searchFilterFunction = (text) => {
         // Check if searched text is not blank
         if (text) {
-            // Inserted text is not blank
-            // Filter the masterDataSource
-            // Update FilteredDataSource
             const newData = LightningTable.filter(function (item) {
                 const itemData = item.macp?.trim()
                     ? item.macp?.trim().toUpperCase()
@@ -156,6 +163,8 @@ function LightningTableScreen(props) {
             setSearch(text);
         }
     };
+
+
     return (
         <View >
             {orientation === 'PORTRAIT' ? <SearchBar
@@ -171,7 +180,7 @@ function LightningTableScreen(props) {
                 inputContainerStyle={orientation === 'PORTRAIT' ? { backgroundColor: '#f3f3f3', margin: 5 } : { width: '30%', backgroundColor: '#f3f3f3', padding: 0, margin: 0, fontSize: 13 }}
                 value={search}
             /> : null}
-            {isFocused ? <FlatList
+            <FlatList
                 data={filteredDataSource}
                 style={orientation === 'PORTRAIT' ? { width: "100%" } : { width: "100%", height: 190, marginTop: 5 }}
                 keyExtractor={(item, index) => index + ""}
@@ -213,18 +222,12 @@ function LightningTableScreen(props) {
                                             }}
                                         > {item.macp?.trim()}</Text>
                                     </Tooltip>
-
                                     <Text style={{ ...styles.columnRowStandard, width: '20%' }}>{item.giaTC / Price.PRICE}</Text>
                                     <Text style={{ ...styles.columnRowCeil, width: '20%' }}>{item.giaTran / Price.PRICE}</Text>
                                     <Text style={{ ...styles.columnRowFloor, width: '20%' }}>{item.giaSan / Price.PRICE}</Text>
                                     <Text style={{ ...styles.columnRowTxt, width: '20%' }}>{item.ktTong || '0'}</Text>
                                 </> :
                                 <>
-                                    {/* <Text
-                                        style={{ ...styles.columnRowTxt, fontSize: 12, fontWeight: "bold", width: "5.263157894736842%", color: ClassNameRender(item.giaTran, item.giaSan, item.giaTC, item.gia) }}
-                                    >
-                                        {item?.macp.trim()}</Text> */}
-
                                     <Tooltip
                                         backgroundColor='#08d4c4'
                                         withOverlay={false}
@@ -276,13 +279,11 @@ function LightningTableScreen(props) {
                                     <Text style={styles.columnRowTxtLandscape}>{item.ktTong || '0'}</Text>
                                 </>
                             }
-
-
                         </View>
 
                     )
                 }}
-            /> : null}
+            />
         </View>
 
     )

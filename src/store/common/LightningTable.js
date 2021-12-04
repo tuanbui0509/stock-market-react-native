@@ -10,6 +10,7 @@ const LightningTableSlice = createSlice({
             let element = action.payload;
             let index = findIndex(state, element);
             state[index] = element;
+            return state
         }
     }
 })
