@@ -70,7 +70,7 @@ function DetailRegisterFormScreen(props) {
 
     const YourOwnComponent = () =>
         <View>
-            <View style={{ ...styleModal.modalView, margin: 0, padding: 10 }}>
+            <View>
                 <Text style={{ ...styles.textTitleRBSheet, fontSize: 18, fontWeight: 'bold', marginBottom: 10, textAlign: 'center' }}>
                     {flag ? 'Bạn có muốn xác nhận đơn không?' : 'Bạn có muốn hủy đơn không?'}</Text>
                 <View style={styles.wrapperLabel}>
@@ -224,7 +224,7 @@ function DetailRegisterFormScreen(props) {
             <Overlay
                 isVisible={visible}
                 onBackdropPress={toggleOverlay}
-                overlayStyle={{ backgroundColor: 'transparent' }}
+            // overlayStyle={{ backgroundColor: 'transparent' }}
             >
                 <YourOwnComponent />
             </Overlay>
@@ -353,6 +353,7 @@ const styles = StyleSheet.create({
         // height: 40,
         paddingHorizontal: 12,
         width: 150,
+        fontSize: 14,
         borderWidth: 1,
         borderColor: '#d5d5d5',
     },

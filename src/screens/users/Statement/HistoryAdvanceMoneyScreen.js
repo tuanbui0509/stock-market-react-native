@@ -100,160 +100,77 @@ export default function HistoryAdvanceMoneyScreen({ navigation }) {
 
     return (
         <>
-            {orientation === 'PORTRAIT' ?
-                <View style={styles.container}>
-                    <View style={{ ...styles.content_wp, justifyContent: 'center' }}>
-                        <Text style={styles.text_title}>Số tài khoản: </Text>
-                        <View style={styles.textStyle}>
-                            <Picker
-                                selectedValue={data.stk}
-                                onValueChange={onChangeListBank}>
-                                {showStatusPicker}
-                            </Picker>
-                        </View>
+            <View style={styles.container}>
+                <View style={{ ...styles.content_wp, justifyContent: 'center' }}>
+                    <Text style={styles.text_title}>Số tài khoản: </Text>
+                    <View style={styles.textStyle}>
+                        <Picker
+                            selectedValue={data.stk}
+                            onValueChange={onChangeListBank}>
+                            {showStatusPicker}
+                        </Picker>
+                    </View>
+
+                </View>
+                <View style={styles.content_wp}>
+                    <View style={styles.box}>
+                        {showFrom && (
+                            <DateTimePicker
+                                value={new Date(data.from)}
+                                mode='date'
+                                name='from'
+                                maximumDate={new Date(data.to)}
+                                onChange={onFromChange}
+                            />
+                        )}
+                        <Text style={styles.text_title}>Từ ngày</Text>
+                        <Text style={styles.textInput} onPress={() => setShowFrom(true)}>{data.from.format('DD/MM/YYYY')}</Text>
 
                     </View>
-                    <View style={styles.content_wp}>
-                        <View style={styles.box}>
-                            {showFrom && (
-                                <DateTimePicker
-                                    value={new Date(data.from)}
-                                    mode='date'
-                                    name='from'
-                                    maximumDate={new Date(data.to)}
-                                    onChange={onFromChange}
-                                />
-                            )}
-                            <Text style={styles.text_title}>Từ ngày</Text>
-                            <Text style={styles.textInput} onPress={() => setShowFrom(true)}>{data.from.format('DD/MM/YYYY')}</Text>
+                    <View style={styles.box}>
+                        {showTo && (
+                            <DateTimePicker
+                                value={new Date(data.to)}
+                                mode='date'
+                                name='to'
+                                minimumDate={new Date(data.from)}
+                                maximumDate={new Date(moment())}
+                                onChange={onToChange}
+                            />
+                        )}
+                        <Text style={styles.text_title}>Đến ngày</Text>
+                        <Text style={styles.textInput} onPress={() => setShowTo(true)}>{data.to.format('DD/MM/YYYY')}</Text>
 
-                        </View>
-                        <View style={styles.box}>
-                            {showTo && (
-                                <DateTimePicker
-                                    value={new Date(data.to)}
-                                    mode='date'
-                                    name='to'
-                                    minimumDate={new Date(data.from)}
-                                    maximumDate={new Date(moment())}
-                                    onChange={onToChange}
-                                />
-                            )}
-                            <Text style={styles.text_title}>Đến ngày</Text>
-                            <Text style={styles.textInput} onPress={() => setShowTo(true)}>{data.to.format('DD/MM/YYYY')}</Text>
-
-                        </View>
                     </View>
-                    <TouchableOpacity onPress={handleSubmit}>
-                        <LinearGradient
-                            colors={[Color.btn_color, Color.bg_color]}
-                            style={styles.appButtonContainer}
-                        >
-                            <Text style={styles.appButtonText}>Cập nhật</Text>
-                        </LinearGradient>
-                    </TouchableOpacity>
-                    <FlatList
-                        data={tableData}
-                        style={{ width: "100%", marginTop: 10, height: 380 }}
-                        keyExtractor={(item, index) => index + ""}
-                        ListHeaderComponent={tableHeader}
-                        stickyHeaderIndices={[0]}
-                        renderItem={({ item, index }) => {
-                            return (
-                                <ScrollView >
-                                    <View style={{ ...Styles.tableRow, backgroundColor: index % 2 == 1 ? "#F0FBFC" : "white" }}>
-                                        <Text style={{ ...Styles.columnRowTxtLight, width: '25%' }}>{format(new Date(item.ngayYeuCau), 'dd/MM/yyyy kk:mm:ss')}</Text>
-                                        <Text style={{ ...Styles.columnRowTxtLight, width: '25%' }}>{format(new Date(item.ngayBan), 'dd/MM/yyyy kk:mm:ss')}</Text>
-                                        <Text style={{ ...Styles.columnRowTxtLight, width: '25%' }}>{Formatter(item.soTien)}</Text>
-                                        <Text style={{ ...Styles.columnRowTxtLight, width: '25%' }}>{Formatter(item.phiUng)}</Text>
-                                    </View>
-                                </ScrollView>
-                            )
-                        }}
-                    />
-                </View> :
-                <View style={styles.container}>
-                    {/* <View style={{ ...styles.content_wp, justifyContent: 'center' }}>
-                        <Text style={styles.text_title}>Số tài khoản: </Text>
-                        <View style={styles.textStyle_responsive}>
-                            <Picker
-                                selectedValue={data.stk}
-                                onValueChange={onChangeListBank}>
-                                {showStatusPicker}
-                            </Picker>
-                        </View>
-                    </View> */}
-                    <View style={{ ...styles.content_wp, justifyContent: 'center' }}>
-                        <View style={styles.box_responsive}>
-                            <Text style={styles.text_title}>STK: </Text>
-                            <View style={styles.textStyle_responsive}>
-                                <Picker
-                                    selectedValue={data.stk}
-                                    onValueChange={onChangeListBank}>
-                                    {showStatusPicker}
-                                </Picker>
-                            </View>
-                        </View>
-
-                        <View style={styles.box_responsive}>
-                            {showFrom && (
-                                <DateTimePicker
-                                    value={new Date(data.from)}
-                                    mode='date'
-                                    name='from'
-                                    maximumDate={new Date(data.to)}
-                                    onChange={onFromChange}
-                                    style={styles.styleDate_responsive}
-                                />
-                            )}
-                            <Text style={styles.text_title}>Từ ngày</Text>
-                            <Text style={styles.textInput_responsive} onPress={() => setShowFrom(true)}>{data.from.format('DD/MM/YYYY')}</Text>
-
-                        </View>
-                        <View style={styles.box_responsive}>
-                            {showTo && (
-                                <DateTimePicker
-                                    value={new Date(data.to)}
-                                    mode='date'
-                                    name='to'
-                                    minimumDate={new Date(data.from)}
-                                    maximumDate={new Date(moment())}
-                                    onChange={onToChange}
-                                />
-                            )}
-                            <Text style={styles.text_title}>Đến ngày</Text>
-                            <Text style={styles.textInput_responsive} onPress={() => setShowTo(true)}>{data.to.format('DD/MM/YYYY')}</Text>
-
-                        </View>
-                        <TouchableOpacity onPress={handleSubmit}>
-                            <LinearGradient
-                                colors={[Color.btn_color, Color.bg_color]}
-                                style={styles.appButtonContainer}
-                            >
-                                <Text style={{ ...styles.appButtonText, fontSize: 14 }}>Cập nhật</Text>
-                            </LinearGradient>
-                        </TouchableOpacity>
-                    </View>
-                    <FlatList
-                        data={tableData}
-                        style={{ width: "100%", marginTop: 10, height: Dimensions.get('window').height - variable.HEIGHT_RESPONSIVE }}
-                        keyExtractor={(item, index) => index + ""}
-                        ListHeaderComponent={tableHeader}
-                        stickyHeaderIndices={[0]}
-                        renderItem={({ item, index }) => {
-                            return (
-                                <ScrollView >
-                                    <View style={{ ...Styles.tableRow, backgroundColor: index % 2 == 1 ? "#F0FBFC" : "white" }}>
-                                        <Text style={{ ...Styles.columnRowTxtLight, width: '25%' }}>{format(new Date(item.ngayYeuCau), 'dd/MM/yyyy kk:mm:ss')}</Text>
-                                        <Text style={{ ...Styles.columnRowTxtLight, width: '25%' }}>{format(new Date(item.ngayBan), 'dd/MM/yyyy kk:mm:ss')}</Text>
-                                        <Text style={{ ...Styles.columnRowTxtLight, width: '25%' }}>{Formatter(item.soTien)}</Text>
-                                        <Text style={{ ...Styles.columnRowTxtLight, width: '25%' }}>{Formatter(item.phiUng)}</Text>
-                                    </View>
-                                </ScrollView>
-                            )
-                        }}
-                    />
-                </View>}
+                </View>
+                <TouchableOpacity onPress={handleSubmit}>
+                    <LinearGradient
+                        colors={[Color.btn_color, Color.bg_color]}
+                        style={styles.appButtonContainer}
+                    >
+                        <Text style={styles.appButtonText}>Cập nhật</Text>
+                    </LinearGradient>
+                </TouchableOpacity>
+                <FlatList
+                    data={tableData}
+                    style={{ width: "100%", marginTop: 10, height: 380 }}
+                    keyExtractor={(item, index) => index + ""}
+                    ListHeaderComponent={tableHeader}
+                    stickyHeaderIndices={[0]}
+                    renderItem={({ item, index }) => {
+                        return (
+                            <ScrollView >
+                                <View style={{ ...Styles.tableRow, backgroundColor: index % 2 == 1 ? "#F0FBFC" : "white" }}>
+                                    <Text style={{ ...Styles.columnRowTxtLight, width: '25%' }}>{format(new Date(item.ngayYeuCau), 'dd/MM/yyyy kk:mm:ss')}</Text>
+                                    <Text style={{ ...Styles.columnRowTxtLight, width: '25%' }}>{format(new Date(item.ngayBan), 'dd/MM/yyyy kk:mm:ss')}</Text>
+                                    <Text style={{ ...Styles.columnRowTxtLight, width: '25%' }}>{Formatter(item.soTien)}</Text>
+                                    <Text style={{ ...Styles.columnRowTxtLight, width: '25%' }}>{Formatter(item.phiUng)}</Text>
+                                </View>
+                            </ScrollView>
+                        )
+                    }}
+                />
+            </View>
         </>
     )
 }
@@ -333,30 +250,4 @@ const styles = StyleSheet.create({
         textTransform: "uppercase"
     },
 
-    // responsive
-    textStyle_responsive: {
-        paddingVertical: 5,
-        height: 30,
-        width: '100%',
-        borderWidth: StyleSheet.hairlineWidth,
-        fontSize: 14,
-        borderRadius: 10,
-    },
-    textInput_responsive: {
-        paddingHorizontal: 8,
-        paddingVertical: 5,
-        height: 30,
-        width: '60%',
-        marginLeft: 10,
-        borderWidth: StyleSheet.hairlineWidth,
-        borderRadius: 10,
-    },
-    box_responsive: {
-        flex: 1,
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-        marginRight: 20
-
-    },
 });

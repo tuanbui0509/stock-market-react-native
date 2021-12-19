@@ -8,14 +8,10 @@ import Formatter from '../../../helpers/formatNumber';
 
 
 export default function MyStockScreen({ navigation }) {
-    const columnPortrait = ['MaCP', 'Tổng', 'Khả dụng', 'Giá TT', 'Giá trị TT']
     const [columns, setColumns] = useState(['MaCP', 'Tổng', 'Khả dụng', 'Giá TT', 'Giá trị TT'])
-    const columnLandscape = ['MaCP', 'Tổng', 'Khả dụng', 'T0', 'T1', 'T2', 'Giá TT', 'Giá trị TT']
-
     const [detail, setDetail] = useState(['MaCP', 'Số dư T0', 'Số dư T1', 'Số dư T2'])
     const [tableData, setTableData] = useState([])
     const [currentSTK, setCurrentSTK] = useState([])
-    const [orientation, setOrientation] = useState();
 
 
 
@@ -32,67 +28,20 @@ export default function MyStockScreen({ navigation }) {
         })
         setTableData(res.data.list);
     }
-    const isPortrait = () => {
-        const dim = Dimensions.get('screen');
-        return dim.height >= dim.width;
-    };
-    useEffect(() => {
-        const unsubscribe = navigation.addListener('focus', () => {
-            if (isPortrait()) {
-                setColumns(columns)
-                setOrientation("PORTRAIT")
-            } else {
-                setOrientation("LANDSCAPE")
-                setColumns(columnLandscape)
-            }
-            fetchApi()
-        });
-        return unsubscribe;
-    }, [navigation]);
 
     useEffect(() => {
-        if (isPortrait()) {
-            setColumns(columnPortrait)
-            setOrientation("PORTRAIT")
-        } else {
-            setOrientation("LANDSCAPE")
-            setColumns(columnLandscape)
-        }
+
         fetchApi()
     }, [])
-    useEffect(() => {
-        const subscription = Dimensions.addEventListener('change', ({ window: { width, height } }) => {
-            if (width < height) {
-                setColumns(columnPortrait)
-                setOrientation("PORTRAIT")
-            } else {
-                setColumns(columnLandscape)
-                setOrientation("LANDSCAPE")
-            }
-        })
-        return () => subscription?.remove();
-    });
-
     const tableHeader = () => (
         <View style={styles.tableHeaderDetail}>
-            {orientation === 'PORTRAIT' ?
+            {
                 columns.map((column, index) => {
                     {
                         return (
                             <TouchableOpacity
                                 key={index}
                                 style={styles.columnHeader}>
-                                <Text style={styles.columnHeaderTxt}>{column}</Text>
-                            </TouchableOpacity>
-                        )
-                    }
-                }) :
-                columns.map((column, index) => {
-                    {
-                        return (
-                            <TouchableOpacity
-                                key={index}
-                                style={{ ...styles.columnHeader, width: '12.5%' }} >
                                 <Text style={styles.columnHeaderTxt}>{column}</Text>
                             </TouchableOpacity>
                         )
@@ -133,20 +82,6 @@ export default function MyStockScreen({ navigation }) {
         setVisible(!visible);
     };
 
-
-    // responsive
-    useEffect(() => {
-        const subscription = Dimensions.addEventListener('change', ({ window: { width, height } }) => {
-            if (width < height) {
-                setColumns(columns)
-                setOrientation("PORTRAIT")
-            } else {
-                setColumns(columnLandscape)
-                setOrientation("LANDSCAPE")
-            }
-        })
-        return () => subscription?.remove();
-    });
     const YourOwnComponent = () =>
         <View style={styleModal.centeredView}>
             <View style={styleModal.modalView}>
@@ -174,29 +109,15 @@ export default function MyStockScreen({ navigation }) {
                 renderItem={({ item, index }) => {
                     return (
                         <View style={{ ...styles.tableRow, backgroundColor: index % 2 == 1 ? "#F0FBFC" : "white" }}>
-                            {orientation === 'PORTRAIT' ?
-                                <>
-                                    <Text
-                                        style={{ ...styles.columnRowTxt, fontWeight: "bold" }}
-                                        onPress={() => toggleModal(item)} >
-                                        {item.maCp.trim()}</Text>
-                                    <Text style={styles.columnRowTxt}>{item.tongSo}</Text>
-                                    <Text style={styles.columnRowTxt}>{item.soLuong}</Text>
-                                    <Text style={styles.columnRowTxt}>{item.giaTT}</Text>
-                                    <Text style={styles.columnRowTxt}>{item.giaTriTT}</Text>
-                                </> :
-                                <>
-                                    <Text style={{ ...styles.columnRowTxt, width: '12.5%', fontWeight: "bold" }}>
-                                        {item.maCp.trim()}</Text>
-                                    <Text style={{ ...styles.columnRowTxt, width: '12.5%' }}>{item.tongSo}</Text>
-                                    <Text style={{ ...styles.columnRowTxt, width: '12.5%' }}>{item.soLuong}</Text>
-                                    <Text style={{ ...styles.columnRowTxt, width: '12.5%' }}>{item.giaTT}</Text>
-                                    <Text style={{ ...styles.columnRowTxt, width: '12.5%' }}>{item.soLuongT0}</Text>
-                                    <Text style={{ ...styles.columnRowTxt, width: '12.5%' }}>{item.soLuongT1}</Text>
-                                    <Text style={{ ...styles.columnRowTxt, width: '12.5%' }}>{item.soLuongT2}</Text>
-                                    <Text style={{ ...styles.columnRowTxt, width: '12.5%' }}>{item.giaTriTT}</Text>
-                                </>
-                            }
+                            <Text
+                                style={{ ...styles.columnRowTxt, fontWeight: "bold" }}
+                                onPress={() => toggleModal(item)} >
+                                {item.maCp.trim()}</Text>
+                            <Text style={styles.columnRowTxt}>{item.tongSo}</Text>
+                            <Text style={styles.columnRowTxt}>{item.soLuong}</Text>
+                            <Text style={styles.columnRowTxt}>{item.giaTT}</Text>
+                            <Text style={styles.columnRowTxt}>{item.giaTriTT}</Text>
+
                         </View>
 
                     )

@@ -1,8 +1,9 @@
 {
   "expo": {
-    "name": "stock-market-react-native",
+    "name": "Stock market",
     "slug": "stock-market-react-native",
-    "version": "1.0.0",
+    "description":"This is stock market app.",
+    "version": "2.0.0",
     "orientation": "default",
     "icon": "./assets/icon.png",
     "splash": {
@@ -20,6 +21,7 @@
       "supportsTablet": true
     },
     "android": {
+      "package":"ntnt.stockmarket",
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#FFFFFF"

@@ -3,7 +3,7 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useIsFocused } from '@react-navigation/core';
 import React, { useEffect, useState } from 'react';
 import { Dimensions, FlatList, TouchableOpacity, View } from 'react-native';
-import { Text, Tooltip, SearchBar } from 'react-native-elements';
+import { SearchBar, Text, Tooltip } from 'react-native-elements';
 import { useDispatch, useSelector } from 'react-redux';
 import * as Api from '../../../api/LightningTable';
 import config from "../../../axios/config";
@@ -15,6 +15,8 @@ import * as notification from '../../../helpers/Notification';
 import { useOrientation } from '../../../helpers/useOrientation';
 import { FetchChangeListStocks, fetchLightningTable } from '../../../store/common/LightningTable';
 import { fetchLightningTableFavored } from '../../../store/common/LightningTableFavored';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import * as ScreenOrientation from 'expo-screen-orientation';
 function LightningTableScreen(props) {
     let { navigation } = props
     const [columns, setColumns] = useState(['MaCK', 'TC', 'Trần', 'Sàn', 'Tổng KL'])
@@ -63,7 +65,7 @@ function LightningTableScreen(props) {
     useEffect(() => {
         setFilteredDataSource(LightningTable);
     }, [LightningTable])
-    
+
     useEffect(() => {
         if (orientation === 'LANDSCAPE') {
             setColumns(columnLandscape)
@@ -110,9 +112,6 @@ function LightningTableScreen(props) {
 
         </View>
     )
-
-    console.log('ready');
-
 
     const ClassNameRender = (giaTran, giaSan, giaTC, val) => {
         if (val === giaTran)
@@ -164,25 +163,64 @@ function LightningTableScreen(props) {
         }
     };
 
+    async function changeScreenOrientationLandscape() {
+        await ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.LANDSCAPE_LEFT);
+    }
+    async function changeScreenOrientationPortrait() {
+        await ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.PORTRAIT);
+    }
 
     return (
         <View >
-            {orientation === 'PORTRAIT' ? <SearchBar
-                round
-                searchIcon={{ size: 20 }}
-                onChangeText={(text) => searchFilterFunction(text)}
-                onClear={(text) => searchFilterFunction('')}
-                showCancel={false}
-                placeholder="Tìm mã cổ phiếu ..."
-                platform='Android'
-                lightTheme
-                containerStyle={{ padding: 0, backgroundColor: '#fff' }}
-                inputContainerStyle={orientation === 'PORTRAIT' ? { backgroundColor: '#f3f3f3', margin: 5 } : { width: '30%', backgroundColor: '#f3f3f3', padding: 0, margin: 0, fontSize: 13 }}
-                value={search}
-            /> : null}
+            {orientation === 'PORTRAIT' ? <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                <SearchBar
+                    round
+                    searchIcon={{ size: 20 }}
+                    onChangeText={(text) => searchFilterFunction(text)}
+                    onClear={(text) => searchFilterFunction('')}
+                    showCancel={false}
+                    placeholder="Tìm mã cổ phiếu ..."
+                    platform='Android'
+                    lightTheme
+                    containerStyle={{ padding: 0, backgroundColor: '#fff', flex: 1 }}
+                    inputContainerStyle={orientation === 'PORTRAIT' ? { backgroundColor: '#f3f3f3', margin: 5 } : { width: '30%', backgroundColor: '#f3f3f3', padding: 0, margin: 0, fontSize: 13 }}
+                    value={search}
+                />
+                <Icon
+                    name="phone-rotate-landscape"
+                    color={Color.bg_color}
+                    style={{ marginLeft: 10, marginRight: 10 }}
+                    size={18}
+                    onPress={changeScreenOrientationLandscape}
+                />
+            </View>
+                : <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                    <SearchBar
+                        round
+                        searchIcon={{ size: 20 }}
+                        onChangeText={(text) => searchFilterFunction(text)}
+                        onClear={(text) => searchFilterFunction('')}
+                        showCancel={false}
+                        placeholder="Tìm mã cổ phiếu ..."
+                        platform='Android'
+                        lightTheme
+                        containerStyle={{ padding: 0, flex: 2, backgroundColor: '#fff', borderRadius: 10, marginTop: 2 }}
+                        inputContainerStyle={{ width: '100%', backgroundColor: '#fff', padding: 0, margin: 0, fontSize: 13 }}
+                        value={search}
+                    />
+                    <View style={{ flexDirection: 'column', alignItems: 'flex-end', flex: 1, }}>
+                        <Icon
+                            name="phone-rotate-portrait"
+                            color={Color.bg_color}
+                            style={{ marginRight: 10 }}
+                            size={18}
+                            onPress={changeScreenOrientationPortrait}
+                        />
+                    </View>
+                </View>}
             <FlatList
                 data={filteredDataSource}
-                style={orientation === 'PORTRAIT' ? { width: "100%" } : { width: "100%", height: 190, marginTop: 5 }}
+                style={orientation === 'PORTRAIT' ? { width: "100%" } : { width: "100%", height: 140, marginTop: 2 }}
                 keyExtractor={(item, index) => index + ""}
                 ListHeaderComponent={tableHeader}
                 stickyHeaderIndices={[0]}

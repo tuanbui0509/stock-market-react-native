@@ -19,7 +19,6 @@ export default function HistoryOrderScreen({ navigation }) {
     const [columns, setColumns] = useState(['Mã CK', 'Mua/Bán', 'KLượng Khớp/Tổng KLượng', 'Giá khớp', 'Trạng thái'])
     const [detail, setDetail] = useState(['Mã CK', 'Giá', 'SL Khớp', 'Giá trị khớp'])
     const columnPortrait = ['Mã CK', 'Mua/Bán', 'KLượng Khớp/Tổng KLượng', 'Giá khớp', 'Trạng thái']
-    const columnLandscape = ['Mã CK', 'Mua/Bán', 'KLượng Khớp/Tổng KLượng', 'Ngày', 'Từ tài khoản', 'Giá', 'Giá khớp', 'Trạng thái']
     const [tableData, setTableData] = useState([])
     const [status, setStatus] = useState([])
     const [currentMaCK, setCurrentMaCK] = useState([])
@@ -50,13 +49,6 @@ export default function HistoryOrderScreen({ navigation }) {
         });
         return unsubscribe;
     }, [navigation]);
-    useEffect(() => {
-        if (orientation === 'LANDSCAPE') {
-            setColumns(columnLandscape)
-        } else if (orientation === 'PORTRAIT') {
-            setColumns(columnPortrait)
-        }
-    }, [orientation])
     const handleSubmit = async () => {
         const temp = { ...data, from: data.from.format('MM/DD/YYYY'), to: data.to.format('MM/DD/YYYY') }
         const paramsString = queryString.stringify(temp);
@@ -172,180 +164,96 @@ export default function HistoryOrderScreen({ navigation }) {
 
     return (
         <>
-            {orientation === 'PORTRAIT' ?
-                <View style={styles.container}>
-                    <View style={styles.content_wp}>
-                        <View style={styles.box}>
-                            <Text style={styles.text_title}>MaCK</Text>
-                            <TextInput
-                                name="maCK"
-                                style={styles.textInput}
-                                onChangeText={text => setData({ ...data, MaCK: text })}
-                                placeholder="MaCK"
-                                value={data.MaCK}
-                            />
-                        </View>
-                        <View style={styles.box}>
-                            <Text style={styles.text_title}>MaTT</Text>
-                            <View style={styles.textStyle}>
-                                <Picker
-                                    style={{ width: 150 }}
-                                    selectedValue={data.MaTT}
-                                    onValueChange={(itemValue) => setData({ ...data, MaTT: itemValue })} >
-                                    {showStatusPicker}
-                                </Picker>
-                            </View>
+            <View style={styles.container}>
+                <View style={styles.content_wp}>
+                    <View style={styles.box}>
+                        <Text style={styles.text_title}>MaCK</Text>
+                        <TextInput
+                            name="maCK"
+                            style={styles.textInput}
+                            onChangeText={text => setData({ ...data, MaCK: text })}
+                            placeholder="MaCK"
+                            value={data.MaCK}
+                        />
+                    </View>
+                    <View style={styles.box}>
+                        <Text style={styles.text_title}>MaTT</Text>
+                        <View style={styles.textStyle}>
+                            <Picker
+                                style={{ width: 150 }}
+                                selectedValue={data.MaTT}
+                                onValueChange={(itemValue) => setData({ ...data, MaTT: itemValue })} >
+                                {showStatusPicker}
+                            </Picker>
                         </View>
                     </View>
-                    <View style={styles.content_wp}>
-                        <View style={styles.box}>
-                            {showFrom && (
-                                <DateTimePicker
-                                    value={new Date(data.from)}
-                                    mode='date'
-                                    name='from'
-                                    maximumDate={new Date(data.to)}
-                                    onChange={onFromChange}
-                                />
-                            )}
-                            <Text style={styles.text_title}>Từ ngày</Text>
-                            <Text style={styles.textInput} onPress={() => setShowFrom(true)}>{data.from.format('DD/MM/YYYY')}</Text>
-
-                        </View>
-                        <View style={styles.box}>
-                            {showTo && (
-                                <DateTimePicker
-                                    value={new Date(data.to)}
-                                    mode='date'
-                                    name='to'
-                                    minimumDate={new Date(data.from)}
-                                    maximumDate={new Date(moment())}
-                                    onChange={onToChange}
-                                />
-                            )}
-                            <Text style={styles.text_title}>Đến ngày</Text>
-                            <Text style={styles.textInput} onPress={() => setShowTo(true)}>{data.to.format('DD/MM/YYYY')}</Text>
-
-                        </View>
-                    </View>
-                    <TouchableOpacity onPress={handleSubmit}>
-                        <LinearGradient
-                            colors={[Color.btn_color, Color.bg_color]}
-                            style={styles.appButtonContainer}
-                        >
-                            <Text style={styles.appButtonText}>Cập nhật</Text>
-                        </LinearGradient>
-                    </TouchableOpacity>
-                    <FlatList
-                        data={tableData}
-                        style={{ width: "100%", marginTop: 10, height: Dimensions.get('window').height - 360 }}
-                        keyExtractor={(item, index) => index + ""}
-                        ListHeaderComponent={tableHeader}
-                        stickyHeaderIndices={[0]}
-                        renderItem={({ item, index }) => {
-                            return (
-                                <ScrollView >
-                                    <View style={{ ...Styles.tableRow, backgroundColor: index % 2 == 1 ? "#F0FBFC" : "white" }}>
-                                        <Text
-                                            style={{ ...Styles.columnRowTxt, fontWeight: "bold" }}
-                                            onPress={() => toggleModal(item)}
-                                        >
-                                            {item.maCP.trim()}</Text>
-                                        <Text style={{ ...Styles.columnRowTxt, width: '20%', color: item.loaiGiaoDich ? Color.green : Color.red }}>{item.loaiGiaoDich ? 'Mua' : 'Bán'}</Text>
-                                        <Text style={{ ...Styles.columnRowTxt, width: '20%' }}>{Formatter(item.slKhop) || '0'}/{Formatter(item.soLuong)}</Text>
-                                        <Text style={{ ...Styles.columnRowTxt, width: '20%' }}>{Formatter(item.gia)}</Text>
-                                        <Text style={{ ...Styles.columnRowTxt, width: '20%', color: ClassNameRender(item.maTT.trim()) }}>{item.tenTrangThai}</Text>
-                                    </View>
-                                </ScrollView>
-                            )
-                        }}
-                    />
-
                 </View>
-                : <View style={styles.container}>
-                    <View style={styles.content_wp}>
-                        <View style={styles.box_responsive}>
-                            <Text style={{ ...styles.text_title, fontSize: 14 }}>MaCK</Text>
-                            <TextInput
-                                name="maCK"
-                                style={styles.textInput_responsive}
-                                onChangeText={text => setData({ ...data, MaCK: text })}
-                                placeholder="MaCK"
-                                value={data.MaCK}
+                <View style={styles.content_wp}>
+                    <View style={styles.box}>
+                        {showFrom && (
+                            <DateTimePicker
+                                value={new Date(data.from)}
+                                mode='date'
+                                name='from'
+                                maximumDate={new Date(data.to)}
+                                onChange={onFromChange}
                             />
-                        </View>
-                        <View style={styles.box_responsive}>
-                            <Text style={{ ...styles.text_title, fontSize: 14 }}>MaTT</Text>
-                            <View style={styles.textStyle_responsive}>
-                                <Picker
-                                    selectedValue={data.MaTT}
-                                    onValueChange={(itemValue) => setData({ ...data, MaTT: itemValue })} >
-                                    {showStatusPicker}
-                                </Picker>
-                            </View>
-                        </View>
-                        <View style={styles.box_responsive}>
-                            {showFrom && (
-                                <DateTimePicker
-                                    value={new Date(data.from)}
-                                    mode='date'
-                                    name='from'
-                                    maximumDate={new Date(data.to)}
-                                    onChange={onFromChange}
-                                />
-                            )}
-                            <Text style={{ ...styles.text_title, fontSize: 14 }}>Từ ngày</Text>
-                            <Text style={styles.textInput_responsive} onPress={() => setShowFrom(true)}>{data.from.format('DD/MM/YYYY')}</Text>
+                        )}
+                        <Text style={styles.text_title}>Từ ngày</Text>
+                        <Text style={styles.textInput} onPress={() => setShowFrom(true)}>{data.from.format('DD/MM/YYYY')}</Text>
 
-                        </View>
-                        <View style={styles.box_responsive}>
-                            {showTo && (
-                                <DateTimePicker
-                                    value={new Date(data.to)}
-                                    mode='date'
-                                    name='to'
-                                    minimumDate={new Date(data.from)}
-                                    maximumDate={new Date(moment())}
-                                    onChange={onToChange}
-                                />
-                            )}
-                            <Text style={{ ...styles.text_title, fontSize: 14 }}>Đến ngày</Text>
-                            <Text style={styles.textInput_responsive} onPress={() => setShowTo(true)}>{data.to.format('DD/MM/YYYY')}</Text>
-
-                        </View>
-                        <TouchableOpacity onPress={handleSubmit}>
-                            <LinearGradient
-                                colors={[Color.btn_color, Color.bg_color]}
-                                style={styles.appButtonContainer}
-                            >
-                                <Text style={{ ...styles.appButtonText, fontSize: 14 }}>Cập nhật</Text>
-                            </LinearGradient>
-                        </TouchableOpacity>
                     </View>
-                    <FlatList
-                        data={tableData}
-                        style={{ width: "100%", marginTop: 10, height: Dimensions.get('window').height - variable.HEIGHT_RESPONSIVE }}
-                        keyExtractor={(item, index) => index + ""}
-                        ListHeaderComponent={tableHeader}
-                        stickyHeaderIndices={[0]}
-                        renderItem={({ item, index }) => {
-                            return (
-                                <ScrollView >
-                                    <View style={{ ...Styles.tableRow, backgroundColor: index % 2 == 1 ? "#F0FBFC" : "white" }}>
-                                        <Text style={{ ...Styles.columnRowTxt, fontWeight: "bold", width: '12.5%' }} > {item.maCP.trim()}</Text>
-                                        <Text style={{ ...Styles.columnRowTxt, width: '12.5%', color: item.loaiGiaoDich ? Color.green : Color.red }}>{item.loaiGiaoDich ? 'Mua' : 'Bán'}</Text>
-                                        <Text style={{ ...Styles.columnRowTxt, width: '12.5%' }}>{Formatter(item.slKhop) || '0'}/{Formatter(item.soLuong)}</Text>
-                                        <Text style={{ ...Styles.columnRowTxt, width: '12.5%' }}>{format(new Date(item.thoiGian), 'dd/MM/yyyy kk:mm:ss')}</Text>
-                                        <Text style={{ ...Styles.columnRowTxt, width: '12.5%' }}>{(item.stk)}</Text>
-                                        <Text style={{ ...Styles.columnRowTxt, width: '12.5%' }}>{Formatter(item.gia)}</Text>
-                                        <Text style={{ ...Styles.columnRowTxt, width: '12.5%' }}>{Formatter(item.giaKhop) || '0'}</Text>
-                                        <Text style={{ ...Styles.columnRowTxt, width: '12.5%', color: ClassNameRender(item.maTT.trim()) }}>{item.tenTrangThai}</Text>
-                                    </View>
-                                </ScrollView>
-                            )
-                        }}
-                    />
-                </View>}
+                    <View style={styles.box}>
+                        {showTo && (
+                            <DateTimePicker
+                                value={new Date(data.to)}
+                                mode='date'
+                                name='to'
+                                minimumDate={new Date(data.from)}
+                                maximumDate={new Date(moment())}
+                                onChange={onToChange}
+                            />
+                        )}
+                        <Text style={styles.text_title}>Đến ngày</Text>
+                        <Text style={styles.textInput} onPress={() => setShowTo(true)}>{data.to.format('DD/MM/YYYY')}</Text>
+
+                    </View>
+                </View>
+                <TouchableOpacity onPress={handleSubmit}>
+                    <LinearGradient
+                        colors={[Color.btn_color, Color.bg_color]}
+                        style={styles.appButtonContainer}
+                    >
+                        <Text style={styles.appButtonText}>Cập nhật</Text>
+                    </LinearGradient>
+                </TouchableOpacity>
+                <FlatList
+                    data={tableData}
+                    style={{ width: "100%", marginTop: 10, height: Dimensions.get('window').height - 360 }}
+                    keyExtractor={(item, index) => index + ""}
+                    ListHeaderComponent={tableHeader}
+                    stickyHeaderIndices={[0]}
+                    renderItem={({ item, index }) => {
+                        return (
+                            <ScrollView >
+                                <View style={{ ...Styles.tableRow, backgroundColor: index % 2 == 1 ? "#F0FBFC" : "white" }}>
+                                    <Text
+                                        style={{ ...Styles.columnRowTxt, fontWeight: "bold" }}
+                                        onPress={() => toggleModal(item)}
+                                    >
+                                        {item.maCP.trim()}</Text>
+                                    <Text style={{ ...Styles.columnRowTxt, width: '20%', color: item.loaiGiaoDich ? Color.green : Color.red }}>{item.loaiGiaoDich ? 'Mua' : 'Bán'}</Text>
+                                    <Text style={{ ...Styles.columnRowTxt, width: '20%' }}>{Formatter(item.slKhop) || '0'}/{Formatter(item.soLuong)}</Text>
+                                    <Text style={{ ...Styles.columnRowTxt, width: '20%' }}>{Formatter(item.gia)}</Text>
+                                    <Text style={{ ...Styles.columnRowTxt, width: '20%', color: ClassNameRender(item.maTT.trim()) }}>{item.tenTrangThai}</Text>
+                                </View>
+                            </ScrollView>
+                        )
+                    }}
+                />
+
+            </View>
+
             <Overlay
                 isVisible={visible}
                 onBackdropPress={toggleOverlay}
@@ -400,7 +308,7 @@ const styles = StyleSheet.create({
         paddingVertical: 10,
         height: 40,
         fontSize: 11,
-        width: '80%',
+        width: '75%',
         marginLeft: 10,
         borderWidth: StyleSheet.hairlineWidth,
         borderRadius: 10,
@@ -430,32 +338,5 @@ const styles = StyleSheet.create({
         alignSelf: "center",
         textTransform: "uppercase"
     },
-    // responsive
-    textStyle_responsive: {
-        paddingVertical: 5,
-        height: 30,
-        marginTop: 5,
-        width: '100%',
-        borderWidth: StyleSheet.hairlineWidth,
-        fontSize: 14,
-        borderRadius: 10,
-    },
-    textInput_responsive: {
-        paddingVertical: 5,
-        height: 30,
-        paddingHorizontal: 8,
-        width: '80%',
-        marginTop: 5,
-        borderWidth: StyleSheet.hairlineWidth,
-        borderRadius: 10,
-        fontSize: 13
-    },
-    box_responsive: {
-        flex: 1,
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        marginRight: 20
-
-    },
+   
 });

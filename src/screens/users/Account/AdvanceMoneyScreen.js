@@ -86,26 +86,6 @@ function AdvanceMoneyScreen({ navigation }) {
     useEffect(() => {
         fetchBank()
     }, []);
-    // useEffect(() => {
-    //     const backAction = () => {
-    //         Alert.alert("Thoát chức năng!", "Are you sure you want to go back?", [
-    //             {
-    //                 text: "Cancel",
-    //                 onPress: () => null,
-    //                 style: "cancel"
-    //             },
-    //             { text: "YES", onPress: () => BackHandler.exitApp() }
-    //         ]);
-    //         return true;
-    //     };
-
-    //     const backHandler = BackHandler.addEventListener(
-    //         "hardwareBackPress",
-    //         backAction
-    //     );
-
-    //     return () => backHandler.remove();
-    // }, []);
     const [visible, setVisible] = useState(false)
     const toggleOverlay = () => {
         setVisible(!visible);
@@ -126,9 +106,9 @@ function AdvanceMoneyScreen({ navigation }) {
 
     const YourOwnComponent = () =>
         <View>
-            <View style={{ ...styleModal.modalView, padding: 10, margin: 0 }}>
+            <View>
                 <Text style={{ ...styles.textTitleRBSheet, fontSize: 18, fontWeight: 'bold', marginBottom: 5, textAlign: 'center' }}>{`Số tiền ứng của bạn là: ${Formatter(data.soTien)} VND`}</Text>
-                <Text style={{ ...styles.textTitleRBSheet, fontSize: 14, marginBottom: 20, fontStyle: 'italic' }}>{`(Phí ứng: ${Formatter(PhiUng)})`}</Text>
+                <Text style={{ ...styles.textTitleRBSheet, fontSize: 14, marginBottom: 20, fontStyle: 'italic', textAlign: 'center'  }}>{`(Phí ứng: ${Formatter(PhiUng)})`}</Text>
                 <View style={styles.wrapperLabel}>
                     <TouchableOpacity onPress={handleSubmitLend}>
                         <LinearGradient
@@ -263,7 +243,6 @@ function AdvanceMoneyScreen({ navigation }) {
             <Overlay
                 isVisible={visible}
                 onBackdropPress={toggleOverlay}
-                overlayStyle={{ backgroundColor: 'transparent' }}
             >
                 <YourOwnComponent />
             </Overlay>

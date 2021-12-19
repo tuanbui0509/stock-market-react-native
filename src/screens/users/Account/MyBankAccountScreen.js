@@ -11,13 +11,10 @@ import { fetchBankAccount } from '../../../store/users/BankAccount'
 export default function MyBankAccountScreen({ navigation }) {
     const BankAccount = useSelector(state => state.BankAccount)
     const dispatch = useDispatch()
-    const columnPortrait = ['STK', 'Số dư TK', 'Số dư khả dụng', 'Tổng số tiền']
-    const [columns, setColumns] = useState(['STK', 'Số dư TK', 'Tổng số tiền'])
+    const [columns, setColumns] = useState(['STK', 'Số dư TK', 'Số dư khả dụng', 'Tổng số tiền'])
     const [detail, setDetail] = useState(['Số dư T0', 'Số dư T1', 'Số dư T2', 'Bán chờ thanh toán'])
-    const columnLandscape = ['STK', 'Số dư TK', 'Tổng số tiền', 'Bán chờ thanh toán', 'Số dư T0', 'Số dư T1', 'Số dư T2']
     const [tableData, setTableData] = useState([])
     const [currentSTK, setCurrentSTK] = useState([])
-    const [orientation, setOrientation] = useState()
 
     const fetchApi = async () => {
         const res = await Api.MyBankAccount()
@@ -36,54 +33,20 @@ export default function MyBankAccountScreen({ navigation }) {
 
     useEffect(() => {
         const unsubscribe = navigation.addListener('focus', () => {
-            const isPortrait = () => {
-                const dim = Dimensions.get('screen')
-                return dim.height >= dim.width
-            }
-            if (isPortrait()) {
-                setColumns(columnPortrait)
-                setOrientation("PORTRAIT")
-            } else {
-                setOrientation("LANDSCAPE")
-                setColumns(columnLandscape)
-            }
             fetchApi()
         })
         return unsubscribe
     }, [navigation])
-    useEffect(() => {
-        const subscription = Dimensions.addEventListener('change', ({ window: { width, height } }) => {
-            if (width < height) {
-                setColumns(columnPortrait)
-                setOrientation("PORTRAIT")
-            } else {
-                setColumns(columnLandscape)
-                setOrientation("LANDSCAPE")
-            }
-        })
-        return () => subscription?.remove()
-    })
 
     const tableHeader = () => (
         <View style={styles.tableHeader}>
-            {orientation === 'PORTRAIT' ?
+            {
                 columns.map((column, index) => {
                     {
                         return (
                             <TouchableOpacity
                                 key={index}
                                 style={{ ...styles.columnHeader, width: '25%', padding: 0 }}>
-                                <Text style={{ ...styles.columnHeaderTxt, fontSize: 14 }}>{column}</Text>
-                            </TouchableOpacity>
-                        )
-                    }
-                }) :
-                columns.map((column, index) => {
-                    {
-                        return (
-                            <TouchableOpacity
-                                key={index}
-                                style={{ ...styles.columnHeader, width: '14.2%' }}>
                                 <Text style={{ ...styles.columnHeaderTxt, fontSize: 14 }}>{column}</Text>
                             </TouchableOpacity>
                         )
@@ -153,25 +116,12 @@ export default function MyBankAccountScreen({ navigation }) {
                     renderItem={({ item, index }) => {
                         return (
                             <View style={{ ...styles.tableRow, backgroundColor: index % 2 == 1 ? "#F0FBFC" : "white" }}>
-                                {orientation === 'PORTRAIT' ?
-                                    <>
-                                        <Text style={{ ...styles.columnRowTxt, fontWeight: "bold", width: "30%", fontSize: 13 }} onPress={() => toggleModal(item)}>
-                                            {item.stk.trim()}</Text>
-                                        <Text style={{ ...styles.columnRowTxt3, fontSize: 14, width: "20%", }}>{item.soDu}</Text>
-                                        <Text style={{ ...styles.columnRowTxt3, fontSize: 14, width: "25%", }}>{item.khaDung}</Text>
-                                        <Text style={{ ...styles.columnRowTxt3, fontSize: 14, width: "25%", }}>{item.tongSoTien}</Text>
-                                    </> :
-                                    <>
-                                        <Text style={{ ...styles.columnRowTxt, fontWeight: "bold", width: "20%" }}>
-                                            {item.stk.trim()}</Text>
-                                        <Text style={{ ...styles.columnRowTxt3, fontSize: 13, width: "13.3%", }}>{item.soDu}</Text>
-                                        <Text style={{ ...styles.columnRowTxt3, fontSize: 13, width: "13.3%", }}>{item.tongSoTien}</Text>
-                                        <Text style={{ ...styles.columnRowTxt3, fontSize: 13, width: "13.3%", }}>{item.choThanhToan}</Text>
-                                        <Text style={{ ...styles.columnRowTxt3, fontSize: 13, width: "13.3%", }}>{item.soDuT0}</Text>
-                                        <Text style={{ ...styles.columnRowTxt3, fontSize: 13, width: "13.3%", }}>{item.soDuT1}</Text>
-                                        <Text style={{ ...styles.columnRowTxt3, fontSize: 13, width: "13.3%", }}>{item.soDuT2}</Text>
-                                    </>
-                                }
+
+                                <Text style={{ ...styles.columnRowTxt, fontWeight: "bold", width: "30%", fontSize: 13 }} onPress={() => toggleModal(item)}>
+                                    {item.stk.trim()}</Text>
+                                <Text style={{ ...styles.columnRowTxt3, fontSize: 14, width: "20%", }}>{item.soDu}</Text>
+                                <Text style={{ ...styles.columnRowTxt3, fontSize: 14, width: "25%", }}>{item.khaDung}</Text>
+                                <Text style={{ ...styles.columnRowTxt3, fontSize: 14, width: "25%", }}>{item.tongSoTien}</Text>
                             </View>
 
                         )

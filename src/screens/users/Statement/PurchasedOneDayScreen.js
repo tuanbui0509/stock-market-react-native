@@ -119,7 +119,7 @@ export default function PurchasedOneDayScreen({ navigation }) {
 
 
     const YourCancelComponent = () =>
-        <View style={{ ...styleModal.modalView, margin: 0, padding: 15 }}>
+        <View>
             <Text style={{ ...styles.textTitle, fontWeight: 'bold', fontSize: 18, color: '#000' }}>Bạn có muốn hủy lệnh này không?</Text>
             <View style={styles.wrapperLabel}>
                 <TouchableOpacity onPress={handleOkDelete}>
@@ -195,7 +195,7 @@ export default function PurchasedOneDayScreen({ navigation }) {
             <Overlay
                 isVisible={isCancelVisible}
                 onBackdropPress={() => setCancelVisible(false)}
-                overlayStyle={{ backgroundColor: 'transparent' }}
+                // overlayStyle={{ backgroundColor: 'transparent' }}
             >
                 <YourCancelComponent />
             </Overlay>

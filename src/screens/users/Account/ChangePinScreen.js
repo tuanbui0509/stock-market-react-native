@@ -1,10 +1,7 @@
 import { LinearGradient } from 'expo-linear-gradient';
 import { Field, Formik } from 'formik';
-import React, { useState } from 'react';
-import {
-    Alert,
-    Platform, ScrollView, StyleSheet, Text, TouchableOpacity, View
-} from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { Alert, BackHandler, Platform, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import * as Animatable from 'react-native-animatable';
 import * as yup from 'yup';
 import * as Api from '../../../api/Account';
@@ -60,6 +57,26 @@ const ChangePinScreen = ({ navigation, route }) => {
         }
     }
 
+    useEffect(() => {
+        const backAction = () => {
+            Alert.alert("Thoát chức năng!", `Bạn có muốn thoát không?`, [
+                {
+                    text: "Hủy",
+                    onPress: () => null,
+                    style: "cancel"
+                },
+                { text: "Thoát", onPress: () => navigation.replace('HomeApp') }
+            ]);
+            return true;
+        };
+
+        const backHandler = BackHandler.addEventListener(
+            "hardwareBackPress",
+            backAction
+        );
+
+        return () => backHandler.remove();
+    }, []);
 
     return (
         <View style={styles.container}>

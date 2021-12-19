@@ -1,9 +1,7 @@
 import { LinearGradient } from 'expo-linear-gradient';
 import { Field, Formik } from 'formik';
-import React, { useState } from 'react';
-import {
-    Platform, ScrollView, StyleSheet, Text, TouchableOpacity, View
-} from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { Alert, BackHandler, Platform, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import * as Animatable from 'react-native-animatable';
 import * as yup from 'yup';
 import * as Api from '../../../api/Account';
@@ -15,18 +13,10 @@ import * as notification from '../../../helpers/Notification';
 const signUpValidationSchema = yup.object().shape({
     oldPassword: yup
         .string()
-        //   .matches(/\w*[a-z]\w*/,  "Password must have a small letter")
-        //   .matches(/\w*[A-Z]\w*/,  "Password must have a capital letter")
-        //   .matches(/\d/, "Password must have a number")
-        //   .matches(/[!@#$%^&*()\-_"=+{}; :,<.>]/, "Password must have a special character")
         .min(8, ({ min }) => `Mật khẩu ít nhất là ${min} ký tự`)
         .required('Mật khẩu cũ không được trống'),
     newPassword: yup
         .string()
-        //   .matches(/\w*[a-z]\w*/,  "Password must have a small letter")
-        //   .matches(/\w*[A-Z]\w*/,  "Password must have a capital letter")
-        //   .matches(/\d/, "Password must have a number")
-        //   .matches(/[!@#$%^&*()\-_"=+{}; :,<.>]/, "Password must have a special character")
         .min(8, ({ min }) => `Mật khẩu ít nhất là ${min} ký tự`)
         .required('Mật khẩu mới không được trống'),
     confirmPassword: yup
@@ -36,7 +26,6 @@ const signUpValidationSchema = yup.object().shape({
 })
 
 const ChangePasswordScreen = ({ navigation, route }) => {
-    const CurrentUser = route.params
     const [data, setData] = useState({
         oldPassword: '',
         newPassword: '',
@@ -62,6 +51,26 @@ const ChangePasswordScreen = ({ navigation, route }) => {
         }
     }
 
+    useEffect(() => {
+        const backAction = () => {
+            Alert.alert("Thoát chức năng!", `Bạn có muốn thoát không?`, [
+                {
+                    text: "Hủy",
+                    onPress: () => null,
+                    style: "cancel"
+                },
+                { text: "Thoát", onPress: () => navigation.replace('HomeApp') }
+            ]);
+            return true;
+        };
+
+        const backHandler = BackHandler.addEventListener(
+            "hardwareBackPress",
+            backAction
+        );
+
+        return () => backHandler.remove();
+    }, []);
 
     return (
         <View style={styles.container}>
@@ -166,22 +175,6 @@ const ChangePasswordScreen = ({ navigation, route }) => {
                             </>
                         )}
                     </Formik>
-
-
-
-
-
-
-
-                    {/* <View style={styles.textPrivate}>
-                        <Text style={styles.color_textPrivate}>
-                            By signing up you agree to our
-                        </Text>
-                        <Text style={[styles.color_textPrivate, { fontWeight: 'bold' }]}>{" "}Terms of service</Text>
-                        <Text style={styles.color_textPrivate}>{" "}and</Text>
-                        <Text style={[styles.color_textPrivate, { fontWeight: 'bold' }]}>{" "}Privacy policy</Text>
-                    </View> */}
-
                 </ScrollView>
             </Animatable.View>
         </View>
