@@ -17,7 +17,7 @@ import { useOrientation } from '../../../helpers/useOrientation';
 
 export default function HistoryOrderScreen({ navigation }) {
     const [columns, setColumns] = useState(['Mã CK', 'Mua/Bán', 'KLượng Khớp/Tổng KLượng', 'Giá khớp', 'Trạng thái'])
-    const [detail, setDetail] = useState(['Mã CK', 'Giá', 'SL Khớp', 'Giá trị khớp'])
+    const [detail, setDetail] = useState(['Mã CK', 'Loại lệnh', 'Giá đặt', 'Giá trị sau phí'])
     const columnPortrait = ['Mã CK', 'Mua/Bán', 'KLượng Khớp/Tổng KLượng', 'Giá khớp', 'Trạng thái']
     const [tableData, setTableData] = useState([])
     const [status, setStatus] = useState([])
@@ -121,7 +121,7 @@ export default function HistoryOrderScreen({ navigation }) {
                             <TouchableOpacity
                                 key={index}
                                 style={{ ...Styles.columnHeader, width: '25%' }} >
-                                <Text style={{ ...Styles.columnHeaderTxt, fontSize: 14 }}>{column} </Text>
+                                <Text style={{ ...Styles.columnHeaderTxt, fontSize: 13 }}>{column} </Text>
                             </TouchableOpacity>
                         )
                     }
@@ -146,17 +146,18 @@ export default function HistoryOrderScreen({ navigation }) {
         <View style={styleModal.centeredView}>
             <View style={styleModal.modalView}>
                 {/* <Text style={{ ...Styles.textTitleRBSheet, fontSize: 16 }}>Mã cổ phiếu: {currentMaCK.maCP}</Text> */}
-                <Text style={{ ...Styles.textTitleRBSheet, fontSize: 16 }}>STK: {currentMaCK.stk}</Text>
-                <Text style={{ ...Styles.textTitleRBSheet, fontSize: 16 }}>Thời gian: {format(new Date(currentMaCK.thoiGian), 'dd/MM/yyyy kk:mm:ss')}</Text>
+                <Text style={{ ...Styles.textTitleRBSheet, fontSize: 15 }}>STK: {currentMaCK.stk}</Text>
+                <Text style={{ ...Styles.textTitleRBSheet, fontSize: 13 }}>Thời gian: {format(new Date(currentMaCK.thoiGian), 'dd/MM/yyyy kk:mm:ss')}</Text>
+                {currentMaCK.tgk && <Text style={{ ...Styles.textTitleRBSheet, fontSize: 13 }}>Thời gian khớp: {format(new Date(currentMaCK.tgk), 'dd/MM/yyyy kk:mm:ss')}</Text>}
                 <FlatList
                     style={{ paddingTop: 5 }}
                     ListHeaderComponent={tableHeaderDetail()}
                 />
                 <View style={{ ...Styles.tableRow, backgroundColor: "#F0FBFC", paddingBottom: 20 }}>
                     <Text style={{ ...Styles.textBodyRBSheet, width: '25%', fontSize: 13 }}>{Formatter(currentMaCK.maCP.trim())}</Text>
-                    <Text style={{ ...Styles.textBodyRBSheet, width: '25%', fontSize: 13 }}>{Formatter(currentMaCK.giaKhop) || '0'}</Text>
-                    <Text style={{ ...Styles.textBodyRBSheet, width: '25%', fontSize: 13 }}>{Formatter(currentMaCK.slKhop) || '0'}</Text>
-                    <Text style={{ ...Styles.textBodyRBSheet, width: '25%', fontSize: 13 }}>{Formatter(currentMaCK.giaTriKhop) || '0'}</Text>
+                    <Text style={{ ...Styles.textBodyRBSheet, width: '25%', fontSize: 13 }}>{currentMaCK.maLL}</Text>
+                    <Text style={{ ...Styles.textBodyRBSheet, width: '25%', fontSize: 13 }}>{Formatter(currentMaCK.gia) || '0'}</Text>
+                    <Text style={{ ...Styles.textBodyRBSheet, width: '25%', fontSize: 13 }}>{Formatter(currentMaCK.giaTriKhopSauPhi) || '0'}</Text>
                 </View>
                 <Button title="Đóng" onPress={() => setVisible(false)} />
             </View>
@@ -338,5 +339,5 @@ const styles = StyleSheet.create({
         alignSelf: "center",
         textTransform: "uppercase"
     },
-   
+
 });

@@ -60,7 +60,7 @@ const styles = StyleSheet.create({
     },
     columnRowTxtLight: {
         textAlign: "center",
-        fontSize: 15,
+        fontSize: 14,
     },
     columnRowTxt4: {
         width: "25%",

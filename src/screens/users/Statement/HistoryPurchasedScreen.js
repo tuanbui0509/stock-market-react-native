@@ -18,7 +18,7 @@ import { useOrientation } from '../../../helpers/useOrientation';
 export default function HistoryPurchasedScreen({ navigation }) {
     const [columns, setColumns] = useState(['Mã CK', 'Mua/Bán', 'KLượng Khớp/Tổng KLượng', 'Giá khớp', 'Trạng thái'])
     const columnPortrait = ['Mã CK', 'Mua/Bán', 'KLượng Khớp/Tổng KLượng', 'Giá khớp', 'Trạng thái']
-    const [detail, setDetail] = useState(['Mã CK', 'Giá', 'SL Khớp', 'Giá trị khớp'])
+    const [detail, setDetail] = useState(['Mã CK', 'Loại lệnh', 'Giá đặt', 'Giá trị sau phí'])
     const [tableData, setTableData] = useState([])
     const [status, setStatus] = useState([])
     const [currentMaCK, setCurrentMaCK] = useState([])
@@ -32,7 +32,7 @@ export default function HistoryPurchasedScreen({ navigation }) {
         current: 1,
         pageSize: 10000
     })
-   
+
     useEffect(() => {
         const unsubscribe = navigation.addListener('focus', () => {
             const fetchStatus = async () => {
@@ -42,7 +42,6 @@ export default function HistoryPurchasedScreen({ navigation }) {
             const fetchApi = async () => {
                 const temp = { ...data, from: data.from.format('MM/DD/YYYY'), to: data.to.format('MM/DD/YYYY') }
                 const paramsString = queryString.stringify(temp);
-                // console.log(paramsString);
                 const res = await Api.HistoryPurchased(paramsString)
                 setTableData(res.data.list)
             }
@@ -147,18 +146,18 @@ export default function HistoryPurchasedScreen({ navigation }) {
     const YourOwnComponent = () =>
         <View style={styleModal.centeredView}>
             <View style={styleModal.modalView}>
-                {/* <Text style={{ ...Styles.textTitleRBSheet, fontSize: 16 }}>Mã cổ phiếu: {currentMaCK.maCP}</Text> */}
-                <Text style={{ ...Styles.textTitleRBSheet, fontSize: 16 }}>STK: {currentMaCK.stk}</Text>
-                <Text style={{ ...Styles.textTitleRBSheet, fontSize: 16 }}>Thời gian: {format(new Date(currentMaCK.thoiGian), 'dd/MM/yyyy kk:mm:ss')}</Text>
+                <Text style={{ ...Styles.textTitleRBSheet, fontSize: 15 }}>STK: {currentMaCK.stk}</Text>
+                <Text style={{ ...Styles.textTitleRBSheet, fontSize: 13 }}>Thời gian: {format(new Date(currentMaCK.thoiGian), 'dd/MM/yyyy kk:mm:ss')}</Text>
+                {currentMaCK.tgk && <Text style={{ ...Styles.textTitleRBSheet, fontSize: 13 }}>Thời gian khớp: {format(new Date(currentMaCK.tgk), 'dd/MM/yyyy kk:mm:ss')}</Text>}
                 <FlatList
                     style={{ paddingTop: 5 }}
                     ListHeaderComponent={tableHeaderDetail()}
                 />
                 <View style={{ ...Styles.tableRow, backgroundColor: "#F0FBFC", paddingBottom: 20 }}>
                     <Text style={{ ...Styles.textBodyRBSheet, width: '25%', fontSize: 13 }}>{Formatter(currentMaCK.maCP.trim())}</Text>
-                    <Text style={{ ...Styles.textBodyRBSheet, width: '25%', fontSize: 13 }}>{Formatter(currentMaCK.giaKhop) || '0'}</Text>
-                    <Text style={{ ...Styles.textBodyRBSheet, width: '25%', fontSize: 13 }}>{Formatter(currentMaCK.slKhop) || '0'}</Text>
-                    <Text style={{ ...Styles.textBodyRBSheet, width: '25%', fontSize: 13 }}>{Formatter(currentMaCK.giaTriKhop) || '0'}</Text>
+                    <Text style={{ ...Styles.textBodyRBSheet, width: '25%', fontSize: 13 }}>{currentMaCK.maLL}</Text>
+                    <Text style={{ ...Styles.textBodyRBSheet, width: '25%', fontSize: 13 }}>{Formatter(currentMaCK.gia) || '0'}</Text>
+                    <Text style={{ ...Styles.textBodyRBSheet, width: '25%', fontSize: 13 }}>{Formatter(currentMaCK.giaTriKhopSauPhi) || '0'}</Text>
                 </View>
                 <Button title="Đóng" onPress={() => setVisible(false)} />
             </View>

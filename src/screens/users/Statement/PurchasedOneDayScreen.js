@@ -13,7 +13,7 @@ import Loading from '../../../helpers/Loading';
 import * as notification from '../../../helpers/Notification';
 export default function PurchasedOneDayScreen({ navigation }) {
     const [columns, setColumns] = useState(['MaCK', 'Mua/Bán', 'KLượng Khớp/Tổng KLượng', 'Trạng thái', 'Giá khớp'])
-    const [detail, setDetail] = useState(['Giá', 'Tổng KL', 'SL Khớp', 'Hủy lệnh'])
+    const [detail, setDetail] = useState(['Giá đặt', 'Loại lệnh', 'Giá trị sau phí', 'Hủy lệnh'])
     const [currentMaCK, setCurrentMaCK] = useState([])
     const [tableData, setTableData] = useState([])
     const [loading, setLoading] = useState(false)
@@ -94,17 +94,17 @@ export default function PurchasedOneDayScreen({ navigation }) {
     const YourOwnComponent = () =>
         <View style={styleModal.centeredView}>
             <View style={styleModal.modalView}>
-                <Text style={{ ...Styles.textTitleRBSheet, fontSize: 16 }}>STK: {currentMaCK.stk}</Text>
-                <Text style={{ ...Styles.textTitleRBSheet, fontSize: 16 }}>Thời gian: {format(new Date(currentMaCK.thoiGian), 'dd/MM/yyyy kk:mm:ss')}</Text>
+                <Text style={{ ...Styles.textTitleRBSheet, fontSize: 15 }}>STK: {currentMaCK.stk}</Text>
+                <Text style={{ ...Styles.textTitleRBSheet, fontSize: 13 }}>Thời gian: {format(new Date(currentMaCK.thoiGian), 'dd/MM/yyyy kk:mm:ss')}</Text>
+                {currentMaCK.tgk && <Text style={{ ...Styles.textTitleRBSheet, fontSize: 13 }}>Thời gian khớp: {format(new Date(currentMaCK.tgk), 'dd/MM/yyyy kk:mm:ss')}</Text>}
                 <FlatList
                     style={{ paddingTop: 5 }}
                     ListHeaderComponent={tableHeaderDetail()}
                 />
                 <View style={{ ...Styles.tableRow, backgroundColor: "#F0FBFC", paddingBottom: 20 }}>
                     <Text style={{ ...Styles.textBodyRBSheet, width: '25%', fontSize: 13 }}>{Formatter(currentMaCK.gia) || '0'}</Text>
-                    <Text style={{ ...Styles.textBodyRBSheet, width: '25%', fontSize: 13 }}>{Formatter(currentMaCK.soLuong) || '0'}</Text>
-                    <Text style={{ ...Styles.textBodyRBSheet, width: '25%', fontSize: 13 }}>{Formatter(currentMaCK.slKhop) || '0'}</Text>
-                    {/* <Text style={{ ...Styles.textBodyRBSheet, width: '25%', fontSize: 13 }}>{Formatter(currentMaCK.giaTriKhop) || '0'}</Text> */}
+                    <Text style={{ ...Styles.textBodyRBSheet, width: '25%', fontSize: 13 }}>{currentMaCK.maLL}</Text>
+                    <Text style={{ ...Styles.textBodyRBSheet, width: '25%', fontSize: 13 }}>{Formatter(currentMaCK.giaTriKhopSauPhi) || '0'}</Text>
                     <Text style={{ ...Styles.columnRowTxtLight, width: '20%' }} onPress={() => toggleModalCancel(currentMaCK)}>
                         {currentMaCK.maTT.trim() === 'CK' ? <Icon
                             name="times"
@@ -157,7 +157,6 @@ export default function PurchasedOneDayScreen({ navigation }) {
         setCancelVisible(false);
         setVisible(false)
     }
-
     return (
         <View style={Styles.container}>
             <FlatList
@@ -178,7 +177,7 @@ export default function PurchasedOneDayScreen({ navigation }) {
                                 <Text style={{ ...Styles.columnRowTxt, width: '20%', color: item.loaiGiaoDich ? Color.green : Color.red }}>{item.loaiGiaoDich ? 'Mua' : 'Bán'}</Text>
                                 <Text style={{ ...Styles.columnRowTxtLight, width: '20%' }}>{Formatter(item.slKhop) || '0'}/{Formatter(item.soLuong)}</Text>
                                 <Text style={{ ...Styles.columnRowTxt, width: '20%', color: ClassNameRender(item.maTT.trim()) }}>{item.tenTrangThai}</Text>
-                                <Text style={{ ...Styles.columnRowTxt, width: '20%', color: ClassNameRender(item.maTT.trim()) }}>{Formatter(item.gia)}</Text>
+                                <Text style={{ ...Styles.columnRowTxt, width: '20%', color: ClassNameRender(item.maTT.trim()) }}>{Formatter(item.giaKhop)}</Text>
                             </View>
                         </ScrollView>
                     )
@@ -195,7 +194,7 @@ export default function PurchasedOneDayScreen({ navigation }) {
             <Overlay
                 isVisible={isCancelVisible}
                 onBackdropPress={() => setCancelVisible(false)}
-                // overlayStyle={{ backgroundColor: 'transparent' }}
+            // overlayStyle={{ backgroundColor: 'transparent' }}
             >
                 <YourCancelComponent />
             </Overlay>
